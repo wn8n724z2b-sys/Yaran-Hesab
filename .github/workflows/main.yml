@@ -1,6 +1,3 @@
-name: Build Yaran for Windows
-on: workflow_dispatch: push: branches: - main
-jobs: build-windows: runs-on: windows-latest
 steps:
   - name: Checkout source
     uses: actions/checkout@v4
@@ -14,11 +11,6 @@ steps:
     uses: dtolnay/rust-toolchain@stable
     with:
       targets: x86_64-pc-windows-msvc
-
-  - name: Cache Rust build
-    uses: swatinem/rust-cache@v2
-    with:
-      workspaces: "Yaran-Native-v1-Alpha-CloudBuild/src-tauri -> target"
 
   - name: Install dependencies
     working-directory: Yaran-Native-v1-Alpha-CloudBuild
