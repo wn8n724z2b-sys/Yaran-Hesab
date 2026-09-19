@@ -1,8 +1,8 @@
 {
   "name": "hesabdari-asan-native",
   "private": true,
-  "version": "2.2.0",
-  "description": "حسابداری آسان v2.2 - Sales-first UX",
+  "version": "3.0.0",
+  "description": "حسابداری آسان v3.0 - UI Reset / Sales-first Desktop",
   "scripts": {
     "tauri": "tauri",
     "dev": "npm run prepare-font && tauri dev",
@@ -10,7 +10,7 @@
     "prepare-font": "node scripts/prepare-vazirmatn.mjs"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.0.0"
+    "@tauri-apps/cli": "^3.0.0"
   },
   "dependencies": {
     "@fontsource-variable/vazirmatn": "5.3.0"

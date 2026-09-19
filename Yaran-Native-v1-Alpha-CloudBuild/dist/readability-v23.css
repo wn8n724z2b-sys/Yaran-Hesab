@@ -1,0 +1,66 @@
+/* =========================================================
+   حسابداری آسان v2.3 — Readability & native-dialog polish
+   هدف: خوانایی استاندارد دسکتاپ بدون بزرگ‌نمایی عمومی UI.
+   ریزمتن‌های 8–10px حذف شده، تراکم جدول‌ها کاهش یافته و
+   فقط اطلاعات ضروری در اندازه‌های کم‌عرض نمایش داده می‌شوند.
+   ========================================================= */
+:root{
+  --sidebar:248px;
+  --ui-body:14.5px;
+  --ui-secondary:12.25px;
+  --ui-caption:11.5px;
+  --ui-row:50px;
+}
+html[data-theme="light"]{--muted:#617282;--line:#dfe6ec;--panel-soft:#f5f8fb}
+html[data-theme="dark"]{--muted:#a7b5c1;--line:#2a3c4d;--panel-soft:#1d2b38}
+body{font-size:var(--ui-body)!important;font-weight:460!important;line-height:1.68!important}
+
+/* Telegram-like information density: fewer micro labels, more breathing room. */
+.brand{padding:5px 8px 16px!important}.brand-title{font-size:18.5px!important;line-height:1.4}.brand-sub{font-size:11.5px!important;letter-spacing:.15px!important;margin-top:2px!important}
+.nav{gap:5px!important}.nav-item{min-height:46px!important;padding:10px 12px!important}.nav-item b{font-size:14px!important;font-weight:620!important}.nav-item span{font-size:18px!important}
+.creator-footer{min-height:66px!important;padding:10px 8px!important}.creator-footer small{font-size:11px!important}.creator-footer strong{font-size:11.5px!important;line-height:1.45!important}.creator-footer em{font-size:10.5px!important;margin-top:2px!important}
+
+.topbar{flex-basis:74px!important;height:74px!important;min-height:74px!important;padding:9px 20px!important}.page-title-wrap h1{font-size:20px!important}.page-title-wrap p{font-size:12px!important;line-height:1.45!important}.global-search{height:43px!important}.global-search input{font-size:13.5px!important}.global-search kbd,.pos-shortcuts kbd{font-size:10.5px!important}
+.work-session.work-session-solid{height:46px!important;min-width:184px!important}.work-session.work-session-solid .work-copy small{font-size:11px!important}.work-session.work-session-solid b{font-size:13.5px!important}.clock{font-size:12.5px!important}
+
+.page{padding:20px 22px 32px!important}.panel-head{padding:16px 17px!important}.panel-head h3{font-size:15.5px!important;font-weight:680!important}.panel-head p{font-size:12px!important;line-height:1.55!important;color:var(--muted)!important}
+.metric-card{padding:17px!important}.metric-card>span,.metric-label span{font-size:12.5px!important}.metric-card small{font-size:11.5px!important;line-height:1.5!important}.metric-card strong{font-size:25px!important}.mini-stat{min-height:50px!important;padding:11px 13px!important}.mini-stat span{font-size:12px!important}.mini-stat b{font-size:13px!important}
+.status-chip,.money-toggle b{font-size:12px!important}
+
+/* Tables: not bigger for the sake of size — more line-height, contrast and row rhythm. */
+.table-wrap th{font-size:11.75px!important;font-weight:680!important;color:var(--muted)!important;padding:12px 15px!important;line-height:1.45!important}
+.table-wrap td{font-size:13.25px!important;font-weight:480!important;padding:13px 15px!important;line-height:1.55!important;min-height:var(--ui-row)}
+.table-wrap tbody tr{height:50px}.table-wrap tbody tr+tr{border-top:1px solid color-mix(in srgb,var(--line) 74%,transparent)}
+.table-wrap tbody tr:hover{background:color-mix(in srgb,var(--accent) 5%,transparent)!important}
+.list-row{min-height:50px!important;padding:11px 4px!important}.list-row strong{font-size:13.25px!important}.list-row small{font-size:11.5px!important;line-height:1.5!important}
+.pill{font-size:11.5px!important;padding:5px 9px!important}
+
+/* Forms and buttons */
+input,select,textarea{font-size:13.5px!important;min-height:40px}.field>span{font-size:12px!important;font-weight:580!important}.field-help,.field-hint{font-size:11.5px!important;line-height:1.55!important}.scan-test{font-size:11.75px!important;line-height:1.55!important}.switch-row b{font-size:13px!important}.switch-row small{font-size:11.5px!important;line-height:1.5!important}.hardware-status b,.theme-preview b{font-size:13px!important}.hardware-status small,.theme-preview small{font-size:11.5px!important}
+.primary-btn,.ghost-btn,.danger-ghost,.money-toggle,.tiny-btn{min-height:38px}.tiny-btn,.compact-action,.compact-sale-btn{font-size:11.75px!important;padding:6px 10px!important}.upload{font-size:12.5px!important}
+
+/* Sales: preserve speed while making the command surface readable at normal viewing distance. */
+.sales-focus-head{padding:17px 18px 14px!important}.sales-focus-head h3{font-size:15.5px!important}.sales-eyebrow{font-size:11.5px!important}.scanner-box{height:56px!important}.scanner-box input{font-size:15px!important}.scanner-state{font-size:11px!important;padding:5px 8px!important}.search-result-item{min-height:52px!important}.qty b{font-size:13px!important}.invoice-meta strong{font-size:13px!important}.summary-line{font-size:13px!important}.field-help{color:var(--muted)!important}.payment-required-note{font-size:12.5px!important}.payment{font-size:13.5px!important}.pos-shortcuts{font-size:11.5px!important}
+
+/* Product page: remove low-value columns before squeezing the text. */
+.product-toolbar{display:grid!important;grid-template-columns:minmax(300px,1fr) 160px 160px auto;gap:8px!important;align-items:center!important}.product-toolbar>*{min-width:0!important}.product-toolbar input{width:100%!important}
+.products-table{min-width:820px!important}.products-table td:first-child{min-width:190px}.products-table td:nth-child(2){max-width:155px}.products-table td:nth-child(2),.products-table td:nth-child(3){white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:1500px){.products-table th:nth-child(3),.products-table td:nth-child(3),.products-table th:nth-child(6),.products-table td:nth-child(6){display:none}.products-table{min-width:720px!important}}
+@media(max-width:1220px){.product-toolbar{grid-template-columns:1fr 1fr}.product-toolbar input{grid-column:1/-1}}
+
+/* Reports and secondary information: no 9px text. */
+.ui-section-head .eyebrow{font-size:11.5px!important}.ui-section-head h2{font-size:20px!important}.ui-section-head p{font-size:12px!important}.period-picker span{font-size:11.5px!important}.period-main>span,.period-main small,.period-progress-wrap small{font-size:11.5px!important}.period-main strong{font-size:14px!important}.report-kpi span{font-size:12px!important}.report-kpi small{font-size:11.25px!important}.report-kpi strong{font-size:21px!important}.soft-badge{font-size:11px!important}.cf-summary-item span{font-size:11.5px!important}.cf-summary-item b{font-size:13px!important}.cf-x{font-size:10.5px!important}.cf-tooltip span{font-size:11.5px!important}.balance-cards span{font-size:11.5px!important}.balance-cards strong{font-size:13.5px!important}.invoice-report-stats span,.invoice-report-stats b{font-size:11px!important}.activity-bubble b{font-size:13px!important}.activity-bubble span{font-size:11.5px!important}.activity-bubble p{font-size:12px!important}.activity-bubble small{font-size:11px!important}
+
+/* Modals */
+.modal-head h3{font-size:16px!important}.image-uploader strong{font-size:13px!important}.image-uploader small,.barcode-section-head small,.barcode-limit{font-size:11.5px!important}.barcode-section-head h4{font-size:13.5px!important}.barcode-index{font-size:11px!important}.category-manager-note,.category-manage-row small{font-size:11.5px!important}.category-edit-input{font-size:13px!important}
+
+/* Custom branded confirmations — replaces browser/Tauri `localhost says` dialogs. */
+.app-dialog{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:22px;background:rgba(10,18,26,.42);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.app-dialog.hidden{display:none}.app-dialog-card{width:min(430px,100%);display:grid;grid-template-columns:48px 1fr;gap:14px 15px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.22);direction:rtl;animation:appDialogIn 150ms cubic-bezier(.2,.75,.2,1)}
+@keyframes appDialogIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+.app-dialog-icon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:21px;font-weight:800}.app-dialog.warning .app-dialog-icon{background:var(--warning-soft);color:var(--warning)}.app-dialog.danger .app-dialog-icon{background:var(--danger-soft);color:var(--danger)}
+.app-dialog-copy{min-width:0}.app-dialog-copy h3{margin:1px 0 5px;font-size:16px;font-weight:720}.app-dialog-copy p{margin:0;color:var(--muted);font-size:13px;line-height:1.72;white-space:pre-line}.app-dialog-actions{grid-column:1/-1;display:flex;justify-content:flex-start;gap:8px;padding-top:3px}.app-dialog-actions button{min-width:92px}
+
+.toast{font-size:12.5px!important;line-height:1.5!important;padding:11px 14px!important;border:1px solid color-mix(in srgb,var(--panel) 18%,transparent);box-shadow:0 12px 38px rgba(0,0,0,.18)!important}
+
+@media(max-width:1050px){.creator-footer small,.creator-footer strong,.creator-footer em{display:none!important}}

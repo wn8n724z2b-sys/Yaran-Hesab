@@ -6,16 +6,13 @@
   <meta name="color-scheme" content="light dark" />
   <title>حسابداری آسان</title>
   <link rel="stylesheet" href="vendor/vazirmatn/wght.css" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="v2.css" />
-  <link rel="stylesheet" href="ui-final.css" />
-  <link rel="stylesheet" href="sales-v22.css" />
+  <link rel="stylesheet" href="app-v3.css" />
 </head>
-<body>
+<body data-page="pos">
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand">
-        <div class="brand-mark">آ</div>
+        <div class="brand-mark"><span>ح</span></div>
         <div class="brand-copy">
           <div class="brand-title">حسابداری آسان</div>
           <div class="brand-sub">نسخه رایگان</div>
@@ -23,13 +20,13 @@
       </div>
 
       <nav id="nav" class="nav">
-        <button class="nav-item" data-page="dashboard"><span>⌂</span><b>داشبورد</b></button>
-        <button class="nav-item active" data-page="pos"><span>▣</span><b>فروش</b></button>
-        <button class="nav-item" data-page="products"><span>◫</span><b>کالاها</b></button>
-        <button class="nav-item" data-page="inventory"><span>▤</span><b>انبار</b></button>
-        <button class="nav-item" data-page="parties"><span>◎</span><b>اشخاص</b></button>
-        <button class="nav-item" data-page="reports"><span>⌁</span><b>گزارش‌ها</b></button>
-        <button class="nav-item" data-page="settings"><span>⚙</span><b>تنظیمات</b></button>
+        <button class="nav-item" data-page="dashboard"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"/></svg></span><b>داشبورد</b></button>
+        <button class="nav-item active" data-page="pos"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M7 8h10M7 12h6M7 16h4"/></svg></span><b>فروش</b></button>
+        <button class="nav-item" data-page="products"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="m4 7 8 4 8-4M4 12l8 4 8-4M4 17l8 4 8-4"/></svg></span><b>کالاها</b></button>
+        <button class="nav-item" data-page="inventory"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><b>انبار</b></button>
+        <button class="nav-item" data-page="parties"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-4 2.5-6 5.5-6s5 2 5.5 6"/><circle cx="17" cy="9" r="2"/><path d="M15.5 14c2.8 0 4.5 1.7 5 5"/></svg></span><b>اشخاص</b></button>
+        <button class="nav-item" data-page="reports"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/></svg></span><b>گزارش‌ها</b></button>
+        <button class="nav-item" data-page="settings"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21h-4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3.1 14H3v-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3.1V3h4v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1v4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></span><b>تنظیمات</b></button>
       </nav>
 
       <a id="creatorContact" class="sidebar-footer creator-footer" href="https://t.me/Naman_Rahimi" title="ارتباط با سازنده">
@@ -43,7 +40,7 @@
           <button id="menuBtn" class="icon-btn mobile-only" aria-label="منو">☰</button>
           <div>
             <h1 id="pageTitle">فروش</h1>
-            <p id="pageSubtitle">فروش سریع، اسکن و ثبت فاکتور</p>
+            <p id="pageSubtitle">فروش سریع و بدون حواس‌پرتی</p>
           </div>
         </div>
 
@@ -264,12 +261,26 @@
           <article class="panel settings-card online-card"><div class="panel-head"><div><h3>آنلاین</h3><p>اتصال اختیاری به سرور و داشبورد آنلاین</p></div><span id="onlineStatusPill" class="pill">محلی</span></div><label class="switch-row"><span><b>فعال‌سازی اتصال آنلاین</b><small>در حالت خاموش، برنامه کاملاً محلی و بدون اینترنت کار می‌کند.</small></span><input id="onlineEnabled" type="checkbox" /></label><div id="onlineFields" class="online-fields"><label class="field"><span>آدرس سرور</span><input id="onlineServerUrl" type="url" dir="ltr" placeholder="https://example.com" /></label><label class="field"><span>کد فروشگاه</span><input id="onlineStoreCode" dir="ltr" placeholder="STORE-001" /></label><label class="field"><span>فاصله همگام‌سازی</span><select id="onlineSyncMinutes"><option value="5">هر 5 دقیقه</option><option value="15">هر 15 دقیقه</option><option value="30">هر 30 دقیقه</option><option value="60">هر 60 دقیقه</option></select></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی فروش‌ها</b><small>فاکتورها و دریافت‌های مرتبط</small></span><input id="onlineSyncSales" type="checkbox" /></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی موجودی</b><small>کالاها، خریدها و موجودی</small></span><input id="onlineSyncInventory" type="checkbox" /></label><div id="onlineStatusText" class="scan-test">وضعیت: حالت محلی</div><div class="online-actions"><button id="testOnlineConnection" type="button" class="ghost-btn">بررسی اتصال</button><button id="syncOnlineNow" type="button" class="primary-btn">همگام‌سازی حالا</button></div></div></article>
           <article class="panel settings-card data-support-card"><div class="panel-head"><div><h3>داده‌ها و پشتیبانی</h3><p>این بخش با رمز مدیر محافظت می‌شود</p></div><span class="pill">ADMIN</span></div><div id="dataSupportLock" class="support-lock"><div class="support-lock-icon">⌁</div><div><b>بخش محافظت‌شده</b><small>برای دسترسی به Backup، بازیابی و بازنشانی رمز مدیر را وارد کنید.</small></div><div class="support-unlock-row"><input id="dataSupportPassword" type="password" placeholder="رمز مدیر"><button id="unlockDataSupport" class="primary-btn">باز کردن</button></div></div><div id="dataSupportControls" class="hidden"><label class="field"><span>پشتیبان خودکار</span><select id="autoBackupPerDay"><option value="0">خاموش</option><option value="1">1 بار در روز</option><option value="2">2 بار در روز</option><option value="3">3 بار در روز</option><option value="4">4 بار در روز</option><option value="6">6 بار در روز</option><option value="8">8 بار در روز</option><option value="12">12 بار در روز</option><option value="24">24 بار در روز</option></select></label><div id="autoBackupStatus" class="scan-test">آخرین پشتیبان خودکار: —</div><button id="backupBtn" class="ghost-btn wide">ذخیره دستی Backup</button><label class="upload wide" title="برای فایل‌های پشتیبان JSON نسخه‌های قبلی">بازیابی Backup قدیمی (JSON)<input id="restoreFile" type="file" accept="application/json" /></label><button id="restoreAutoBackup" class="ghost-btn wide">بازیابی آخرین پشتیبان خودکار</button><button id="dbHealthBtn" class="ghost-btn wide">بررسی سلامت دیتابیس</button><button id="auditLogBtn" class="ghost-btn wide">فعالیت‌های اخیر فاکتورها</button><button id="loadTrainingDemo" class="ghost-btn wide">نسخه آموزشی ۲ ماه و ۱۰ روزه</button><button id="lockDataSupport" class="ghost-btn wide">قفل کردن بخش</button><button id="resetDemo" class="danger-ghost wide">بازنشانی به حالت اولیه</button></div></article>
         </div>
-        <article class="panel roadmap"><div class="panel-head"><div><h3>سازگاری</h3><p>نسخه Native v2.0 برای Windows 10/11 64-bit</p></div></div><div class="roadmap-row"><span>Windows 10 64-bit (2015+)</span><b>فعال</b></div><div class="roadmap-row"><span>Windows 11 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>فونت رابط</span><b>Vazirmatn Variable آفلاین</b></div><div class="roadmap-row"><span>SQLite Native</span><b>WAL + Backup فعال</b></div><div class="roadmap-row"><span>چاپ حرارتی 80mm</span><b>Windows Driver مستقیم</b></div><div class="roadmap-row"><span>بارکدخوان USB HID</span><b>اسکن سریع فعال</b></div><div class="roadmap-row"><span>اتصال آنلاین</span><b>قابل پیکربندی</b></div></article>
+        <article class="panel roadmap"><div class="panel-head"><div><h3>سازگاری</h3><p>نسخه Native v2.3 برای Windows 10/11 64-bit</p></div></div><div class="roadmap-row"><span>Windows 10 64-bit (2015+)</span><b>فعال</b></div><div class="roadmap-row"><span>Windows 11 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>فونت رابط</span><b>Vazirmatn Variable آفلاین</b></div><div class="roadmap-row"><span>SQLite Native</span><b>WAL + Backup فعال</b></div><div class="roadmap-row"><span>چاپ حرارتی 80mm</span><b>Windows Driver مستقیم</b></div><div class="roadmap-row"><span>بارکدخوان USB HID</span><b>اسکن سریع فعال</b></div><div class="roadmap-row"><span>اتصال آنلاین</span><b>قابل پیکربندی</b></div></article>
       </section>
     </main>
   </div>
 
   <div id="modal" class="modal hidden"><div class="modal-card"><div class="modal-head"><h3 id="modalTitle">کالای جدید</h3><button id="modalClose" aria-label="بستن">×</button></div><div id="modalContent"></div></div></div>
+
+  <div id="appDialog" class="app-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="appDialogTitle">
+    <div class="app-dialog-card">
+      <div id="appDialogIcon" class="app-dialog-icon">؟</div>
+      <div class="app-dialog-copy">
+        <h3 id="appDialogTitle">تأیید عملیات</h3>
+        <p id="appDialogMessage"></p>
+      </div>
+      <div class="app-dialog-actions">
+        <button id="appDialogCancel" class="ghost-btn" type="button">انصراف</button>
+        <button id="appDialogConfirm" class="primary-btn" type="button">تأیید</button>
+      </div>
+    </div>
+  </div>
   <div id="toast" class="toast"></div>
   <iframe id="printFrame" class="print-frame"></iframe>
   <script src="native.js"></script>
