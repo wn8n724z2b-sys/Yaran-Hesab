@@ -1,8 +1,8 @@
 {
   "name": "hesabdari-asan-native",
   "private": true,
-  "version": "2.1.0",
-  "description": "حسابداری آسان v2 - نسخه رایگان Windows Native",
+  "version": "2.2.0",
+  "description": "حسابداری آسان v2.2 - Sales-first UX",
   "scripts": {
     "tauri": "tauri",
     "dev": "npm run prepare-font && tauri dev",

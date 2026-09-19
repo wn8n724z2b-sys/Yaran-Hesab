@@ -16,6 +16,7 @@ let paymentMethod=null;
 let lastSale=null;
 let editingSaleId=null;
 let checkoutBusy=false;
+let lastCartMutation=null;
 let dataSupportUnlocked=false;
 let moneyVisible=!db.settings.hideDashboardMoney;
 let dashboardChartRange='7';
@@ -243,8 +244,7 @@ function renderProducts(){
  let rows=db.products.filter(function(p){const special=filter==='low'?p.stock<=p.min:filter==='packaged'?!!p.unitConversionEnabled:true;return (!q||productMatches(p,q))&&special&&(catFilter==='all'||p.categoryId===catFilter)});if(q)rows=searchProducts(q).filter(function(p){const special=filter==='low'?p.stock<=p.min:filter==='packaged'?!!p.unitConversionEnabled:true;return special&&(catFilter==='all'||p.categoryId===catFilter)});
  $('#productsBody').innerHTML=rows.map(function(p){const enabled=!!p.unitConversionEnabled,units=Math.max(1,Number(p.unitsPerPurchase)||1),packLabel=enabled?num(units)+' '+esc(p.baseUnit)+' / '+esc(p.purchaseUnit):'تک‌واحد · '+esc(p.baseUnit);const meta='<div class="product-meta-line"><span class="meta-pill">'+esc(categoryName(p.categoryId))+'</span>'+(p.producer?'<span class="meta-pill">'+esc(p.producer)+'</span>':'')+(enabled?'<span class="meta-pill pack">تبدیل واحد فعال</span>':'<span class="meta-pill">تک‌واحد</span>')+'</div>';return '<tr><td><div class="product-name-cell">'+productImageHtml(p,'product-thumb')+'<div><b>'+esc(p.name)+'</b>'+meta+'</div></div></td><td><code class="barcode-code" title="'+esc(p.barcode||'—')+'">'+esc(p.barcode||'—')+'</code></td><td>'+num((p.barcodes||[]).length)+'/15</td><td><b>'+money(p.buy)+'</b><small class="table-sub">هر '+esc(p.baseUnit)+'</small></td><td>'+productPriceText(p)+'</td><td><span class="unit-conversion">'+packLabel+'</span></td><td><span class="pill '+(p.stock<=p.min?'danger':'success')+'">'+num(p.stock)+' '+esc(p.baseUnit)+'</span></td><td><div class="row-actions"><button class="tiny-btn purchase-product" data-id="'+p.id+'">+ خرید</button><button class="ghost-btn edit-product" data-id="'+p.id+'">ویرایش</button></div></td></tr>'}).join('')||'<tr><td colspan="8" class="muted">کالایی پیدا نشد.</td></tr>';
  $$('.edit-product').forEach(function(b){b.onclick=function(){openProduct(b.dataset.id)}});$$('.purchase-product').forEach(function(b){b.onclick=function(){openPurchase(b.dataset.id)}});
- $('#quickProducts').innerHTML=db.products.slice(0,8).map(function(p){return '<button class="quick-product" data-id="'+p.id+'">'+(p.image?'<img src="'+esc(p.image)+'" alt="">':'<span class="mini-placeholder">'+esc((p.name||'آ').charAt(0))+'</span>')+'<span><b>'+esc(p.name)+'</b><small>'+productPriceText(p)+' · موجودی '+num(p.stock)+' '+esc(p.baseUnit)+'</small></span></button>'}).join('');
- $$('.quick-product').forEach(function(b){b.onclick=function(){addToCart(b.dataset.id)}});
+ const quick=$('#quickProducts');if(quick)quick.innerHTML='';
 }
 function inventoryStatus(p){if((Number(p.stock)||0)<=0)return 'out';if((Number(p.stock)||0)<=(Number(p.min)||0))return 'low';return 'ok'}
 function renderInventory(){
@@ -351,7 +351,7 @@ function renderCart(){
 }
 function renderAll(){updateInventorySnapshot();renderDashboard();renderProducts();renderInventory();renderCustomers();renderReports();renderSettings();renderCart();renderWorkSession()}
 
-function addCartItem(p,overrides){let i=cart.find(function(x){return x.id===p.id}),available=availableStock(p.id);if(i){if(i.qty>=available){toast('موجودی کافی نیست');return}i.qty++}else{if(available<=0){toast('موجودی این کالا صفر است');return}cart.push(Object.assign({},clone(p),overrides||{},{qty:1}))}renderCart();pulseCart();toast(p.name+' اضافه شد')}
+function addCartItem(p,overrides){let i=cart.find(function(x){return x.id===p.id}),available=availableStock(p.id);if(i){if(i.qty>=available){toast('موجودی کافی نیست');return}i.qty++;lastCartMutation={id:p.id,type:'inc'}}else{if(available<=0){toast('موجودی این کالا صفر است');return}cart.push(Object.assign({},clone(p),overrides||{},{qty:1}));lastCartMutation={id:p.id,type:'add'}}renderCart();pulseCart()}
 function addToCart(pid){const p=db.products.find(function(x){return x.id===pid});if(!p)return;if(availableStock(pid)<=0){toast('موجودی این کالا صفر است');return}addCartItem(p)}
 function renderPosSearch(term){
  const box=$('#posSearchResults'),q=String(term||'').trim();if(!q){box.classList.add('hidden');box.innerHTML='';return}
@@ -364,6 +364,7 @@ function cartAction(a,pid){let i=cart.find(function(x){return x.id===pid}),p=db.
 $('#barcodeInput').addEventListener('input',function(e){renderPosSearch(e.target.value)});
 $('#barcodeInput').addEventListener('keydown',function(e){const suffix=db.settings.scannerSuffix||'Enter';if(e.key===suffix||e.key==='Enter'){e.preventDefault();if(e.target.value.length>=5)markScannerDetected(e.target.value);if(findAndAdd(e.target.value)){e.target.value='';renderPosSearch('')}}if(e.key==='Escape'){e.target.value='';renderPosSearch('')}});
 $('#discountInput').oninput=renderCart;$('#clearCart').onclick=function(){cart=[];$('#discountInput').value=0;if(editingSaleId){editingSaleId=null;paymentMethod=null;setCustomerSelection('c0');$$('.payment').forEach(function(x){x.classList.remove('active')});renderPaymentRequirement();toast('ویرایش فاکتور لغو شد')}renderCart()};
+if($('#undoLastCart'))$('#undoLastCart').onclick=function(){if(!lastCartMutation){toast('عملی برای برگشت وجود ندارد');return}const i=cart.find(function(x){return x.id===lastCartMutation.id});if(i){if(lastCartMutation.type==='add'||i.qty<=1)cart=cart.filter(function(x){return x.id!==lastCartMutation.id});else i.qty=Math.max(1,i.qty-1);renderCart();toast('آخرین قلم برگشت داده شد')}lastCartMutation=null};
 function renderPaymentRequirement(alertMode){const n=$('#paymentRequiredNote');if(!n)return;n.classList.toggle('selected',!!paymentMethod);n.classList.toggle('attention',!!alertMode&&!paymentMethod);n.textContent=paymentMethod?'روش پرداخت: '+paymentMethod:'روش پرداخت را انتخاب کنید'}
 $$('.payment').forEach(function(b){b.onclick=function(){$$('.payment').forEach(function(x){x.classList.remove('active')});b.classList.add('active');paymentMethod=b.dataset.pay;renderPaymentRequirement(false)}});
 function resolveCustomerSearch(){const q=normalizeText($('#customerSearch').value),exact=db.customers.find(function(c){return normalizeText(c.name)===q||normalizeText(c.phone)===q});if(exact){setCustomerSelection(exact.id);return}const hit=db.customers.find(function(c){return normalizeText(c.name).startsWith(q)||normalizeText(c.phone).includes(q)});if(hit&&q){setCustomerSelection(hit.id)}else if(!q)setCustomerSelection('c0')}if($('#customerSearch')){$('#customerSearch').onchange=resolveCustomerSearch;$('#customerSearch').onblur=resolveCustomerSearch;$('#customerSearch').onfocus=function(){this.select()}}

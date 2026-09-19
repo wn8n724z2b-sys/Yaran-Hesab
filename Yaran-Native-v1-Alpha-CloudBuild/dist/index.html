@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="v2.css" />
   <link rel="stylesheet" href="ui-final.css" />
+  <link rel="stylesheet" href="sales-v22.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -22,8 +23,8 @@
       </div>
 
       <nav id="nav" class="nav">
-        <button class="nav-item active" data-page="dashboard"><span>⌂</span><b>داشبورد</b></button>
-        <button class="nav-item" data-page="pos"><span>▣</span><b>فروش</b></button>
+        <button class="nav-item" data-page="dashboard"><span>⌂</span><b>داشبورد</b></button>
+        <button class="nav-item active" data-page="pos"><span>▣</span><b>فروش</b></button>
         <button class="nav-item" data-page="products"><span>◫</span><b>کالاها</b></button>
         <button class="nav-item" data-page="inventory"><span>▤</span><b>انبار</b></button>
         <button class="nav-item" data-page="parties"><span>◎</span><b>اشخاص</b></button>
@@ -41,8 +42,8 @@
         <div class="page-title-wrap">
           <button id="menuBtn" class="icon-btn mobile-only" aria-label="منو">☰</button>
           <div>
-            <h1 id="pageTitle">داشبورد</h1>
-            <p id="pageSubtitle">نمای کلی فروشگاه</p>
+            <h1 id="pageTitle">فروش</h1>
+            <p id="pageSubtitle">فروش سریع، اسکن و ثبت فاکتور</p>
           </div>
         </div>
 
@@ -64,7 +65,7 @@
         </div>
       </header>
 
-      <section id="page-dashboard" class="page active">
+      <section id="page-dashboard" class="page">
         <div class="dashboard-control-row">
           <div class="status-chip"><span></span> سیستم آماده ثبت فروش است</div>
           <button id="moneyToggle" class="money-toggle" title="پنهان/نمایش مبلغ‌ها"><span id="moneyToggleIcon">◉</span><b id="moneyToggleText">پنهان کردن مبلغ‌ها</b></button>
@@ -113,15 +114,24 @@
         </article>
       </section>
 
-      <section id="page-pos" class="page">
+      <section id="page-pos" class="page active">
         <div class="pos-layout">
           <div class="panel pos-main">
+            <div class="sales-focus-head">
+              <div>
+                <span class="sales-eyebrow">فروش سریع</span>
+                <h3>اسکن کنید، تعداد را تنظیم کنید، ثبت کنید</h3>
+              </div>
+              <div class="sales-focus-actions">
+                <button id="undoLastCart" class="ghost-btn compact-sale-btn" type="button">↶ برگشت آخرین قلم</button>
+                <button id="clearCart" class="danger-ghost compact-sale-btn" type="button">پاک کردن فاکتور</button>
+              </div>
+            </div>
             <div class="scanner-row">
-              <div class="scanner-box"><span class="scan-icon">▥</span><input id="barcodeInput" autocomplete="off" placeholder="بارکد را اسکن کنید یا نام کالا را بنویسید..." /><span id="scannerState" class="scanner-state">SCANNER READY</span></div>
-              <button id="clearCart" class="danger-ghost">پاک کردن</button>
+              <div class="scanner-box"><span class="scan-icon">▥</span><input id="barcodeInput" autocomplete="off" placeholder="بارکد را اسکن کنید یا نام کالا را بنویسید..." /><span id="scannerState" class="scanner-state">آماده اسکن</span></div>
             </div>
             <div id="posSearchResults" class="pos-search-results hidden"></div>
-            <div id="quickProducts" class="quick-products"></div>
+            <div id="quickProducts" class="quick-products hidden"></div>
             <div class="table-wrap cart-wrap"><table><thead><tr><th>کالا</th><th>تعداد</th><th>قیمت</th><th>جمع</th><th></th></tr></thead><tbody id="cartBody"></tbody></table></div>
             <div id="emptyCart" class="empty"><div>▣</div><strong>فاکتور خالی است</strong><span>یک کالا را اسکن یا جستجو کنید</span></div>
           </div>
