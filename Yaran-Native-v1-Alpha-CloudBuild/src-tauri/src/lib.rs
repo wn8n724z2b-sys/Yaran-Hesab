@@ -87,5 +87,5 @@ pub fn run() {
             print_receipt_png
         ])
         .run(tauri::generate_context!())
-        .expect("error while running Yaran Financial System");
+        .expect("error while running Hesabdari Asan");
 }

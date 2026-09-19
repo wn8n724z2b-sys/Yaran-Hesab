@@ -1,12 +1,12 @@
 [package]
-name = "yaran-financial-system"
+name = "hesabdari-asan"
 version = "1.0.0"
-description = "Yaran Financial System native local production release"
-authors = ["Yaran"]
+description = "Hesabdari Asan native free edition"
+authors = ["MNRAHIMI . Ltd"]
 edition = "2021"
 
 [lib]
-name = "yaran_financial_system_lib"
+name = "hesabdari_asan_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

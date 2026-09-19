@@ -59,7 +59,7 @@ pub fn print_receipt_png(printer_name: &str, png_base64: &str) -> Result<(), Str
 
         let mut path: PathBuf = std::env::temp_dir();
         let stamp = Local::now().format("%Y%m%d_%H%M%S_%3f");
-        path.push(format!("yaran_receipt_{stamp}.png"));
+        path.push(format!("hesabdari_asan_receipt_{stamp}.png"));
         fs::write(&path, bytes).map_err(|e| e.to_string())?;
 
         let printer = ps_single_quote(printer_name);
@@ -79,7 +79,7 @@ $pd.OriginAtMargins = $false
 $pd.DefaultPageSettings.Margins = New-Object System.Drawing.Printing.Margins(0,0,0,0)
 $paperWidth = 315
 $paperHeight = [Math]::Max(120, [Math]::Ceiling($img.Height * $paperWidth / $img.Width))
-$pd.DefaultPageSettings.PaperSize = New-Object System.Drawing.Printing.PaperSize('Yaran 80mm', $paperWidth, $paperHeight)
+$pd.DefaultPageSettings.PaperSize = New-Object System.Drawing.Printing.PaperSize('Hesabdari Asan 80mm', $paperWidth, $paperHeight)
 $handler = [System.Drawing.Printing.PrintPageEventHandler]{{
   param($sender, $e)
   $w = $e.PageBounds.Width

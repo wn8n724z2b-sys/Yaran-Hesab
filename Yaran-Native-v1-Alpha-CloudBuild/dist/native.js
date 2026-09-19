@@ -18,7 +18,7 @@
       window.__YARAN_NATIVE_HEALTH__ = health;
       return { native: true, health: health };
     } catch (error) {
-      console.error('Yaran native hydrate failed:', error);
+      console.error('Hesabdari Asan native hydrate failed:', error);
       return { native: true, error: String(error) };
     }
   }
@@ -31,7 +31,7 @@
         window.__YARAN_PRELOADED_STATE__ = raw;
         return true;
       } catch (error) {
-        console.error('Yaran SQLite save failed:', error);
+        console.error('Hesabdari Asan SQLite save failed:', error);
         throw error;
       }
     });
@@ -65,7 +65,7 @@
       if (raw) await queueWrite(function () { return invoke('save_state', { json: raw }); });
       return await invoke('create_backup');
     } catch (error) {
-      console.error('Yaran native backup failed:', error);
+      console.error('Hesabdari Asan native backup failed:', error);
       return null;
     }
   }

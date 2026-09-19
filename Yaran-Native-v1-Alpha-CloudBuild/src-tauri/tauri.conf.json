@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Yaran Financial System",
-  "version": "1.0.0",
-  "identifier": "com.yaran.financialsystem",
+  "productName": "حسابداری آسان",
+  "version": "1.1.0",
+  "identifier": "com.mnrahimi.hesabdariasan",
   "build": {
     "frontendDist": "../dist"
   },
@@ -11,7 +11,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Yaran Financial System",
+        "title": "حسابداری آسان",
         "width": 1440,
         "height": 900,
         "minWidth": 1100,

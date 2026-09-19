@@ -23,7 +23,7 @@ fn app_dir(app: &AppHandle) -> Result<PathBuf, String> {
 }
 
 pub fn db_path(app: &AppHandle) -> Result<PathBuf, String> {
-    Ok(app_dir(app)?.join("yaran.sqlite3"))
+    Ok(app_dir(app)?.join("hesabdari_asan.sqlite3"))
 }
 
 fn open(app: &AppHandle) -> Result<Connection, String> {
@@ -657,7 +657,7 @@ pub fn create_backup_impl(app: &AppHandle) -> Result<String, String> {
     let dir = app_dir(app)?.join("backups");
     fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
     let stamp = Local::now().format("%Y-%m-%d_%H-%M-%S").to_string();
-    let target = dir.join(format!("Yaran_Backup_{stamp}.sqlite3"));
+    let target = dir.join(format!("HesabdariAsan_Backup_{stamp}.sqlite3"));
     let conn = open(app)?;
     conn.execute_batch("PRAGMA wal_checkpoint(FULL);")
         .map_err(|e| e.to_string())?;

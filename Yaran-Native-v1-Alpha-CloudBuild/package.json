@@ -1,8 +1,8 @@
 {
-  "name": "yaran-financial-system-native",
+  "name": "hesabdari-asan-native",
   "private": true,
-  "version": "1.0.0",
-  "description": "Yaran Financial System - Windows native local production release",
+  "version": "1.1.0",
+  "description": "حسابداری آسان - نسخه رایگان Windows Native",
   "scripts": {
     "tauri": "tauri",
     "dev": "tauri dev",

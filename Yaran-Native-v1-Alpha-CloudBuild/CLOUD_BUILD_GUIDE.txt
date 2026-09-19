@@ -8,11 +8,11 @@ ONE-TIME SETUP
 2) Create a PRIVATE repository. Suggested name: yaran-financial-system
 3) Upload the CONTENTS of this folder to the repository root.
 4) Open the repository's Actions tab.
-5) Choose: "Build Yaran for Windows"
+5) Choose: "Build Hesabdari Asan for Windows"
 6) Click: Run workflow -> Run workflow
 7) Wait for a green check mark.
 8) Open the successful run.
-9) Under Artifacts, download: Yaran-Windows-Installer
+9) Under Artifacts, download: Hesabdari Asan-Windows-Installer
 10) Extract the artifact and run the NSIS Setup .exe.
 
 AUTOMATIC BUILDS
@@ -22,13 +22,13 @@ INSTALLER OUTPUT
 src-tauri/target/release/bundle/nsis/*.exe
 
 FIRST RUN
-- Yaran creates yaran.sqlite3 in the Windows AppData directory.
+- Hesabdari Asan creates hesabdari_asan.sqlite3 in the Windows AppData directory.
 - Configure store identity, XPrinter/thermal printer and backup frequency.
 - Default protected data/support password: admin
 - Use Settings -> Data & Support -> Database Health Check after installation.
 
 PRINTER
-Install the printer's Windows driver first. In Yaran Settings, use Detect Printers and select the installed XPrinter/thermal printer. Native printing is sent through the Windows driver without opening the print dialog.
+Install the printer's Windows driver first. In Hesabdari Asan Settings, use Detect Printers and select the installed XPrinter/thermal printer. Native printing is sent through the Windows driver without opening the print dialog.
 
 BACKUP
-Native SQLite backups are stored under the Yaran AppData backups folder. The app keeps the latest 30 native backups.
+Native SQLite backups are stored under the Hesabdari Asan AppData backups folder. The app keeps the latest 30 native backups.
