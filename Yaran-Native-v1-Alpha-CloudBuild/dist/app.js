@@ -304,25 +304,39 @@ function renderCashFlowMonth(){
   data.push({day:day,input:v.input,output:v.output,net:v.net});
  }
  const totalIn=data.reduce(function(a,d){return a+d.input},0),totalOut=data.reduce(function(a,d){return a+d.output},0),totalNet=totalIn-totalOut;
- const W=860,H=250,L=58,R=18,T=18,B=34,pw=W-L-R,ph=H-T-B;
- const values=data.map(function(d){return d.net}),rawMax=Math.max.apply(null,[0].concat(values)),rawMin=Math.min.apply(null,[0].concat(values));
- let span=Math.max(1,rawMax-rawMin),max=rawMax+span*.12,min=rawMin-span*.12;
- if(rawMin>=0)min=0;if(rawMax<=0)max=0;if(max===min)max=min+1;
- span=max-min;
- const xStep=pw/Math.max(1,data.length-1),x=function(i){return data.length===1?L+pw/2:L+xStep*i},y=function(v){return T+((max-v)/span)*ph},zeroY=y(0);
- let grid='',yl='';
- for(let i=0;i<4;i++){
-  const val=max-span*(i/3),yy=T+ph*(i/3);
-  grid+='<line class="cf-grid" x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'"></line>';
-  yl+='<text class="cf-label" x="'+(L-8)+'" y="'+(yy+4)+'" text-anchor="end">'+(moneyVisible?amount(val):'•••')+'</text>';
+ const hasData=data.some(function(d){return d.input!==0||d.output!==0});
+ const summary='<div class="cf-summary"><div class="cf-summary-item"><span>ورودی ماه</span><b>'+maskedMoney(totalIn)+'</b></div><div class="cf-summary-item out"><span>خروجی ماه</span><b>'+maskedMoney(totalOut)+'</b></div><div class="cf-summary-item net"><span>خالص ماه</span><b>'+maskedMoney(totalNet)+'</b></div></div>';
+ if(!hasData){
+  root.innerHTML=summary+'<div class="chart-empty-state"><div class="chart-empty-icon">⌁</div><b>هنوز گردش نقدی در این ماه ثبت نشده است</b><span>با ثبت فروش نقدی، خرید، هزینه یا دریافت قرض، نمودار به‌صورت خودکار شکل می‌گیرد.</span></div>';
+  return;
  }
- const pts=data.map(function(d,i){return {x:x(i),y:y(d.net),v:d.net}}),linePath=chartSmoothPath(pts);
- const areaPath=pts.length?linePath+' L '+pts[pts.length-1].x+' '+zeroY+' L '+pts[0].x+' '+zeroY+' Z':'';
- let xl='',hits='',dots='';
- data.forEach(function(d,i){const cx=x(i);if(data.length<=12||i===0||i===data.length-1||d.day%5===0)xl+='<text class="cf-x" x="'+cx+'" y="'+(H-10)+'" text-anchor="middle">'+d.day+'</text>';hits+='<rect class="cf-hit" data-cf="'+i+'" x="'+(i===0?L:cx-xStep/2)+'" y="'+T+'" width="'+(data.length===1?pw:Math.max(10,i===0||i===data.length-1?xStep/2:xStep))+'" height="'+ph+'"></rect>';if(data.length<=12||i===data.length-1||d.day%5===0)dots+='<circle class="cf-net-dot '+(d.net<0?'negative':'')+'" cx="'+cx+'" cy="'+y(d.net)+'" r="2.8"></circle>'});
- root.innerHTML='<div class="cf-summary"><div class="cf-summary-item"><span>ورودی این ماه</span><b>'+maskedMoney(totalIn)+'</b></div><div class="cf-summary-item out"><span>خروجی این ماه</span><b>'+maskedMoney(totalOut)+'</b></div><div class="cf-summary-item net"><span>خالص گردش نقدی</span><b>'+maskedMoney(totalNet)+'</b></div></div><div class="cf-stage"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><defs><linearGradient id="cfNetGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".18"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>'+grid+yl+'<line class="cf-zero" x1="'+L+'" y1="'+zeroY+'" x2="'+(W-R)+'" y2="'+zeroY+'"></line><path class="cf-net-area" d="'+areaPath+'"></path><path class="cf-net-line" d="'+linePath+'"></path>'+dots+xl+hits+'</svg><div class="cf-tooltip"></div></div>';
+ const W=900,H=220,L=26,R=18,T=22,B=30,pw=W-L-R,ph=H-T-B;
+ const values=data.map(function(d){return d.net}),rawMax=Math.max.apply(null,[0].concat(values)),rawMin=Math.min.apply(null,[0].concat(values));
+ let maxAbs=Math.max(Math.abs(rawMax),Math.abs(rawMin),1)*1.15,max=maxAbs,min=-maxAbs;
+ if(rawMin>=0){min=0;max=Math.max(rawMax*1.18,1)}
+ if(rawMax<=0){max=0;min=Math.min(rawMin*1.18,-1)}
+ const span=max-min,xStep=pw/Math.max(1,data.length-1),x=function(i){return data.length===1?L+pw/2:L+xStep*i},y=function(v){return T+((max-v)/span)*ph},zeroY=y(0);
+ let grid='';
+ [0,.5,1].forEach(function(k){const yy=T+ph*k;grid+='<line class="cf-grid" x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'"></line>'});
+ const pts=data.map(function(d,i){return {x:x(i),y:y(d.net),v:d.net}}),linePath=chartSmoothPath(pts),areaPath=pts.length?linePath+' L '+pts[pts.length-1].x+' '+zeroY+' L '+pts[0].x+' '+zeroY+' Z':'';
+ let labels='',hits='',dots='';
+ data.forEach(function(d,i){
+  const cx=x(i),show=(i===0||i===data.length-1||d.day===5||d.day===10||d.day===15||d.day===20||d.day===25);
+  if(show)labels+='<text class="cf-x" x="'+cx+'" y="'+(H-9)+'" text-anchor="middle">'+num(d.day)+'</text>';
+  const hitW=data.length===1?pw:Math.max(12,xStep);
+  hits+='<rect class="cf-hit" data-cf="'+i+'" x="'+Math.max(L,cx-hitW/2)+'" y="'+T+'" width="'+hitW+'" height="'+ph+'"></rect>';
+  if(show||i===data.length-1)dots+='<circle class="cf-net-dot '+(d.net<0?'negative':'')+'" cx="'+cx+'" cy="'+y(d.net)+'" r="3"></circle>';
+ });
+ root.innerHTML=summary+'<div class="cf-stage"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><defs><linearGradient id="cfNetGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".16"/><stop offset="100%" stop-color="var(--accent)" stop-opacity=".015"/></linearGradient></defs>'+grid+'<line class="cf-zero" x1="'+L+'" y1="'+zeroY+'" x2="'+(W-R)+'" y2="'+zeroY+'"></line><path class="cf-net-area" d="'+areaPath+'"></path><path class="cf-net-line" d="'+linePath+'"></path>'+dots+labels+hits+'</svg><div class="cf-tooltip"></div></div>';
  const tt=root.querySelector('.cf-tooltip'),stage=root.querySelector('.cf-stage');
- root.querySelectorAll('.cf-hit').forEach(function(hit){hit.onpointerenter=hit.onpointermove=function(e){const d=data[Number(hit.dataset.cf)],r=stage.getBoundingClientRect();tt.innerHTML='<b>روز '+num(d.day)+'</b><span>ورودی <strong>'+maskedMoney(d.input)+'</strong></span><span>خروجی <strong>'+maskedMoney(d.output)+'</strong></span><span>خالص <strong class="'+(d.net<0?'negative':'')+'">'+maskedMoney(d.net)+'</strong></span>';tt.classList.add('show');tt.style.left=Math.min(r.width-180,Math.max(8,e.clientX-r.left+10))+'px';tt.style.top=Math.max(8,e.clientY-r.top-64)+'px'};hit.onpointerleave=function(){tt.classList.remove('show')}});
+ root.querySelectorAll('.cf-hit').forEach(function(hit){
+  hit.onpointerenter=hit.onpointermove=function(e){
+   const d=data[Number(hit.dataset.cf)],r=stage.getBoundingClientRect();
+   tt.innerHTML='<b>روز '+num(d.day)+'</b><span>ورودی <strong>'+maskedMoney(d.input)+'</strong></span><span>خروجی <strong>'+maskedMoney(d.output)+'</strong></span><span>خالص <strong class="'+(d.net<0?'negative':'')+'">'+maskedMoney(d.net)+'</strong></span>';
+   tt.classList.add('show');tt.style.left=Math.min(r.width-178,Math.max(8,e.clientX-r.left+10))+'px';tt.style.top=Math.max(8,e.clientY-r.top-60)+'px'
+  };
+  hit.onpointerleave=function(){tt.classList.remove('show')}
+ });
 }
 function renderBrandIdentity(){const mark=$('.brand-mark'),logo=db.settings.storeLogo||'';mark.classList.toggle('has-logo',!!logo);mark.innerHTML=logo?'<img src="'+esc(logo)+'" alt="لوگو">':'آ';const prev=$('#storeLogoPreview');if(prev)prev.innerHTML=logo?'<img src="'+esc(logo)+'" alt="لوگو">':'آ'}
 function renderAutoBackupStatus(){const x=getLatestAutoBackup(),el=$('#autoBackupStatus');if(el)el.textContent='آخرین پشتیبان خودکار: '+(x&&x.time?formatDateTime(x.time):'—')}
@@ -552,18 +566,86 @@ $('#removeStoreLogo').onclick=function(){db.settings.storeLogo='';$('#storeLogoI
 $('#backupBtn').onclick=async function(){try{if(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.exportBackup){const path=await window.YaranNative.exportBackup(JSON.stringify(db));toast(path?'Backup در Downloads ذخیره شد':'ذخیره Backup انجام نشد');return}const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hesabdari-asan-backup-'+dateKey()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},500)}catch(e){console.error(e);toast('ذخیره Backup انجام نشد')}};
 $('#restoreFile').onchange=async function(e){const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!x.products||!x.settings)throw new Error('bad');db=normalizeDB(x);moneyVisible=!db.settings.hideDashboardMoney;save();toast('Backup بازیابی شد')}catch(err){toast('فایل Backup معتبر نیست')}};
 function buildTrainingDemo(){
- const now=new Date(),D=clone(DEFAULT);D.settings=Object.assign({},db.settings,{storeName:'فروشگاه آموزشی حسابداری آسان',storeAddress:'نمونه آموزشی 35 روزه',demoMode:true,workDayDate:dateKey(),workDayStartedAt:new Date(now.getFullYear(),now.getMonth(),now.getDate(),8,15).toISOString()});D.categories=[{id:'cat-general',name:'عمومی'},{id:'cat-food',name:'خوراکی'},{id:'cat-stationery',name:'قرطاسیه'},{id:'cat-home',name:'لوازم خانه'}];D.products=[
- {id:'p-demo-1',name:'شیر 1 لیتر',categoryId:'cat-food',producer:'نمونه لبنیات',barcodes:['6290000000001'],barcode:'6290000000001',baseUnit:'دانه',purchaseUnit:'کارتن',unitConversionEnabled:true,unitsPerPurchase:12,packageBuyPrice:540,buy:45,sell:60,stock:38,min:8,image:''},
- {id:'p-demo-2',name:'قلم آبی',categoryId:'cat-stationery',producer:'Sample Pen',barcodes:['6290000000002','12345678901234567890123456789'],barcode:'6290000000002',baseUnit:'دانه',purchaseUnit:'جعبه',unitConversionEnabled:true,unitsPerPurchase:24,packageBuyPrice:360,buy:15,sell:25,stock:71,min:15,image:''},
- {id:'p-demo-3',name:'کتابچه 80 برگ',categoryId:'cat-stationery',producer:'دفتر نمونه',barcodes:['6290000000003'],barcode:'6290000000003',baseUnit:'دانه',purchaseUnit:'بسته',unitConversionEnabled:true,unitsPerPurchase:12,packageBuyPrice:720,buy:60,sell:85,stock:27,min:6,image:''},
- {id:'p-demo-4',name:'مایع ظرفشویی',categoryId:'cat-home',producer:'خانه پاک',barcodes:['6290000000004'],barcode:'6290000000004',baseUnit:'دانه',purchaseUnit:'دانه',unitConversionEnabled:false,unitsPerPurchase:1,packageBuyPrice:95,buy:95,sell:130,stock:18,min:5,image:''}
- ];D.customers=[{id:'c0',name:'مشتری عمومی',phone:'',balance:0},{id:'c-demo-1',name:'احمد رحیمی',phone:'0700000001',balance:0},{id:'c-demo-2',name:'فاطمه احمدی',phone:'0700000002',balance:0},{id:'c-demo-3',name:'فروشگاه همکار',phone:'0700000003',balance:0}];D.suppliers=[{id:'sup-1',name:'شرکت پخش نمونه',phone:'0700000010',balance:4200},{id:'sup-2',name:'قرطاسیه مرکزی',phone:'0700000011',balance:1800}];D.sales=[];D.purchases=[];D.inventory=[];D.expenses=[];D.supplierPayments=[];D.customerReceipts=[];D.inventorySnapshots=[];D.financialPeriods=[];D.financialPeriod={no:1,start:new Date(now.getTime()-34*86400000).toISOString()};
- function at(days,h){const d=new Date(now.getTime()-days*86400000);d.setHours(h||10,15,0,0);return d.toISOString()}
- let no=1;for(let day=34;day>=0;day--){const count=2+(day%4);for(let j=0;j<count;j++){const p=D.products[(day+j)%D.products.length],qty=1+((day+j)%3),credit=((day+j)%7===0),cust=credit?D.customers[1+((day+j)%3)]:D.customers[0],total=p.sell*qty,sl={id:'demo-sale-'+day+'-'+j,no:no++,time:at(day,9+j*2),items:[{id:p.id,name:p.name,barcode:p.barcode,buy:p.buy,sell:p.sell,qty:qty,baseUnit:p.baseUnit}],subtotal:total,discount:(j===2&&day%5===0)?5:0,total:total-((j===2&&day%5===0)?5:0),payment:credit?'نسیه':'نقدی',customerId:cust.id,revisions:[]};D.sales.push(sl);if(credit)cust.balance+=sl.total}if(day%6===0)D.expenses.push({id:'demo-exp-'+day,time:at(day,16),category:day%12===0?'برق':'حمل‌ونقل',amount:150+(day%5)*40,note:'نمونه آموزشی'});if(day%8===0)D.customerReceipts.push({id:'demo-cr-'+day,time:at(day,14),customerId:'c-demo-1',customerName:'احمد رحیمی',amount:180,note:'پرداخت قرض'});if(day%9===0)D.supplierPayments.push({id:'demo-sp-'+day,time:at(day,13),supplierId:'sup-1',supplierName:'شرکت پخش نمونه',amount:300,note:'پرداخت دوره‌ای'})}
- D.purchases=[{id:'demo-pur-1',time:at(28,11),productId:'p-demo-2',productName:'قلم آبی',supplierId:'sup-2',supplierName:'قرطاسیه مرکزی',purchaseMode:'package',qty:3,unitsAdded:72,unitCost:15,total:1080,payment:'نسیه'},{id:'demo-pur-2',time:at(18,12),productId:'p-demo-1',productName:'شیر 1 لیتر',supplierId:'sup-1',supplierName:'شرکت پخش نمونه',purchaseMode:'package',qty:4,unitsAdded:48,unitCost:45,total:2160,payment:'نقدی'},{id:'demo-pur-3',time:at(7,10),productId:'p-demo-3',productName:'کتابچه 80 برگ',supplierId:'sup-2',supplierName:'قرطاسیه مرکزی',purchaseMode:'unit',qty:24,unitsAdded:24,unitCost:60,total:1440,payment:'نقدی'}];
- D.purchases.forEach(function(x){D.inventory.push({id:id('inv'),time:x.time,productId:x.productId,productName:x.productName,type:'خرید',qty:x.unitsAdded,ref:'نمونه آموزشی'})});D.sales.forEach(function(sl){sl.items.forEach(function(i){D.inventory.push({id:id('inv'),time:sl.time,productId:i.id,productName:i.name,type:'فروش',qty:-i.qty,ref:'#'+sl.no})})});return normalizeDB(D)
+ const now=new Date(),D=clone(DEFAULT),start=new Date(now);start.setMonth(start.getMonth()-2);start.setDate(start.getDate()-10);start.setHours(8,0,0,0);
+ D.settings=Object.assign({},db.settings,{storeName:'فروشگاه آموزشی حسابداری آسان',storeAddress:'نسخه آموزشی کامل · ۲ ماه و ۱۰ روز',storePhone:'0700000000',demoMode:true,workDayDate:dateKey(),workDayStartedAt:new Date(now.getFullYear(),now.getMonth(),now.getDate(),8,10).toISOString()});
+ D.categories=[
+  {id:'cat-general',name:'عمومی'},{id:'cat-food',name:'خوراکی و نوشیدنی'},{id:'cat-dairy',name:'لبنیات'},{id:'cat-stationery',name:'قرطاسیه'},
+  {id:'cat-home',name:'لوازم خانه'},{id:'cat-hygiene',name:'بهداشتی'},{id:'cat-sewing',name:'خیاطی'},{id:'cat-snacks',name:'تنقلات'}
+ ];
+ const P=function(idv,name,cat,producer,barcode,buy,sell,stock,min,base,purchase,units){
+  return {id:idv,name:name,categoryId:cat,producer:producer,barcodes:[barcode],barcode:barcode,baseUnit:base||'دانه',purchaseUnit:purchase||base||'دانه',unitConversionEnabled:(units||1)>1,unitsPerPurchase:units||1,packageBuyPrice:buy*(units||1),buy:buy,sell:sell,stock:stock,min:min,image:''}
+ };
+ D.products=[
+  P('p1','شیر 1 لیتر','cat-dairy','لبنیات پامیر','6291000000001',45,62,0,12,'دانه','کارتن',12),
+  P('p2','ماست 500 گرم','cat-dairy','لبنیات پامیر','6291000000002',32,45,0,10,'دانه','کارتن',12),
+  P('p3','آب معدنی 1.5 لیتر','cat-food','آب هریوا','6291000000003',18,25,0,20,'دانه','کارتن',12),
+  P('p4','نوشابه 330ml','cat-food','نوشابه شرق','6291000000004',24,35,0,18,'دانه','کارتن',24),
+  P('p5','چای سیاه 500 گرم','cat-food','چای بهار','6291000000005',145,180,0,5),
+  P('p6','بسکویت ساده','cat-snacks','شیرین هرات','6291000000006',28,40,0,12,'دانه','کارتن',24),
+  P('p7','شکلات تخته‌ای','cat-snacks','شیرین هرات','6291000000007',20,30,0,15,'دانه','جعبه',30),
+  P('p8','قلم آبی','cat-stationery','قلم آریا','6291000000008',15,25,0,20,'دانه','جعبه',24),
+  P('p9','قلم مشکی','cat-stationery','قلم آریا','6291000000009',15,25,0,20,'دانه','جعبه',24),
+  P('p10','کتابچه 80 برگ','cat-stationery','دفتر سپید','6291000000010',58,85,0,8,'دانه','بسته',12),
+  P('p11','کاغذ A4 بسته 500','cat-stationery','Paper One','6291000000011',265,320,0,4),
+  P('p12','مایع ظرفشویی','cat-home','خانه پاک','6291000000012',92,125,0,6),
+  P('p13','دستمال کاغذی','cat-hygiene','پاکیزه','6291000000013',42,58,0,10,'دانه','بسته',12),
+  P('p14','صابون','cat-hygiene','پاکیزه','6291000000014',25,38,0,10,'دانه','کارتن',24),
+  P('p15','نخ خیاطی','cat-sewing','نخ هریوا','6291000000015',12,20,0,25,'دانه','جعبه',50),
+  P('p16','سوزن خیاطی بسته','cat-sewing','ابزار خیاطی شرق','6291000000016',18,30,0,15,'بسته','جعبه',20),
+  P('p17','باتری قلمی جفت','cat-home','Power Cell','6291000000017',32,50,0,10,'جفت','بسته',12),
+  P('p18','کیسه زباله رول','cat-home','خانه پاک','6291000000018',35,50,0,8,'رول','کارتن',24)
+ ];
+ D.products[7].barcodes.push('12345678901234567890123456789');
+ D.customers=[
+  {id:'c0',name:'مشتری عمومی',phone:'',balance:0},
+  {id:'c1',name:'احمد رحیمی',phone:'0701000001',balance:0},{id:'c2',name:'فاطمه احمدی',phone:'0701000002',balance:0},
+  {id:'c3',name:'محمد کریمی',phone:'0701000003',balance:0},{id:'c4',name:'مریم نوری',phone:'0701000004',balance:0},
+  {id:'c5',name:'فروشگاه همکار بهار',phone:'0701000005',balance:0},{id:'c6',name:'علی رضایی',phone:'0701000006',balance:0},
+  {id:'c7',name:'سارا حسینی',phone:'0701000007',balance:0},{id:'c8',name:'کتاب‌فروشی دانش',phone:'0701000008',balance:0},
+  {id:'c9',name:'خیاطی ستاره',phone:'0701000009',balance:0},{id:'c10',name:'حمید صادقی',phone:'0701000010',balance:0}
+ ];
+ D.suppliers=[
+  {id:'s1',name:'شرکت پخش هریوا',phone:'0792000001',balance:0},{id:'s2',name:'لبنیات پامیر',phone:'0792000002',balance:0},
+  {id:'s3',name:'قرطاسیه مرکزی',phone:'0792000003',balance:0},{id:'s4',name:'خانه پاک',phone:'0792000004',balance:0},
+  {id:'s5',name:'شیرین هرات',phone:'0792000005',balance:0},{id:'s6',name:'بازرگانی عمومی شرق',phone:'0792000006',balance:0}
+ ];
+ D.sales=[];D.purchases=[];D.inventory=[];D.expenses=[];D.supplierPayments=[];D.customerReceipts=[];D.inventorySnapshots=[];D.financialPeriods=[];D.deletedSales=[];
+ D.financialPeriod={no:1,start:start.toISOString()};
+ function at(offset,h,m){const d=new Date(start);d.setDate(d.getDate()+offset);d.setHours(h||10,m==null?15:m,0,0);return d.toISOString()}
+ const dayCount=Math.max(1,Math.floor((new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime()-start.getTime())/86400000)+1);
+ const opening={};D.products.forEach(function(p,i){opening[p.id]=90+(i%6)*18});
+ let purNo=1;
+ for(let day=1;day<dayCount;day+=4){
+  const p=D.products[(day*3)%D.products.length],sup=D.suppliers[(day+1)%D.suppliers.length],pack=p.unitConversionEnabled,qty=pack?(1+(day%4)):(8+(day%12)),units=pack?qty*p.unitsPerPurchase:qty,total=units*p.buy,payment=(purNo%2===0?'نسیه':'نقدی');
+  D.purchases.push({id:'demo-pur-'+purNo++,time:at(day,10,20),productId:p.id,productName:p.name,supplierId:sup.id,supplierName:sup.name,purchaseMode:pack?'package':'unit',qty:qty,unitsAdded:units,unitCost:p.buy,total:total,payment:payment});
+  if(payment==='نسیه')sup.balance+=total;opening[p.id]+=units;
+ }
+ let no=1;
+ for(let day=0;day<dayCount;day++){
+  const count=2+(day%5);
+  for(let j=0;j<count;j++){
+   const p=D.products[(day*2+j*5)%D.products.length],qty=1+((day+j)%3),credit=((day+j)%8===0),cust=credit?D.customers[1+((day+j)%10)]:D.customers[0],discount=((day+j)%13===0)?5:0,total=Math.max(0,p.sell*qty-discount);
+   const sl={id:'demo-sale-'+day+'-'+j,no:no++,time:at(day,9+j*2,(day+j*7)%55),items:[{id:p.id,name:p.name,barcode:p.barcode,buy:p.buy,sell:p.sell,qty:qty,baseUnit:p.baseUnit}],subtotal:p.sell*qty,discount:discount,total:total,payment:credit?'نسیه':'نقدی',customerId:cust.id,revisions:[]};
+   D.sales.push(sl);opening[p.id]-=qty;if(credit)cust.balance+=total
+  }
+  if(day%5===0)D.expenses.push({id:'demo-exp-'+day,time:at(day,17,10),category:['حمل‌ونقل','برق','مصارف روزانه','بسته‌بندی'][day%4],amount:120+(day%7)*45,note:'نمونه آموزشی'});
+  if(day%7===0){const c=D.customers[1+((day/7)%10|0)],amt=Math.min(220+(day%4)*80,Math.max(0,c.balance));if(amt>0){D.customerReceipts.push({id:'demo-cr-'+day,time:at(day,15,10),customerId:c.id,customerName:c.name,amount:amt,note:'دریافت بخشی از قرض'});c.balance=Math.max(0,c.balance-amt)}}
+  if(day%8===0){const s=D.suppliers[(day/8)%D.suppliers.length|0],amt=Math.min(450+(day%4)*100,Math.max(0,s.balance));if(amt>0){D.supplierPayments.push({id:'demo-sp-'+day,time:at(day,14,20),supplierId:s.id,supplierName:s.name,amount:amt,note:'پرداخت دوره‌ای'});s.balance=Math.max(0,s.balance-amt)}}
+ }
+ D.products.forEach(function(p,i){D.inventory.push({id:'demo-open-'+p.id,time:at(0,8,5),productId:p.id,productName:p.name,type:'موجودی اولیه',qty:90+(i%6)*18,ref:'شروع نسخه آموزشی'})});
+ D.purchases.forEach(function(x){D.inventory.push({id:'inv-p-'+x.id,time:x.time,productId:x.productId,productName:x.productName,type:'خرید',qty:x.unitsAdded,ref:x.supplierName})});
+ D.sales.forEach(function(sl){sl.items.forEach(function(i){D.inventory.push({id:'inv-s-'+sl.id+'-'+i.id,time:sl.time,productId:i.id,productName:i.name,type:'فروش',qty:-i.qty,ref:'#'+sl.no})})});
+ [5,11,16].forEach(function(idx,n){const p=D.products[idx],q=n===1?-2:3;opening[p.id]+=q;D.inventory.push({id:'demo-adj-'+n,time:at(Math.max(3,dayCount-18+n*4),18,5),productId:p.id,productName:p.name,type:'اصلاح موجودی',qty:q,ref:'انبارگردانی آموزشی'})});
+ D.products.forEach(function(p){p.stock=Math.max(0,Math.round(opening[p.id]))});
+ D.products[1].stock=0;D.products[9].stock=4;D.products[14].stock=9;
+ for(let d=0;d<dayCount;d+=5){const sd=new Date(start);sd.setDate(sd.getDate()+d);D.inventorySnapshots.push({date:dateKey(sd),value:D.products.reduce(function(a,p){return a+p.buy*Math.max(0,p.stock+(dayCount-d)%9)},0)})}
+ return normalizeDB(D)
 }
-if($('#loadTrainingDemo'))$('#loadTrainingDemo').onclick=async function(){if(!confirm('نمونه آموزشی 35 روزه بارگذاری شود؟ ابتدا از اطلاعات فعلی Backup گرفته می‌شود و سپس داده‌های فعلی با نمونه آموزشی جایگزین می‌شوند.'))return;if(window.YaranNative&&window.YaranNative.isNative)await createAutoBackup(false);db=buildTrainingDemo();moneyVisible=true;await persistState(db);renderAll();closeModal();toast('نمونه آموزشی 35 روزه فعال شد')};
+if($('#loadTrainingDemo'))$('#loadTrainingDemo').onclick=async function(){
+ if(!confirm('نسخه آموزشی کامل ۲ ماه و ۱۰ روزه بارگذاری شود؟ ابتدا از اطلاعات فعلی Backup گرفته می‌شود و سپس کالاها، دسته‌ها، مشتریان، شرکت‌ها، خرید، فروش، قرض، هزینه و انبار با داده آموزشی پر می‌شوند.'))return;
+ if(window.YaranNative&&window.YaranNative.isNative)await createAutoBackup(false);
+ db=buildTrainingDemo();moneyVisible=true;await persistState(db);renderAll();closeModal();toast('نسخه آموزشی ۲ ماه و ۱۰ روزه فعال شد')
+};
 $('#resetDemo').onclick=function(){if(confirm('تمام اطلاعات حسابداری آسان به حالت اولیه بازنشانی شود؟ این کار قابل برگشت نیست.')){db=normalizeDB(clone(DEFAULT));moneyVisible=true;save();toast('حسابداری آسان به حالت اولیه بازنشانی شد')}};
 $('#exportCsv').onclick=async function(){const list=filteredSalesForReport(),lines=[['شماره فاکتور','تاریخ و زمان','مشتری','روش پرداخت','تعداد اقلام','مبلغ'],...list.map(function(s){const c=db.customers.find(function(x){return x.id===s.customerId});return [s.no,formatDateTime(s.time),c?c.name:'',s.payment,s.items.reduce(function(a,i){return a+i.qty},0),s.total]})],csv='\ufeff'+lines.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),filename='hesabdari-asan-sales-'+dateKey()+'.csv';try{if(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.exportText){const path=await window.YaranNative.exportText(filename,csv);toast(path?'فایل CSV در Downloads ذخیره شد':'خروجی CSV انجام نشد');return}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},500)}catch(e){console.error(e);toast('خروجی CSV انجام نشد')}};
 
@@ -577,6 +659,15 @@ $('#menuBtn').onclick=function(){$('.sidebar').classList.toggle('open')};
 setInterval(renderWorkSession,1000);setInterval(refreshScannerStatus,30000);setInterval(function(){maybeAutoBackup(false)},60000);
 updateInventorySnapshot();applyTheme();renderAll();renderPaymentRequirement();maybeAutoBackup(false);
 (async function setupCloseProtection(){try{if(window.__TAURI__&&window.__TAURI__.window&&window.__TAURI__.window.getCurrentWindow){const win=window.__TAURI__.window.getCurrentWindow();await win.onCloseRequested(async function(e){e.preventDefault();if(!confirm('آیا برنامه بسته شود؟ قبل از خروج یک پشتیبان سبک از دیتابیس گرفته می‌شود.'))return;try{await createAutoBackup(false)}catch(ignore){}await win.destroy()})}}catch(e){console.warn('close protection unavailable',e)}})();
+
+
+/* table-wrap vertical wheel forwarding: horizontal tables never trap page scrolling */
+document.addEventListener('wheel',function(e){
+ const wrap=e.target&&e.target.closest?e.target.closest('.table-wrap'):null;
+ if(!wrap||Math.abs(e.deltaY)<=Math.abs(e.deltaX))return;
+ const page=wrap.closest('.page');
+ if(page){page.scrollTop+=e.deltaY;e.preventDefault()}
+},{passive:false});
 
 /* Desktop-native interaction guards */
 (function(){

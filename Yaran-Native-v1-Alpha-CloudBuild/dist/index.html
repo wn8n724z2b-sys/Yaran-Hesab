@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="vendor/vazirmatn/wght.css" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="v2.css" />
+  <link rel="stylesheet" href="ui-final.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -171,46 +172,76 @@
       </section>
 
       <section id="page-reports" class="page">
-        <div class="reports-hero">
-          <div><h2>گزارش مالی</h2><p>فروش، پول، قرضه‌ها، هزینه و سود در یک نمای ساده</p></div>
+        <div class="reports-hero ui-section-head">
+          <div>
+            <span class="eyebrow">گزارش‌های مالی</span>
+            <h2>گزارش مالی</h2>
+            <p>فروش، نقدینگی، سود و بدهی‌ها؛ مرتب، قابل فهم و بدون شلوغی.</p>
+          </div>
           <div class="report-hero-actions">
-            <label class="period-picker"><span>نمایش</span><select id="reportPeriod"><option value="today">امروز</option><option value="month">ماه جاری</option><option value="financial" selected>دوره مالی جاری</option><option value="all">همه</option></select></label>
+            <label class="period-picker"><span>بازه گزارش</span><select id="reportPeriod"><option value="today">امروز</option><option value="month">ماه جاری</option><option value="financial" selected>دوره مالی جاری</option><option value="all">همه اطلاعات</option></select></label>
             <button id="addExpenseBtn" class="ghost-btn">+ ثبت هزینه</button>
           </div>
         </div>
 
-        <article class="period-card">
-          <div><span>دوره حسابی جاری</span><strong id="financialPeriodTitle">دوره حسابی اول</strong><small id="financialPeriodDates">ماه اول · —</small></div>
-          <div class="period-progress-wrap"><div class="period-progress"><span id="financialPeriodProgress"></span></div><small id="financialPeriodStatus">هدف استاندارد: 6 ماه</small></div>
-          <button id="startNewPeriodBtn" class="primary-btn">شروع دوره جدید</button>
+        <article class="period-card compact-period-card">
+          <div class="period-main">
+            <span>دوره حسابی جاری</span>
+            <strong id="financialPeriodTitle">دوره حسابی اول</strong>
+            <small id="financialPeriodDates">ماه اول · —</small>
+          </div>
+          <div class="period-progress-wrap">
+            <div class="period-progress"><span id="financialPeriodProgress"></span></div>
+            <small id="financialPeriodStatus">هدف استاندارد: 6 ماه</small>
+          </div>
+          <button id="startNewPeriodBtn" class="ghost-btn period-new-btn">شروع دوره جدید</button>
         </article>
 
-        <div class="metric-grid report-metrics">
-          <article class="metric-card primary-metric"><span>گردش پول امروز</span><strong id="rCashToday">0 ؋</strong><small>ورودی منهای خروجی نقدی</small></article>
-          <article class="metric-card"><span>گردش پول ماه جاری</span><strong id="rCashMonth">0 ؋</strong><small>خالص گردش نقدی ماه</small></article>
-          <article class="metric-card"><span>فروش دوره</span><strong id="rSalesPeriod">0 ؋</strong><small id="rSalesPeriodMeta">0 فاکتور</small></article>
-          <article class="metric-card"><span>سود خالص دوره</span><strong id="rNetProfitPeriod">0 ؋</strong><small>سود فروش منهای هزینه‌ها</small></article>
-          <article class="metric-card"><span>قرضه مشتریان</span><strong id="rCustomerDebt">0 ؋</strong><small>مطالبات فعلی</small></article>
-          <article class="metric-card"><span>قرض شرکت‌ها</span><strong id="rSupplierDebt">0 ؋</strong><small>بدهی فعلی به تأمین‌کنندگان</small></article>
-          <article class="metric-card"><span>هزینه‌های دوره</span><strong id="rExpensesPeriod">0 ؋</strong><small>هزینه‌های ثبت‌شده</small></article>
-          <article class="metric-card"><span>ارزش موجودی فعلی</span><strong id="rInventoryValue">0 ؋</strong><small>بر اساس قیمت خرید</small></article>
+        <div class="report-kpi-grid">
+          <article class="report-kpi accent"><span>گردش پول امروز</span><strong id="rCashToday">0 ؋</strong><small>خالص ورود و خروج امروز</small></article>
+          <article class="report-kpi"><span>گردش پول ماه جاری</span><strong id="rCashMonth">0 ؋</strong><small>خالص نقدینگی ماه</small></article>
+          <article class="report-kpi"><span>فروش بازه</span><strong id="rSalesPeriod">0 ؋</strong><small id="rSalesPeriodMeta">0 فاکتور</small></article>
+          <article class="report-kpi success"><span>سود خالص بازه</span><strong id="rNetProfitPeriod">0 ؋</strong><small>سود فروش منهای هزینه‌ها</small></article>
         </div>
 
-        <div class="report-grid">
-          <article class="panel cashflow-pro-panel">
-            <div class="panel-head cashflow-head"><div><h3>گردش نقدی ماه جاری</h3><p>روند خالص نقدینگی؛ جزئیات ورودی و خروجی با نگه‌داشتن ماوس روی هر روز</p></div></div>
-            <div id="cashFlowBars" class="cashflow-pro-chart"></div>
+        <article class="panel cashflow-pro-panel clean-report-panel">
+          <div class="panel-head cashflow-head">
+            <div><h3>گردش نقدی ماه جاری</h3><p>روند خالص پول؛ برای جزئیات هر روز نشانگر ماوس را روی نمودار نگه دارید.</p></div>
+            <span class="soft-badge">ماه جاری</span>
+          </div>
+          <div id="cashFlowBars" class="cashflow-pro-chart"></div>
+        </article>
+
+        <div class="report-detail-grid">
+          <article class="panel financial-summary clean-report-panel">
+            <div class="panel-head"><div><h3 id="financialSummaryTitle">خلاصه مالی دوره</h3><p>جزئیات بازه انتخاب‌شده</p></div></div>
+            <div id="financialSummary" class="summary-list report-summary-grid"></div>
           </article>
-          <article class="panel financial-summary">
-            <div class="panel-head"><div><h3 id="financialSummaryTitle">خلاصه مالی دوره</h3><p>اعداد بر اساس بازه انتخاب‌شده</p></div></div>
-            <div id="financialSummary" class="summary-list"></div>
+          <article class="panel report-balance-panel clean-report-panel">
+            <div class="panel-head"><div><h3>وضعیت فعلی</h3><p>مانده‌های مهم همین لحظه</p></div></div>
+            <div class="balance-cards">
+              <div><span>قرضه مشتریان</span><strong id="rCustomerDebt">0 ؋</strong></div>
+              <div><span>قرض شرکت‌ها</span><strong id="rSupplierDebt">0 ؋</strong></div>
+              <div><span>هزینه‌های بازه</span><strong id="rExpensesPeriod">0 ؋</strong></div>
+              <div><span>ارزش موجودی</span><strong id="rInventoryValue">0 ؋</strong></div>
+            </div>
           </article>
         </div>
 
-        <article class="panel sales-report-panel">
-          <div class="panel-head"><div><h3>فاکتورهای فروش</h3><p>گزارش حرفه‌ای فروش با جستجو و خروجی قابل استفاده در Excel</p></div><div class="report-actions"><button id="exportCsv" class="ghost-btn" title="CSV یک فایل جدولی است که در Excel باز می‌شود">خروجی Excel (CSV)</button><button id="printLastReceipt" class="ghost-btn">چاپ آخرین رسید</button></div></div>
-          <div class="invoice-report-toolbar"><input id="invoiceReportSearch" placeholder="شماره فاکتور، مشتری یا مبلغ..." /><select id="invoicePaymentFilter"><option value="all">همه روش‌ها</option><option value="نقدی">نقدی</option><option value="نسیه">نسیه</option></select><div id="invoiceReportStats" class="invoice-report-stats"></div></div>
-          <div class="table-wrap"><table><thead><tr><th>فاکتور</th><th>تاریخ/زمان</th><th>مشتری</th><th>روش</th><th>اقلام</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="salesBody"></tbody></table></div>
+        <article class="panel sales-report-panel clean-report-panel">
+          <div class="panel-head sales-report-head">
+            <div><h3>فاکتورهای فروش</h3><p>جستجو، فیلتر، ویرایش و خروجی Excel</p></div>
+            <div class="report-actions">
+              <button id="exportCsv" class="ghost-btn compact-action" title="فایل CSV در Excel باز می‌شود">خروجی Excel</button>
+              <button id="printLastReceipt" class="ghost-btn compact-action">چاپ آخرین رسید</button>
+            </div>
+          </div>
+          <div class="invoice-report-toolbar">
+            <div class="invoice-search-wrap"><span>⌕</span><input id="invoiceReportSearch" placeholder="جستجو در فاکتورها: شماره، مشتری یا مبلغ..." /></div>
+            <select id="invoicePaymentFilter"><option value="all">همه روش‌ها</option><option value="نقدی">نقدی</option><option value="نسیه">نسیه</option></select>
+            <div id="invoiceReportStats" class="invoice-report-stats"></div>
+          </div>
+          <div class="table-wrap report-table-wrap"><table class="report-sales-table"><thead><tr><th>فاکتور</th><th>تاریخ/زمان</th><th>مشتری</th><th>روش</th><th>اقلام</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="salesBody"></tbody></table></div>
         </article>
       </section>
 
@@ -221,7 +252,7 @@
           <article class="panel settings-card"><div class="panel-head"><div><h3>پرینتر رسید</h3><p>XPrinter و پرینترهای حرارتی نصب‌شده در Windows</p></div><span class="pill success">80mm</span></div><label class="field"><span>نام پرینتر</span><div class="printer-pick-row"><input id="printerName" list="printerList" placeholder="مثلاً XPrinter XP-Q200" /><button id="detectPrinters" type="button" class="tiny-btn accent">شناسایی</button></div><datalist id="printerList"></datalist></label><label class="switch-row"><span><b>چاپ خودکار</b><small>بعد از ثبت فروش رسید مستقیم چاپ شود</small></span><input id="autoPrint" type="checkbox" /></label><label class="switch-row"><span><b>برش خودکار</b><small>در مدل‌هایی که Driver برش خودکار را پشتیبانی می‌کند.</small></span><input id="autoCut" type="checkbox" /></label><button id="testPrint" class="ghost-btn wide">چاپ آزمایشی 80mm</button><div class="scan-test">چاپ Native به‌صورت تصویری انجام می‌شود تا متن دری/فارسی به‌هم نریزد.</div></article>
           <article class="panel settings-card"><div class="panel-head"><div><h3>بارکدخوان</h3><p>USB HID / Laser Scanner</p></div><span id="scannerStatusPill" class="pill warning">شناسایی نشده</span></div><div class="hardware-status" id="scannerHardwareStatus"><span class="pulse muted-pulse"></span><div><b id="scannerStatusTitle">منتظر اولین اسکن</b><small id="scannerStatusHint">بارکدخوان USB را وصل کنید و یک بارکد اسکن کنید؛ سیستم اسکن سریع را خودکار تشخیص می‌دهد.</small></div></div><label class="field"><span>Suffix</span><select id="scannerSuffix"><option value="Enter">Enter</option><option value="Tab">Tab</option></select></label><div id="lastScan" class="scan-test">آخرین اسکن: —</div></article>
           <article class="panel settings-card online-card"><div class="panel-head"><div><h3>آنلاین</h3><p>اتصال اختیاری به سرور و داشبورد آنلاین</p></div><span id="onlineStatusPill" class="pill">محلی</span></div><label class="switch-row"><span><b>فعال‌سازی اتصال آنلاین</b><small>در حالت خاموش، برنامه کاملاً محلی و بدون اینترنت کار می‌کند.</small></span><input id="onlineEnabled" type="checkbox" /></label><div id="onlineFields" class="online-fields"><label class="field"><span>آدرس سرور</span><input id="onlineServerUrl" type="url" dir="ltr" placeholder="https://example.com" /></label><label class="field"><span>کد فروشگاه</span><input id="onlineStoreCode" dir="ltr" placeholder="STORE-001" /></label><label class="field"><span>فاصله همگام‌سازی</span><select id="onlineSyncMinutes"><option value="5">هر 5 دقیقه</option><option value="15">هر 15 دقیقه</option><option value="30">هر 30 دقیقه</option><option value="60">هر 60 دقیقه</option></select></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی فروش‌ها</b><small>فاکتورها و دریافت‌های مرتبط</small></span><input id="onlineSyncSales" type="checkbox" /></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی موجودی</b><small>کالاها، خریدها و موجودی</small></span><input id="onlineSyncInventory" type="checkbox" /></label><div id="onlineStatusText" class="scan-test">وضعیت: حالت محلی</div><div class="online-actions"><button id="testOnlineConnection" type="button" class="ghost-btn">بررسی اتصال</button><button id="syncOnlineNow" type="button" class="primary-btn">همگام‌سازی حالا</button></div></div></article>
-          <article class="panel settings-card data-support-card"><div class="panel-head"><div><h3>داده‌ها و پشتیبانی</h3><p>این بخش با رمز مدیر محافظت می‌شود</p></div><span class="pill">ADMIN</span></div><div id="dataSupportLock" class="support-lock"><div class="support-lock-icon">⌁</div><div><b>بخش محافظت‌شده</b><small>برای دسترسی به Backup، بازیابی و بازنشانی رمز مدیر را وارد کنید.</small></div><div class="support-unlock-row"><input id="dataSupportPassword" type="password" placeholder="رمز مدیر"><button id="unlockDataSupport" class="primary-btn">باز کردن</button></div></div><div id="dataSupportControls" class="hidden"><label class="field"><span>پشتیبان خودکار</span><select id="autoBackupPerDay"><option value="0">خاموش</option><option value="1">1 بار در روز</option><option value="2">2 بار در روز</option><option value="3">3 بار در روز</option><option value="4">4 بار در روز</option><option value="6">6 بار در روز</option><option value="8">8 بار در روز</option><option value="12">12 بار در روز</option><option value="24">24 بار در روز</option></select></label><div id="autoBackupStatus" class="scan-test">آخرین پشتیبان خودکار: —</div><button id="backupBtn" class="ghost-btn wide">ذخیره دستی Backup</button><label class="upload wide" title="برای فایل‌های پشتیبان JSON نسخه‌های قبلی">بازیابی Backup قدیمی (JSON)<input id="restoreFile" type="file" accept="application/json" /></label><button id="restoreAutoBackup" class="ghost-btn wide">بازیابی آخرین پشتیبان خودکار</button><button id="dbHealthBtn" class="ghost-btn wide">بررسی سلامت دیتابیس</button><button id="auditLogBtn" class="ghost-btn wide">فعالیت‌های اخیر فاکتورها</button><button id="loadTrainingDemo" class="ghost-btn wide">نمونه آموزشی زنده 35 روزه</button><button id="lockDataSupport" class="ghost-btn wide">قفل کردن بخش</button><button id="resetDemo" class="danger-ghost wide">بازنشانی به حالت اولیه</button></div></article>
+          <article class="panel settings-card data-support-card"><div class="panel-head"><div><h3>داده‌ها و پشتیبانی</h3><p>این بخش با رمز مدیر محافظت می‌شود</p></div><span class="pill">ADMIN</span></div><div id="dataSupportLock" class="support-lock"><div class="support-lock-icon">⌁</div><div><b>بخش محافظت‌شده</b><small>برای دسترسی به Backup، بازیابی و بازنشانی رمز مدیر را وارد کنید.</small></div><div class="support-unlock-row"><input id="dataSupportPassword" type="password" placeholder="رمز مدیر"><button id="unlockDataSupport" class="primary-btn">باز کردن</button></div></div><div id="dataSupportControls" class="hidden"><label class="field"><span>پشتیبان خودکار</span><select id="autoBackupPerDay"><option value="0">خاموش</option><option value="1">1 بار در روز</option><option value="2">2 بار در روز</option><option value="3">3 بار در روز</option><option value="4">4 بار در روز</option><option value="6">6 بار در روز</option><option value="8">8 بار در روز</option><option value="12">12 بار در روز</option><option value="24">24 بار در روز</option></select></label><div id="autoBackupStatus" class="scan-test">آخرین پشتیبان خودکار: —</div><button id="backupBtn" class="ghost-btn wide">ذخیره دستی Backup</button><label class="upload wide" title="برای فایل‌های پشتیبان JSON نسخه‌های قبلی">بازیابی Backup قدیمی (JSON)<input id="restoreFile" type="file" accept="application/json" /></label><button id="restoreAutoBackup" class="ghost-btn wide">بازیابی آخرین پشتیبان خودکار</button><button id="dbHealthBtn" class="ghost-btn wide">بررسی سلامت دیتابیس</button><button id="auditLogBtn" class="ghost-btn wide">فعالیت‌های اخیر فاکتورها</button><button id="loadTrainingDemo" class="ghost-btn wide">نسخه آموزشی ۲ ماه و ۱۰ روزه</button><button id="lockDataSupport" class="ghost-btn wide">قفل کردن بخش</button><button id="resetDemo" class="danger-ghost wide">بازنشانی به حالت اولیه</button></div></article>
         </div>
         <article class="panel roadmap"><div class="panel-head"><div><h3>سازگاری</h3><p>نسخه Native v2.0 برای Windows 10/11 64-bit</p></div></div><div class="roadmap-row"><span>Windows 10 64-bit (2015+)</span><b>فعال</b></div><div class="roadmap-row"><span>Windows 11 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>فونت رابط</span><b>Vazirmatn Variable آفلاین</b></div><div class="roadmap-row"><span>SQLite Native</span><b>WAL + Backup فعال</b></div><div class="roadmap-row"><span>چاپ حرارتی 80mm</span><b>Windows Driver مستقیم</b></div><div class="roadmap-row"><span>بارکدخوان USB HID</span><b>اسکن سریع فعال</b></div><div class="roadmap-row"><span>اتصال آنلاین</span><b>قابل پیکربندی</b></div></article>
       </section>
