@@ -6,29 +6,34 @@
   <meta name="color-scheme" content="light dark" />
   <title>حسابداری آسان</title>
   <link rel="stylesheet" href="vendor/vazirmatn/wght.css" />
-  <link rel="stylesheet" href="app-v4.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="v2.css" />
+  <link rel="stylesheet" href="ui-final.css" />
+  <link rel="stylesheet" href="v3.css" />
 </head>
-<body data-page="dashboard">
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 36 36"><rect x="4" y="20" width="6" height="12" rx="3"/><rect x="15" y="12" width="6" height="20" rx="3"/><rect x="26" y="5" width="6" height="27" rx="3"/></svg>
-        </div>
+<body>
+  <div class="app-shell v3-shell">
+    <aside class="sidebar v3-sidebar">
+      <div class="brand v3-brand">
+        <div class="brand-mark">آ</div>
         <div class="brand-copy">
           <div class="brand-title">حسابداری آسان</div>
-          <div class="brand-sub">مدیریت ساده، کار سریع</div>
+          <div class="brand-sub">مدیریت ساده، کسب‌وکار موفق</div>
+          <span class="free-badge">نسخه رایگان</span>
         </div>
       </div>
 
-      <nav id="nav" class="nav">
-        <button class="nav-item active" data-page="dashboard"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-6h5v6"/></svg></span><b>داشبورد</b></button>
-        <button class="nav-item" data-page="pos"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 5h2l2 10h10l2-7H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg></span><b>فروش</b></button>
-        <button class="nav-item" data-page="products"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="M4 7v10l8 4 8-4V7"/><path d="M12 11v10"/></svg></span><b>کالاها</b></button>
-        <button class="nav-item" data-page="parties"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-4 2.5-6 5.5-6s5 2 5.5 6"/><circle cx="17" cy="9" r="2"/><path d="M15.5 14c2.8 0 4.5 1.7 5 5"/></svg></span><b>اشخاص</b></button>
-        <button class="nav-item" data-page="inventory"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 10 12 4l8 6v10H4V10Z"/><path d="M8 20v-6h8v6"/><path d="M8 10h8"/></svg></span><b>انبارداری</b></button>
-        <button class="nav-item" data-page="reports"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/></svg></span><b>گزارش‌ها</b></button>
-        <button class="nav-item" data-page="settings"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21h-4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3.1 14H3v-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3.1V3h4v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1v4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></span><b>تنظیمات</b></button>
+      <nav id="nav" class="nav v3-nav">
+        <button class="nav-item active" data-page="dashboard"><span class="nav-icon">⌂</span><b>داشبورد</b></button>
+        <button class="nav-item" data-page="pos"><span class="nav-icon">▣</span><b>فروش</b></button>
+        <button class="nav-item" data-page="products"><span class="nav-icon">◇</span><b>کالاها</b></button>
+        <button class="nav-item" data-page="parties"><span class="nav-icon">♙</span><b>مشتریان و شرکت‌ها</b></button>
+        <button class="nav-item" data-page="categories"><span class="nav-icon">◇</span><b>دسته‌ها</b></button>
+        <button class="nav-item" data-page="expenses"><span class="nav-icon">▣</span><b>هزینه‌ها</b></button>
+        <button class="nav-item" data-page="reports"><span class="nav-icon">▥</span><b>گزارش‌ها</b></button>
+        <button class="nav-item" data-page="inventory"><span class="nav-icon">⌂</span><b>انبارداری</b></button>
+        <button class="nav-item" data-page="data"><span class="nav-icon">◉</span><b>داده‌ها و پشتیبانی</b></button>
+        <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span><b>تنظیمات</b></button>
       </nav>
 
       <a id="creatorContact" class="sidebar-footer creator-footer" href="https://t.me/Naman_Rahimi" title="ارتباط با سازنده">
@@ -36,261 +41,211 @@
       </a>
     </aside>
 
-    <main class="main">
-      <header class="topbar">
-        <div class="profile-zone">
-          <div class="profile-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.6-5 3-7.5 7.5-7.5s6.9 2.5 7.5 7.5"/></svg></div>
-          <div class="profile-copy"><strong>مدیر سیستم</strong><small>حسابداری آسان</small></div>
-          <button id="menuBtn" class="icon-btn mobile-only" aria-label="منو">☰</button>
-          <div class="profile-tools">
-            <button class="icon-btn soft-icon" type="button" title="پیام‌ها"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 3V5Z"/><path d="M8 9h8M8 13h5"/></svg></button>
-            <button class="icon-btn soft-icon" type="button" title="تقویم"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></button>
-          </div>
-        </div>
-
-        <div class="global-search">
-          <input id="globalSearch" placeholder="جستجو در فاکتورها، مشتریان، کالاها و ..." />
-          <span class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span>
-          <kbd>Ctrl K</kbd>
-        </div>
-
-        <div class="topbar-meta">
-          <div class="today-card"><span>امروز</span><b id="topDateText">—</b></div>
-          <div id="workSession" class="work-session" title="از اولین اجرای امروز محاسبه می‌شود">
-            <span class="work-door"><svg viewBox="0 0 32 32"><path d="M8 5.5h10.5v21H8z"/><path d="M18.5 7.2 25 10v14l-6.5 2.8V7.2Z"/><circle cx="21.5" cy="17" r="1"/></svg></span>
-            <span class="work-copy"><small>ساعات کاری</small><b id="workSessionValue">00:00:00</b></span>
-          </div>
-          <div id="clock" class="clock"></div>
+    <main class="main v3-main">
+      <header class="topbar v3-topbar">
+        <div class="top-actions v3-top-actions">
+          <button id="newSaleTop" class="primary-btn top-sale-btn">+ فروش جدید</button>
           <button id="themeToggle" class="icon-btn theme-toggle" title="تغییر تم" aria-label="تغییر تم">☾</button>
-          <button id="newSaleTop" class="primary-btn new-sale-top"><span>+</span> فروش جدید</button>
+          <div id="clock" class="clock"></div>
+          <div id="workSession" class="work-session v3-work-session" title="از اولین اجرای امروز محاسبه می‌شود">
+            <span class="work-door" aria-hidden="true">▥</span>
+            <span class="work-copy"><small>ساعات کاری امروز</small><b id="workSessionValue">00:00:00</b></span>
+          </div>
+          <div class="global-search v3-global-search">
+            <span class="search-icon">⌕</span>
+            <input id="globalSearch" placeholder="جستجو در کالا، بارکد، فاکتور و مشتری..." />
+            <kbd>Ctrl K</kbd>
+          </div>
         </div>
-
-        <div class="page-title-wrap page-title-hidden" aria-hidden="true"><div><h1 id="pageTitle">داشبورد</h1><p id="pageSubtitle">نمای کلی فروشگاه</p></div></div>
+        <div class="page-title-wrap v3-page-title-wrap">
+          <button id="menuBtn" class="icon-btn mobile-only" aria-label="منو">☰</button>
+          <div>
+            <h1 id="pageTitle">داشبورد</h1>
+            <p id="pageSubtitle">نمای کلی کسب‌وکار</p>
+          </div>
+        </div>
       </header>
 
       <section id="page-dashboard" class="page active">
-        <div class="dashboard-topline">
-          <div><span class="section-kicker">نمای کلی</span><h2>داشبورد حسابداری آسان</h2><p>فروش، وضعیت مالی و عملیات روزانه در یک نگاه.</p></div>
-          <button id="moneyToggle" class="money-toggle" title="پنهان/نمایش مبلغ‌ها"><span id="moneyToggleIcon">◉</span><b id="moneyToggleText">پنهان کردن مبلغ‌ها</b></button>
+        <div class="dashboard-headline">
+          <div><span class="eyebrow">امروز</span><h2>نمای کلی کسب‌وکار</h2><p>مهم‌ترین اعداد روز را بدون شلوغی ببینید.</p></div>
+          <button id="moneyToggle" class="money-toggle compact-money-toggle" title="پنهان/نمایش مبلغ‌ها"><span id="moneyToggleIcon">◉</span><b id="moneyToggleText">پنهان کردن مبلغ‌ها</b></button>
         </div>
 
-        <div class="metric-grid dashboard-metrics reference-metrics">
-          <article class="metric-card metric-sales"><div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M4 17 9 12l4 3 7-8"/><path d="M15 7h5v5"/></svg></div><div><span>فروش امروز</span><strong id="mSales" class="sensitive-money">0 ؋</strong><small id="mSalesCount">0 فاکتور</small></div></article>
-          <article class="metric-card metric-income"><div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M5 19V11M12 19V5M19 19v-8"/></svg></div><div><span>درآمد نقدی امروز</span><strong id="mIncome" class="sensitive-money">0 ؋</strong><small>ورودی واقعی پول</small></div></article>
-          <article class="metric-card metric-expense"><div class="metric-icon"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><div><span>هزینه امروز</span><strong id="mExpensesToday" class="sensitive-money">0 ؋</strong><small>مصارف ثبت‌شده امروز</small></div></article>
-          <article class="metric-card metric-debt"><div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M7 7a5 5 0 0 1 9.5 2M17 17a5 5 0 0 1-9.5-2"/><path d="M17 4v5h-5M7 20v-5h5"/></svg></div><div><span>قرض مشتریان</span><strong id="mCustomerDebt" class="sensitive-money">0 ؋</strong><small>مانده نسیه مشتریان</small></div></article>
-          <article class="metric-card metric-profit"><div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/><path d="m4 8 5-4 4 3 7-5"/></svg></div><div><span>سود خالص امروز</span><strong id="mNetProfit" class="sensitive-money">0 ؋</strong><small>پس از کسر هزینه‌ها</small></div></article>
+        <div class="metric-grid v3-metric-grid">
+          <article class="metric-card metric-sales"><div class="metric-icon">↗</div><span>فروش امروز</span><strong id="mSales" class="sensitive-money">0 ؋</strong><small id="mSalesCount">0 فاکتور</small></article>
+          <article class="metric-card metric-profit"><div class="metric-icon">⌁</div><span>سود خالص امروز</span><strong id="mNetProfit" class="sensitive-money">0 ؋</strong><small>پس از هزینه‌های امروز</small></article>
+          <article class="metric-card metric-expense"><div class="metric-icon">▣</div><span>هزینه امروز</span><strong id="mExpenseToday" class="sensitive-money">0 ؋</strong><small>هزینه‌های ثبت‌شده</small></article>
+          <article class="metric-card metric-debt"><div class="metric-icon">↻</div><span>قرض مشتریان</span><strong id="mCustomerDebt" class="sensitive-money">0 ؋</strong><small>مانده نسیه مشتریان</small></article>
+          <article class="metric-card metric-inventory"><div class="metric-icon">◇</div><span>ارزش موجودی</span><strong id="mInventoryValue" class="sensitive-money">0 ؋</strong><small id="mInventorySnapshot">بر اساس قیمت خرید</small></article>
         </div>
 
-        <div class="dashboard-grid reference-dashboard-grid">
-          <article class="panel finance-chart-panel">
+        <div class="dashboard-main-grid">
+          <article class="panel finance-chart-panel v3-chart-panel">
             <div class="panel-head chart-panel-head">
-              <div><h3>نمودار عملکرد مالی</h3><p>فروش، قرض‌ها و سود خالص در بازه انتخابی</p></div>
+              <div><h3>روند فروش و سود</h3><p>عملکرد روزانه بر اساس داده‌های واقعی</p></div>
               <div class="chart-range" aria-label="بازه نمودار">
                 <button class="chart-range-btn active" data-chart-range="7">7 روز</button>
                 <button class="chart-range-btn" data-chart-range="30">30 روز</button>
                 <button class="chart-range-btn" data-chart-range="month">ماه جاری</button>
               </div>
             </div>
-            <div class="chart-legend"><span><i class="legend-dot sales"></i>فروش</span><span><i class="legend-dot debt"></i>قرض</span><span><i class="legend-dot profit"></i>سود خالص</span></div>
-            <div id="financeChart" class="finance-chart"></div>
+            <div class="chart-legend dashboard-chart-legend">
+              <span><i class="legend-dot sales"></i>فروش</span>
+              <span><i class="legend-dot debt"></i>قرض</span>
+              <span><i class="legend-dot profit"></i>سود خالص</span>
+            </div>
+            <div id="financeChart" class="finance-chart" aria-label="نمودار مالی روزانه"></div>
           </article>
 
-          <article class="panel recent-sales-panel">
-            <div class="panel-head"><div><h3>فروش‌های اخیر</h3><p>آخرین فاکتورهای ثبت‌شده</p></div><button class="text-link" data-go="reports">مشاهده همه</button></div>
-            <div id="recentSales" class="recent-sales-list"></div>
+          <article class="panel recent-sales-card">
+            <div class="panel-head"><div><h3>فروش‌های اخیر</h3><p>آخرین فاکتورهای ثبت‌شده</p></div><button class="link-btn" data-go="archive">مشاهده همه</button></div>
+            <div id="dashboardRecentSales" class="recent-sales-list"></div>
           </article>
         </div>
 
-        <div class="dashboard-bottom-grid">
+        <div class="dashboard-lower-grid">
           <article class="panel quick-access-panel">
-            <div class="panel-head"><div><h3>دسترسی سریع</h3><p>عملیات‌های پرکاربرد سیستم</p></div></div>
+            <div class="panel-head"><div><h3>دسترسی سریع</h3><p>عملیات پرکاربرد سیستم</p></div></div>
             <div class="quick-access-grid">
-              <button class="quick-action qa-blue" data-go="pos"><span class="qa-icon"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><span><b>ثبت فاکتور</b><small>صدور فاکتور فروش</small></span></button>
-              <button id="quickAddProduct" class="quick-action qa-green"><span class="qa-icon"><svg viewBox="0 0 24 24"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="M4 7v10l8 4 8-4V7M12 11v10"/></svg></span><span><b>کالای جدید</b><small>ثبت کالای جدید</small></span></button>
-              <button id="quickAddCustomer" class="quick-action qa-yellow"><span class="qa-icon"><svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="3"/><path d="M4 20c.5-4.5 2.5-7 6-7 2.2 0 3.8.9 4.8 2.5"/><path d="M18 13v6M15 16h6"/></svg></span><span><b>مشتری جدید</b><small>ثبت مشتری جدید</small></span></button>
+              <button class="quick-action qa-sale" data-go="pos"><span>＋</span><div><b>ثبت فاکتور</b><small>فروش جدید</small></div></button>
+              <button class="quick-action qa-product" id="dashboardAddProduct"><span>◇</span><div><b>کالای جدید</b><small>ثبت کالا</small></div></button>
+              <button class="quick-action qa-customer" id="dashboardAddCustomer"><span>♙</span><div><b>مشتری جدید</b><small>ثبت مشتری</small></div></button>
+              <button class="quick-action qa-expense" data-go="expenses"><span>▣</span><div><b>ثبت هزینه</b><small>هزینه جدید</small></div></button>
             </div>
           </article>
-
-          <article class="panel mini-overview-card"><div class="overview-icon"><svg viewBox="0 0 24 24"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="M4 7v10l8 4 8-4V7M12 11v10"/></svg></div><div><span>وضعیت موجودی کالاها</span><strong id="dashInventoryCount">0</strong><small>قلم کالا</small><button class="text-link" data-go="inventory">مشاهده انبار ←</button></div></article>
-          <article class="panel mini-overview-card"><div class="overview-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-4 2.5-6 5.5-6s5 2 5.5 6"/><circle cx="17" cy="9" r="2"/><path d="M15.5 14c2.8 0 4.5 1.7 5 5"/></svg></div><div><span>مشتریان ثبت‌شده</span><strong id="dashCustomerCount">0</strong><small>مشتری</small><button class="text-link" data-go="parties">مشاهده همه ←</button></div></article>
+          <article class="panel compact-status-card"><div class="panel-head"><div><h3>وضعیت موجودی</h3><p>خلاصه انبار</p></div></div><strong id="mLowStock">0</strong><span>کالای کم‌موجود</span><button class="link-btn" data-go="inventory">مشاهده انبار</button></article>
+          <article class="panel compact-status-card"><div class="panel-head"><div><h3>مشتریان</h3><p>خلاصه مشتریان</p></div></div><strong id="dashboardCustomerCount">0</strong><span>مشتری ثبت‌شده</span><button class="link-btn" data-go="parties">مشاهده مشتریان</button></article>
         </div>
 
-        <div class="dashboard-compat visually-hidden" aria-hidden="true">
-          <span id="mInventoryValue">0 ؋</span><span id="mInventorySnapshot"></span><span id="mSupplierPaid">0 ؋</span><span id="mSupplierDebt">0 ؋</span><span id="mLowStock">0</span><span id="mFinancialPeriod"></span><div id="lowStockList"></div>
+        <div class="compat-hidden" aria-hidden="true">
+          <b id="mSupplierPaid">0 ؋</b><b id="mSupplierDebt">0 ؋</b><b id="mFinancialPeriod">دوره حسابی اول</b><div id="lowStockList"></div><table><tbody id="recentSales"></tbody></table>
         </div>
       </section>
 
       <section id="page-pos" class="page">
+        <div class="page-section-head"><div><span class="eyebrow">صندوق فروش</span><h2>فروش</h2><p>اسکن سریع، ثبت فاکتور و چاپ رسید</p></div></div>
         <div class="pos-layout">
           <div class="panel pos-main">
-            <div class="sales-focus-head">
-              <div>
-                <span class="sales-eyebrow">فروش سریع</span>
-                <h3>اسکن کنید، تعداد را تنظیم کنید، ثبت کنید</h3>
-              </div>
-              <div class="sales-focus-actions">
-                <button id="undoLastCart" class="ghost-btn compact-sale-btn" type="button">↶ برگشت آخرین قلم</button>
-                <button id="clearCart" class="danger-ghost compact-sale-btn" type="button">پاک کردن فاکتور</button>
-              </div>
-            </div>
             <div class="scanner-row">
-              <div class="scanner-box"><span class="scan-icon">▥</span><input id="barcodeInput" autocomplete="off" placeholder="بارکد را اسکن کنید یا نام کالا را بنویسید..." /><span id="scannerState" class="scanner-state">آماده اسکن</span></div>
+              <div class="scanner-box v3-search-box"><span class="scan-icon">⌕</span><input id="barcodeInput" autocomplete="off" placeholder="بارکد را اسکن کنید یا نام کالا را بنویسید..." /><span id="scannerState" class="scanner-state">آماده اسکن</span></div>
+              <button id="clearCart" class="danger-ghost">پاک کردن</button>
             </div>
             <div id="posSearchResults" class="pos-search-results hidden"></div>
-            <div id="quickProducts" class="quick-products hidden"></div>
+            <div id="quickProducts" class="quick-products"></div>
             <div class="table-wrap cart-wrap"><table><thead><tr><th>کالا</th><th>تعداد</th><th>قیمت</th><th>جمع</th><th></th></tr></thead><tbody id="cartBody"></tbody></table></div>
             <div id="emptyCart" class="empty"><div>▣</div><strong>فاکتور خالی است</strong><span>یک کالا را اسکن یا جستجو کنید</span></div>
           </div>
           <aside class="panel checkout">
-            <div class="invoice-meta"><div><span>فاکتور</span><strong id="invoiceNo">#000001</strong></div><div><span>صندوق‌دار</span><strong>Owner</strong></div></div>
+            <div class="invoice-meta"><div><span>فاکتور</span><strong id="invoiceNo">#000001</strong></div><div><span>وضعیت</span><strong>جدید</strong></div></div>
             <div class="summary-line"><span>جمع کالا</span><b id="sumSubtotal">0 ؋</b></div>
             <div class="summary-line"><span>تخفیف</span><div class="inline-input"><input id="discountInput" type="number" min="0" value="0" inputmode="numeric" /><span>؋</span></div></div>
             <div class="summary-line total"><span>قابل پرداخت</span><b id="sumTotal">0 ؋</b></div>
-            <label class="field customer-field"><span>مشتری</span><div class="customer-picker"><input id="customerSearch" list="customerDatalist" autocomplete="off" placeholder="مشتری عمومی" /><datalist id="customerDatalist"></datalist><input id="customerSelect" type="hidden" value="c0" /></div><small class="field-help">برای فاکتور جدید «مشتری عمومی» پیش‌فرض است؛ نام یا شماره را برای جستجوی سریع بنویسید.</small></label>
+            <label class="field customer-field"><span>مشتری</span><div class="customer-picker"><input id="customerSearch" list="customerDatalist" autocomplete="off" placeholder="مشتری عمومی" /><datalist id="customerDatalist"></datalist><input id="customerSelect" type="hidden" value="c0" /></div><small class="field-help">مشتری عمومی به‌صورت پیش‌فرض انتخاب شده است.</small></label>
             <div class="payment-required-note" id="paymentRequiredNote">روش پرداخت را انتخاب کنید</div>
             <div class="payment-tabs"><button class="payment" data-pay="نقدی">نقدی</button><button class="payment" data-pay="نسیه">نسیه</button></div>
             <button id="checkoutBtn" class="pay-btn">ثبت و پرداخت</button>
             <div class="pos-shortcuts"><span><kbd>F4</kbd> پرداخت</span><span><kbd>Ctrl P</kbd> چاپ</span></div>
           </aside>
         </div>
+        <article class="panel recent-invoices-panel">
+          <div class="panel-head"><div><h3>فاکتورهای اخیر</h3><p>برای سرعت بیشتر فقط تعداد انتخاب‌شده نمایش داده می‌شود.</p></div><div class="panel-head-actions"><label class="compact-select-label">نمایش <select id="posInvoiceLimit"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select> فاکتور</label><button class="ghost-btn" data-go="archive">آرشیو کامل</button></div></div>
+          <div class="table-wrap"><table><thead><tr><th>فاکتور</th><th>زمان</th><th>مشتری</th><th>روش</th><th>اقلام</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="posRecentSales"></tbody></table></div>
+        </article>
       </section>
 
       <section id="page-products" class="page">
+        <div class="page-section-head"><div><span class="eyebrow">مدیریت کالا</span><h2>کالاها</h2><p>کالا، قیمت، بارکد و موجودی در یک جدول منظم</p></div><button id="addProductBtn" class="primary-btn">+ کالای جدید</button></div>
         <article class="panel">
-          <div class="panel-head"><div><h3>کالاها</h3><p>عکس، دسته‌بندی، شرکت تولیدکننده، قیمت و بارکد</p></div><button id="addProductBtn" class="primary-btn">+ کالای جدید</button></div>
-          <div class="toolbar product-toolbar"><input id="productSearch" placeholder="نام کالا، شرکت تولیدکننده یا هر بارکد را بنویسید..." /><select id="categoryFilter"><option value="all">همه دسته‌ها</option></select><select id="productFilter"><option value="all">همه کالاها</option><option value="low">موجودی کم</option><option value="packaged">تبدیل واحد فعال</option></select><button id="manageCategoriesBtn" class="ghost-btn">+ ایجاد دسته</button></div>
-          <div class="table-wrap product-table-wrap"><table class="products-table"><thead><tr><th>کالا</th><th>بارکد اصلی</th><th>بارکدها</th><th>بهای هر واحد</th><th>قیمت فروش</th><th>واحد خرید</th><th>موجودی</th><th></th></tr></thead><tbody id="productsBody"></tbody></table></div>
+          <div class="toolbar unified-toolbar product-toolbar"><div class="search-control"><span>⌕</span><input id="productSearch" placeholder="جستجوی نام، شرکت یا بارکد..." /></div><select id="categoryFilter"><option value="all">همه دسته‌ها</option></select><select id="productFilter"><option value="all">همه کالاها</option><option value="low">موجودی کم</option><option value="packaged">تبدیل واحد فعال</option></select><select id="productPageSize" class="page-size-select"><option value="10">10 ردیف</option><option value="20" selected>20 ردیف</option><option value="50">50 ردیف</option></select><button id="manageCategoriesBtn" class="ghost-btn">مدیریت دسته‌ها</button></div>
+          <div class="table-wrap product-table-wrap"><table class="products-table"><thead><tr><th>کالا</th><th>بارکد اصلی</th><th>بارکدها</th><th>بهای واحد</th><th>قیمت فروش</th><th>واحد خرید</th><th>موجودی</th><th>عملیات</th></tr></thead><tbody id="productsBody"></tbody></table></div>
+          <div id="productsPagination" class="pagination"></div>
         </article>
-      </section>
-
-      <section id="page-inventory" class="page">
-        <div class="metric-grid compact">
-          <article class="metric-card"><span>تعداد کالا</span><strong id="invProductCount">0</strong><small>کالاهای فعال</small></article>
-          <article class="metric-card"><span>تعداد موجودی</span><strong id="invUnits">0</strong><small>مجموع واحدها</small></article>
-          <article class="metric-card"><span>ارزش موجودی</span><strong id="invCost">0 ؋</strong><small>بر اساس بهای خرید</small></article>
-          <article class="metric-card"><span>هشدار موجودی</span><strong id="invLow">0</strong><small id="invOutOfStockMeta">0 ناموجود</small></article>
-        </div>
-        <article class="panel inventory-overview-panel">
-          <div class="panel-head"><div><h3>وضعیت انبار</h3><p>موجودی، ارزش و وضعیت هر کالا</p></div><div class="inventory-tools"><input id="inventorySearch" placeholder="جستجوی کالا یا بارکد..." /><select id="inventoryStatusFilter"><option value="all">همه وضعیت‌ها</option><option value="out">ناموجود</option><option value="low">رو به اتمام</option><option value="ok">موجود</option></select><button id="adjustInventoryBtn" class="ghost-btn">اصلاح موجودی</button></div></div>
-          <div class="table-wrap"><table class="inventory-stock-table"><thead><tr><th>کالا</th><th>دسته</th><th>موجودی</th><th>حداقل</th><th>ارزش خرید</th><th>ارزش فروش</th><th>وضعیت</th></tr></thead><tbody id="inventoryStockBody"></tbody></table></div>
-        </article>
-        <div class="inventory-grid">
-          <article class="panel"><div class="panel-head"><div><h3>کاردکس موجودی</h3><p>ورود، خروج و اصلاح‌های اخیر</p></div></div><div class="table-wrap"><table><thead><tr><th>زمان</th><th>کالا</th><th>نوع</th><th>تغییر</th><th>مرجع</th></tr></thead><tbody id="inventoryBody"></tbody></table></div></article>
-          <article class="panel"><div class="panel-head"><div><h3>خریدهای اخیر</h3><p>آخرین ورود کالا به انبار</p></div></div><div id="inventoryPurchases" class="list"></div></article>
-        </div>
       </section>
 
       <section id="page-parties" class="page">
-        <div class="party-grid">
-          <article class="panel"><div class="panel-head"><div><h3>مشتریان</h3><p>دفتر قرضه و دریافت مشتری</p></div><button id="addCustomerBtn" class="ghost-btn">+ مشتری</button></div><div id="customerList" class="list"></div></article>
-          <article class="panel"><div class="panel-head"><div><h3>شرکت‌ها / تأمین‌کنندگان</h3><p>مانده قرض و پرداخت‌ها</p></div><button id="addSupplierBtn" class="ghost-btn">+ شرکت</button></div><div id="supplierList" class="list"></div></article>
+        <div class="page-section-head"><div><span class="eyebrow">اشخاص</span><h2>مشتریان و شرکت‌ها</h2><p>قرض‌ها، دریافت‌ها و تأمین‌کنندگان</p></div></div>
+        <div class="party-grid v3-party-grid">
+          <article class="panel"><div class="panel-head"><div><h3>مشتریان</h3><p>جستجو و مدیریت دفتر قرضه</p></div><button id="addCustomerBtn" class="primary-btn small-primary">+ مشتری</button></div><div class="unified-toolbar slim-toolbar"><div class="search-control"><span>⌕</span><input id="partyCustomerSearch" placeholder="نام یا شماره مشتری..." /></div><select id="customerPageSize"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select></div><div id="customerList" class="list"></div><div id="customerPagination" class="pagination"></div></article>
+          <article class="panel"><div class="panel-head"><div><h3>شرکت‌ها / تأمین‌کنندگان</h3><p>مانده قرض و پرداخت‌ها</p></div><button id="addSupplierBtn" class="primary-btn small-primary">+ شرکت</button></div><div class="unified-toolbar slim-toolbar"><div class="search-control"><span>⌕</span><input id="supplierSearch" placeholder="جستجوی شرکت..." /></div><select id="supplierPageSize"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select></div><div id="supplierList" class="list"></div><div id="supplierPagination" class="pagination"></div></article>
         </div>
+      </section>
+
+      <section id="page-categories" class="page">
+        <div class="page-section-head"><div><span class="eyebrow">ساختار کالا</span><h2>دسته‌ها</h2><p>ویرایش، مرتب‌سازی و مدیریت دسته‌بندی کالاها</p></div><button id="categoryPageManageBtn" class="primary-btn">+ دسته جدید</button></div>
+        <article class="panel"><div class="unified-toolbar"><div class="search-control"><span>⌕</span><input id="categoryPageSearch" placeholder="جستجوی دسته..." /></div><select id="categoryPageSize"><option value="10">10 ردیف</option><option value="20" selected>20 ردیف</option></select></div><div class="table-wrap"><table><thead><tr><th>نام دسته</th><th>تعداد کالا</th><th>ترتیب</th><th>عملیات</th></tr></thead><tbody id="categoriesBody"></tbody></table></div><div id="categoriesPagination" class="pagination"></div></article>
+      </section>
+
+      <section id="page-expenses" class="page">
+        <div class="page-section-head"><div><span class="eyebrow">مالی</span><h2>هزینه‌ها</h2><p>هزینه‌ها مستقیماً در SQLite ذخیره و در سود خالص و گزارش‌ها استفاده می‌شوند.</p></div><button id="addExpenseBtn" class="primary-btn">+ ثبت هزینه</button></div>
+        <div class="metric-grid compact expense-metrics"><article class="metric-card"><span>هزینه امروز</span><strong id="expenseTodayTotal">0 ؋</strong><small>جمع هزینه امروز</small></article><article class="metric-card"><span>هزینه ماه جاری</span><strong id="expenseMonthTotal">0 ؋</strong><small>جمع ماه</small></article><article class="metric-card"><span>تعداد هزینه‌ها</span><strong id="expenseCount">0</strong><small>کل رکوردها</small></article></div>
+        <article class="panel"><div class="unified-toolbar"><div class="search-control"><span>⌕</span><input id="expenseSearch" placeholder="نوع هزینه یا یادداشت..." /></div><select id="expensePeriod"><option value="today">امروز</option><option value="last7">7 روز گذشته</option><option value="month" selected>ماه جاری</option><option value="prevmonth">ماه قبل</option><option value="all">همه</option></select><select id="expensePageSize"><option value="10">10 ردیف</option><option value="20" selected>20 ردیف</option><option value="50">50 ردیف</option></select></div><div class="table-wrap"><table><thead><tr><th>تاریخ</th><th>نوع هزینه</th><th>یادداشت</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="expensesBody"></tbody></table></div><div id="expensesPagination" class="pagination"></div></article>
       </section>
 
       <section id="page-reports" class="page">
-        <div class="reports-hero ui-section-head">
-          <div>
-            <span class="eyebrow">گزارش‌های مالی</span>
-            <h2>گزارش مالی</h2>
-            <p>فروش، نقدینگی، سود و بدهی‌ها؛ مرتب، قابل فهم و بدون شلوغی.</p>
-          </div>
-          <div class="report-hero-actions">
-            <label class="period-picker"><span>بازه گزارش</span><select id="reportPeriod"><option value="today">امروز</option><option value="month">ماه جاری</option><option value="financial" selected>دوره مالی جاری</option><option value="all">همه اطلاعات</option></select></label>
-            <button id="addExpenseBtn" class="ghost-btn">+ ثبت هزینه</button>
-          </div>
+        <div class="page-section-head reports-title"><div><span class="eyebrow">تحلیل مالی</span><h2>گزارش‌ها</h2><p>گزارش ساده، قابل فهم و قابل فیلتر</p></div><div class="report-hero-actions"><label class="period-picker"><span>بازه گزارش</span><select id="reportPeriod"><option value="today">امروز</option><option value="yesterday">دیروز</option><option value="last7">7 روز گذشته</option><option value="month" selected>ماه جاری</option><option value="prevmonth">ماه قبل</option><option value="financial">دوره مالی جاری</option><option value="all">همه اطلاعات</option><option value="custom">بازه سفارشی</option></select></label></div></div>
+        <div id="customReportRange" class="custom-range hidden"><label>از <input id="reportFrom" type="date" /></label><label>تا <input id="reportTo" type="date" /></label><button id="applyCustomReport" class="ghost-btn">اعمال بازه</button></div>
+
+        <div class="report-kpi-grid v3-report-kpis">
+          <article class="report-kpi accent"><span>فروش</span><strong id="rSalesPeriod">0 ؋</strong><small id="rSalesPeriodMeta">0 فاکتور</small></article>
+          <article class="report-kpi expense"><span>هزینه</span><strong id="rExpensesPeriod">0 ؋</strong><small>هزینه‌های بازه</small></article>
+          <article class="report-kpi debt"><span>قرض</span><strong id="rReportDebt">0 ؋</strong><small>فروش نسیه بازه</small></article>
+          <article class="report-kpi payment"><span>پرداخت</span><strong id="rReportPayments">0 ؋</strong><small>دریافت قرض مشتریان</small></article>
+          <article class="report-kpi success"><span>سود خالص</span><strong id="rNetProfitPeriod">0 ؋</strong><small>سود فروش منهای هزینه</small></article>
         </div>
 
-        <article class="period-card compact-period-card">
-          <div class="period-main">
-            <span>دوره حسابی جاری</span>
-            <strong id="financialPeriodTitle">دوره حسابی اول</strong>
-            <small id="financialPeriodDates">ماه اول · —</small>
-          </div>
-          <div class="period-progress-wrap">
-            <div class="period-progress"><span id="financialPeriodProgress"></span></div>
-            <small id="financialPeriodStatus">هدف استاندارد: 6 ماه</small>
-          </div>
-          <button id="startNewPeriodBtn" class="ghost-btn period-new-btn">شروع دوره جدید</button>
+        <article class="panel report-chart-panel">
+          <div class="panel-head"><div><h3>نمودار مالی</h3><p>سری‌های مورد نیاز را روشن یا خاموش کنید.</p></div><div class="series-toggles"><button class="series-toggle active" data-report-series="sales">فروش</button><button class="series-toggle active" data-report-series="expenses">هزینه</button><button class="series-toggle active" data-report-series="debt">قرض</button><button class="series-toggle active" data-report-series="payments">پرداخت</button><button class="series-toggle active" data-report-series="profit">سود خالص</button></div></div>
+          <div id="reportTrendChart" class="report-trend-chart"></div>
         </article>
 
-        <div class="report-kpi-grid">
-          <article class="report-kpi accent"><span>گردش پول امروز</span><strong id="rCashToday">0 ؋</strong><small>خالص ورود و خروج امروز</small></article>
-          <article class="report-kpi"><span>گردش پول ماه جاری</span><strong id="rCashMonth">0 ؋</strong><small>خالص نقدینگی ماه</small></article>
-          <article class="report-kpi"><span>فروش بازه</span><strong id="rSalesPeriod">0 ؋</strong><small id="rSalesPeriodMeta">0 فاکتور</small></article>
-          <article class="report-kpi success"><span>سود خالص بازه</span><strong id="rNetProfitPeriod">0 ؋</strong><small>سود فروش منهای هزینه‌ها</small></article>
+        <div class="report-detail-grid v3-report-detail-grid">
+          <article class="panel financial-summary"><div class="panel-head"><div><h3 id="financialSummaryTitle">خلاصه مالی</h3><p>جزئیات بازه انتخاب‌شده</p></div></div><div id="financialSummary" class="summary-list report-summary-grid"></div></article>
+          <article class="panel report-balance-panel"><div class="panel-head"><div><h3>وضعیت فعلی</h3><p>مانده‌های مهم همین لحظه</p></div></div><div class="balance-cards"><div><span>قرض مشتریان</span><strong id="rCustomerDebt">0 ؋</strong></div><div><span>قرض شرکت‌ها</span><strong id="rSupplierDebt">0 ؋</strong></div><div><span>ارزش موجودی</span><strong id="rInventoryValue">0 ؋</strong></div><div><span>گردش نقدی ماه</span><strong id="rCashMonth">0 ؋</strong></div></div><span id="rCashToday" class="hidden">0 ؋</span></article>
         </div>
 
-        <article class="panel cashflow-pro-panel clean-report-panel">
-          <div class="panel-head cashflow-head">
-            <div><h3>گردش نقدی ماه جاری</h3><p>روند خالص پول؛ برای جزئیات هر روز نشانگر ماوس را روی نمودار نگه دارید.</p></div>
-            <span class="soft-badge">ماه جاری</span>
-          </div>
-          <div id="cashFlowBars" class="cashflow-pro-chart"></div>
+        <article class="panel sales-report-panel">
+          <div class="panel-head"><div><h3>فاکتورهای فروش</h3><p>برای کار روزانه فقط تعداد محدود نمایش داده می‌شود.</p></div><div class="report-actions"><button id="exportCsv" class="ghost-btn compact-action">خروجی Excel</button><button id="printLastReceipt" class="ghost-btn compact-action">چاپ آخرین رسید</button><button class="primary-btn compact-action" data-go="archive">آرشیو کامل</button></div></div>
+          <div class="unified-toolbar invoice-report-toolbar"><div class="search-control invoice-search-wrap"><span>⌕</span><input id="invoiceReportSearch" placeholder="شماره فاکتور، مشتری یا مبلغ..." /></div><select id="invoicePaymentFilter"><option value="all">همه روش‌ها</option><option value="نقدی">نقدی</option><option value="نسیه">نسیه</option></select><select id="reportInvoicePageSize"><option value="10">10 فاکتور</option><option value="20" selected>20 فاکتور</option><option value="50">50 فاکتور</option></select><div id="invoiceReportStats" class="invoice-report-stats"></div></div>
+          <div class="table-wrap report-table-wrap"><table class="report-sales-table"><thead><tr><th>فاکتور</th><th>تاریخ/زمان</th><th>مشتری</th><th>روش</th><th>اقلام</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="salesBody"></tbody></table></div><div id="reportSalesPagination" class="pagination"></div>
         </article>
 
-        <div class="report-detail-grid">
-          <article class="panel financial-summary clean-report-panel">
-            <div class="panel-head"><div><h3 id="financialSummaryTitle">خلاصه مالی دوره</h3><p>جزئیات بازه انتخاب‌شده</p></div></div>
-            <div id="financialSummary" class="summary-list report-summary-grid"></div>
-          </article>
-          <article class="panel report-balance-panel clean-report-panel">
-            <div class="panel-head"><div><h3>وضعیت فعلی</h3><p>مانده‌های مهم همین لحظه</p></div></div>
-            <div class="balance-cards">
-              <div><span>قرضه مشتریان</span><strong id="rCustomerDebt">0 ؋</strong></div>
-              <div><span>قرض شرکت‌ها</span><strong id="rSupplierDebt">0 ؋</strong></div>
-              <div><span>هزینه‌های بازه</span><strong id="rExpensesPeriod">0 ؋</strong></div>
-              <div><span>ارزش موجودی</span><strong id="rInventoryValue">0 ؋</strong></div>
-            </div>
-          </article>
-        </div>
+        <article class="period-card compact-period-card"><div class="period-main"><span>دوره حسابی جاری</span><strong id="financialPeriodTitle">دوره حسابی اول</strong><small id="financialPeriodDates">ماه اول · —</small></div><div class="period-progress-wrap"><div class="period-progress"><span id="financialPeriodProgress"></span></div><small id="financialPeriodStatus">هدف استاندارد: 6 ماه</small></div><button id="startNewPeriodBtn" class="ghost-btn period-new-btn">شروع دوره جدید</button></article>
+        <div id="cashFlowBars" class="hidden"></div>
+      </section>
 
-        <article class="panel sales-report-panel clean-report-panel">
-          <div class="panel-head sales-report-head">
-            <div><h3>فاکتورهای فروش</h3><p>جستجو، فیلتر، ویرایش و خروجی Excel</p></div>
-            <div class="report-actions">
-              <button id="exportCsv" class="ghost-btn compact-action" title="فایل CSV در Excel باز می‌شود">خروجی Excel</button>
-              <button id="printLastReceipt" class="ghost-btn compact-action">چاپ آخرین رسید</button>
-            </div>
-          </div>
-          <div class="invoice-report-toolbar">
-            <div class="invoice-search-wrap"><span>⌕</span><input id="invoiceReportSearch" placeholder="جستجو در فاکتورها: شماره، مشتری یا مبلغ..." /></div>
-            <select id="invoicePaymentFilter"><option value="all">همه روش‌ها</option><option value="نقدی">نقدی</option><option value="نسیه">نسیه</option></select>
-            <div id="invoiceReportStats" class="invoice-report-stats"></div>
-          </div>
-          <div class="table-wrap report-table-wrap"><table class="report-sales-table"><thead><tr><th>فاکتور</th><th>تاریخ/زمان</th><th>مشتری</th><th>روش</th><th>اقلام</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="salesBody"></tbody></table></div>
-        </article>
+      <section id="page-archive" class="page">
+        <div class="page-section-head"><div><span class="eyebrow">بایگانی</span><h2>آرشیو فاکتورها</h2><p>تمام فاکتورها با صفحه‌بندی و فیلتر کامل</p></div><button class="ghost-btn" data-go="reports">بازگشت به گزارش‌ها</button></div>
+        <article class="panel"><div class="unified-toolbar archive-toolbar"><div class="search-control"><span>⌕</span><input id="archiveSearch" placeholder="شماره فاکتور، مشتری یا مبلغ..." /></div><select id="archivePaymentFilter"><option value="all">همه روش‌ها</option><option value="نقدی">نقدی</option><option value="نسیه">نسیه</option></select><label class="date-control">از <input id="archiveFrom" type="date" /></label><label class="date-control">تا <input id="archiveTo" type="date" /></label><select id="archivePageSize"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option><option value="100">100</option></select></div><div class="table-wrap"><table><thead><tr><th>فاکتور</th><th>تاریخ/زمان</th><th>مشتری</th><th>روش</th><th>اقلام</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="archiveBody"></tbody></table></div><div id="archivePagination" class="pagination"></div></article>
+      </section>
+
+      <section id="page-inventory" class="page">
+        <div class="page-section-head"><div><span class="eyebrow">انبارداری</span><h2>انبار</h2><p>موجودی، ارزش، کاردکس و خریدهای اخیر</p></div><button id="adjustInventoryBtn" class="primary-btn">اصلاح موجودی</button></div>
+        <div class="metric-grid compact"><article class="metric-card"><span>تعداد کالا</span><strong id="invProductCount">0</strong><small>کالاهای فعال</small></article><article class="metric-card"><span>تعداد موجودی</span><strong id="invUnits">0</strong><small>مجموع واحدها</small></article><article class="metric-card"><span>ارزش موجودی</span><strong id="invCost">0 ؋</strong><small>بر اساس بهای خرید</small></article><article class="metric-card"><span>هشدار موجودی</span><strong id="invLow">0</strong><small id="invOutOfStockMeta">0 ناموجود</small></article></div>
+        <article class="panel inventory-overview-panel"><div class="unified-toolbar inventory-tools"><div class="search-control"><span>⌕</span><input id="inventorySearch" placeholder="جستجوی کالا یا بارکد..." /></div><select id="inventoryStatusFilter"><option value="all">همه وضعیت‌ها</option><option value="out">ناموجود</option><option value="low">رو به اتمام</option><option value="ok">موجود</option></select><select id="inventoryPageSize"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select></div><div class="table-wrap"><table class="inventory-stock-table"><thead><tr><th>کالا</th><th>دسته</th><th>موجودی</th><th>حداقل</th><th>ارزش خرید</th><th>ارزش فروش</th><th>وضعیت</th></tr></thead><tbody id="inventoryStockBody"></tbody></table></div><div id="inventoryPagination" class="pagination"></div></article>
+        <div class="inventory-grid"><article class="panel"><div class="panel-head"><div><h3>کاردکس موجودی</h3><p>ورود، خروج و اصلاح‌های اخیر</p></div><select id="ledgerPageSize"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select></div><div class="table-wrap"><table><thead><tr><th>زمان</th><th>کالا</th><th>نوع</th><th>تغییر</th><th>مرجع</th></tr></thead><tbody id="inventoryBody"></tbody></table></div><div id="ledgerPagination" class="pagination"></div></article><article class="panel"><div class="panel-head"><div><h3>خریدهای اخیر</h3><p>آخرین ورود کالا به انبار</p></div></div><div id="inventoryPurchases" class="list"></div></article></div>
+      </section>
+
+      <section id="page-data" class="page">
+        <div class="page-section-head"><div><span class="eyebrow">امنیت اطلاعات</span><h2>داده‌ها و پشتیبانی</h2><p>Backup، بازیابی، سلامت دیتابیس و نسخه آموزشی</p></div></div>
+        <article class="panel settings-card data-support-card data-page-card"><div class="panel-head"><div><h3>مرکز داده‌ها</h3><p>این بخش با رمز مدیر محافظت می‌شود</p></div><span class="pill">ADMIN</span></div><div id="dataSupportLock" class="support-lock"><div class="support-lock-icon">⌁</div><div><b>بخش محافظت‌شده</b><small>برای دسترسی به Backup، بازیابی و بازنشانی رمز مدیر را وارد کنید.</small></div><div class="support-unlock-row"><input id="dataSupportPassword" type="password" placeholder="رمز مدیر"><button id="unlockDataSupport" class="primary-btn">باز کردن</button></div></div><div id="dataSupportControls" class="hidden"><label class="field"><span>پشتیبان خودکار</span><select id="autoBackupPerDay"><option value="0">خاموش</option><option value="1">1 بار در روز</option><option value="2">2 بار در روز</option><option value="3">3 بار در روز</option><option value="4">4 بار در روز</option><option value="6">6 بار در روز</option><option value="8">8 بار در روز</option><option value="12">12 بار در روز</option><option value="24">24 بار در روز</option></select></label><div id="autoBackupStatus" class="scan-test">آخرین پشتیبان خودکار: —</div><div class="data-action-grid"><button id="backupBtn" class="ghost-btn">ذخیره دستی Backup</button><label class="upload" title="برای فایل‌های پشتیبان JSON نسخه‌های قبلی">بازیابی Backup قدیمی (JSON)<input id="restoreFile" type="file" accept="application/json" /></label><button id="restoreAutoBackup" class="ghost-btn">بازیابی آخرین پشتیبان خودکار</button><button id="dbHealthBtn" class="ghost-btn">بررسی سلامت دیتابیس</button><button id="auditLogBtn" class="ghost-btn">فعالیت‌های اخیر فاکتورها</button><button id="loadTrainingDemo" class="ghost-btn">نسخه آموزشی 2 ماه و 10 روزه</button><button id="lockDataSupport" class="ghost-btn">قفل کردن بخش</button><button id="resetDemo" class="danger-ghost">بازنشانی به حالت اولیه</button></div></div></article>
       </section>
 
       <section id="page-settings" class="page">
+        <div class="page-section-head"><div><span class="eyebrow">تنظیمات</span><h2>تنظیمات برنامه</h2><p>ظاهر، هویت فروشگاه، چاپ، بارکدخوان و آنلاین</p></div></div>
         <div class="settings-grid">
           <article class="panel settings-card"><div class="panel-head"><div><h3>ظاهر برنامه</h3><p>انتخاب حالت روشن یا دارک</p></div></div><label class="field"><span>تم برنامه</span><select id="themeSelect"><option value="light">روشن</option><option value="dark">دارک</option></select></label><div class="theme-preview"><span class="preview-dot"></span><div><b>رابط مینیمال دسکتاپ</b><small>RTL، منوی ثابت و حرکت‌های نرم</small></div></div></article>
-          <article class="panel settings-card identity-card"><div class="panel-head"><div><h3>هویت فروشگاه</h3><p>لوگو و اطلاعاتی که در داشبورد و رسید استفاده می‌شود</p></div></div><div class="identity-editor"><label class="store-logo-uploader"><input id="storeLogoInput" type="file" accept="image/*"><span id="storeLogoPreview" class="store-logo-preview">Y</span><small>لوگو</small></label><div class="identity-fields"><label class="field"><span>نام فروشگاه</span><input id="storeName" /></label><label class="field"><span>آدرس فروشگاه</span><input id="storeAddress" placeholder="اختیاری" /></label><label class="field"><span>شماره تماس</span><input id="storePhone" /></label></div></div><button id="removeStoreLogo" class="tiny-btn identity-remove" type="button">حذف لوگو</button><label class="field"><span>متن پایین رسید</span><input id="receiptFooter" /></label></article>
-          <article class="panel settings-card"><div class="panel-head"><div><h3>پرینتر رسید</h3><p>XPrinter و پرینترهای حرارتی نصب‌شده در Windows</p></div><span class="pill success">80mm</span></div><label class="field"><span>نام پرینتر</span><div class="printer-pick-row"><input id="printerName" list="printerList" placeholder="مثلاً XPrinter XP-Q200" /><button id="detectPrinters" type="button" class="tiny-btn accent">شناسایی</button></div><datalist id="printerList"></datalist></label><label class="switch-row"><span><b>چاپ خودکار</b><small>بعد از ثبت فروش رسید مستقیم چاپ شود</small></span><input id="autoPrint" type="checkbox" /></label><label class="switch-row"><span><b>برش خودکار</b><small>در مدل‌هایی که Driver برش خودکار را پشتیبانی می‌کند.</small></span><input id="autoCut" type="checkbox" /></label><button id="testPrint" class="ghost-btn wide">چاپ آزمایشی 80mm</button><div class="scan-test">چاپ Native به‌صورت تصویری انجام می‌شود تا متن دری/فارسی به‌هم نریزد.</div></article>
-          <article class="panel settings-card"><div class="panel-head"><div><h3>بارکدخوان</h3><p>USB HID / Laser Scanner</p></div><span id="scannerStatusPill" class="pill warning">شناسایی نشده</span></div><div class="hardware-status" id="scannerHardwareStatus"><span class="pulse muted-pulse"></span><div><b id="scannerStatusTitle">منتظر اولین اسکن</b><small id="scannerStatusHint">بارکدخوان USB را وصل کنید و یک بارکد اسکن کنید؛ سیستم اسکن سریع را خودکار تشخیص می‌دهد.</small></div></div><label class="field"><span>Suffix</span><select id="scannerSuffix"><option value="Enter">Enter</option><option value="Tab">Tab</option></select></label><div id="lastScan" class="scan-test">آخرین اسکن: —</div></article>
-          <article class="panel settings-card online-card"><div class="panel-head"><div><h3>آنلاین</h3><p>اتصال اختیاری به سرور و داشبورد آنلاین</p></div><span id="onlineStatusPill" class="pill">محلی</span></div><label class="switch-row"><span><b>فعال‌سازی اتصال آنلاین</b><small>در حالت خاموش، برنامه کاملاً محلی و بدون اینترنت کار می‌کند.</small></span><input id="onlineEnabled" type="checkbox" /></label><div id="onlineFields" class="online-fields"><label class="field"><span>آدرس سرور</span><input id="onlineServerUrl" type="url" dir="ltr" placeholder="https://example.com" /></label><label class="field"><span>کد فروشگاه</span><input id="onlineStoreCode" dir="ltr" placeholder="STORE-001" /></label><label class="field"><span>فاصله همگام‌سازی</span><select id="onlineSyncMinutes"><option value="5">هر 5 دقیقه</option><option value="15">هر 15 دقیقه</option><option value="30">هر 30 دقیقه</option><option value="60">هر 60 دقیقه</option></select></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی فروش‌ها</b><small>فاکتورها و دریافت‌های مرتبط</small></span><input id="onlineSyncSales" type="checkbox" /></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی موجودی</b><small>کالاها، خریدها و موجودی</small></span><input id="onlineSyncInventory" type="checkbox" /></label><div id="onlineStatusText" class="scan-test">وضعیت: حالت محلی</div><div class="online-actions"><button id="testOnlineConnection" type="button" class="ghost-btn">بررسی اتصال</button><button id="syncOnlineNow" type="button" class="primary-btn">همگام‌سازی حالا</button></div></div></article>
-          <article class="panel settings-card data-support-card"><div class="panel-head"><div><h3>داده‌ها و پشتیبانی</h3><p>این بخش با رمز مدیر محافظت می‌شود</p></div><span class="pill">ADMIN</span></div><div id="dataSupportLock" class="support-lock"><div class="support-lock-icon">⌁</div><div><b>بخش محافظت‌شده</b><small>برای دسترسی به Backup، بازیابی و بازنشانی رمز مدیر را وارد کنید.</small></div><div class="support-unlock-row"><input id="dataSupportPassword" type="password" placeholder="رمز مدیر"><button id="unlockDataSupport" class="primary-btn">باز کردن</button></div></div><div id="dataSupportControls" class="hidden"><label class="field"><span>پشتیبان خودکار</span><select id="autoBackupPerDay"><option value="0">خاموش</option><option value="1">1 بار در روز</option><option value="2">2 بار در روز</option><option value="3">3 بار در روز</option><option value="4">4 بار در روز</option><option value="6">6 بار در روز</option><option value="8">8 بار در روز</option><option value="12">12 بار در روز</option><option value="24">24 بار در روز</option></select></label><div id="autoBackupStatus" class="scan-test">آخرین پشتیبان خودکار: —</div><button id="backupBtn" class="ghost-btn wide">ذخیره دستی Backup</button><label class="upload wide" title="برای فایل‌های پشتیبان JSON نسخه‌های قبلی">بازیابی Backup قدیمی (JSON)<input id="restoreFile" type="file" accept="application/json" /></label><button id="restoreAutoBackup" class="ghost-btn wide">بازیابی آخرین پشتیبان خودکار</button><button id="dbHealthBtn" class="ghost-btn wide">بررسی سلامت دیتابیس</button><button id="auditLogBtn" class="ghost-btn wide">فعالیت‌های اخیر فاکتورها</button><button id="loadTrainingDemo" class="ghost-btn wide">نسخه آموزشی ۲ ماه و ۱۰ روزه</button><button id="lockDataSupport" class="ghost-btn wide">قفل کردن بخش</button><button id="resetDemo" class="danger-ghost wide">بازنشانی به حالت اولیه</button></div></article>
+          <article class="panel settings-card identity-card"><div class="panel-head"><div><h3>هویت فروشگاه</h3><p>لوگو و اطلاعات رسید</p></div></div><div class="identity-editor"><label class="store-logo-uploader"><input id="storeLogoInput" type="file" accept="image/*"><span id="storeLogoPreview" class="store-logo-preview">آ</span><small>لوگو</small></label><div class="identity-fields"><label class="field"><span>نام فروشگاه</span><input id="storeName" /></label><label class="field"><span>آدرس فروشگاه</span><input id="storeAddress" placeholder="اختیاری" /></label><label class="field"><span>شماره تماس</span><input id="storePhone" /></label></div></div><button id="removeStoreLogo" class="tiny-btn identity-remove" type="button">حذف لوگو</button><label class="field"><span>متن پایین رسید</span><input id="receiptFooter" /></label></article>
+          <article class="panel settings-card"><div class="panel-head"><div><h3>پرینتر رسید</h3><p>XPrinter و پرینترهای حرارتی Windows</p></div><span class="pill success">80mm</span></div><label class="field"><span>نام پرینتر</span><div class="printer-pick-row"><input id="printerName" list="printerList" placeholder="مثلاً XPrinter XP-Q200" /><button id="detectPrinters" type="button" class="tiny-btn accent">شناسایی</button></div><datalist id="printerList"></datalist></label><label class="switch-row"><span><b>چاپ خودکار</b><small>بعد از ثبت فروش رسید مستقیم چاپ شود</small></span><input id="autoPrint" type="checkbox" /></label><label class="switch-row"><span><b>برش خودکار</b><small>در مدل‌هایی که Driver پشتیبانی می‌کند.</small></span><input id="autoCut" type="checkbox" /></label><button id="testPrint" class="ghost-btn wide">چاپ آزمایشی 80mm</button><div class="scan-test">چاپ Native تصویری برای حفظ درست متن دری/فارسی</div></article>
+          <article class="panel settings-card"><div class="panel-head"><div><h3>بارکدخوان</h3><p>USB HID / Laser Scanner</p></div><span id="scannerStatusPill" class="pill warning">شناسایی نشده</span></div><div class="hardware-status" id="scannerHardwareStatus"><span class="pulse muted-pulse"></span><div><b id="scannerStatusTitle">منتظر اولین اسکن</b><small id="scannerStatusHint">بارکدخوان را وصل کنید و یک بارکد اسکن کنید.</small></div></div><label class="field"><span>Suffix</span><select id="scannerSuffix"><option value="Enter">Enter</option><option value="Tab">Tab</option></select></label><div id="lastScan" class="scan-test">آخرین اسکن: —</div></article>
+          <article class="panel settings-card online-card"><div class="panel-head"><div><h3>آنلاین</h3><p>اتصال اختیاری به سرور و داشبورد آنلاین</p></div><span id="onlineStatusPill" class="pill">محلی</span></div><label class="switch-row"><span><b>فعال‌سازی اتصال آنلاین</b><small>در حالت خاموش برنامه کاملاً محلی است.</small></span><input id="onlineEnabled" type="checkbox" /></label><div id="onlineFields" class="online-fields"><label class="field"><span>آدرس سرور</span><input id="onlineServerUrl" type="url" dir="ltr" placeholder="https://example.com" /></label><label class="field"><span>کد فروشگاه</span><input id="onlineStoreCode" dir="ltr" placeholder="STORE-001" /></label><label class="field"><span>فاصله همگام‌سازی</span><select id="onlineSyncMinutes"><option value="5">هر 5 دقیقه</option><option value="15">هر 15 دقیقه</option><option value="30">هر 30 دقیقه</option><option value="60">هر 60 دقیقه</option></select></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی فروش‌ها</b><small>فاکتورها و دریافت‌ها</small></span><input id="onlineSyncSales" type="checkbox" /></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی موجودی</b><small>کالاها، خریدها و موجودی</small></span><input id="onlineSyncInventory" type="checkbox" /></label><div id="onlineStatusText" class="scan-test">وضعیت: حالت محلی</div><div class="online-actions"><button id="testOnlineConnection" type="button" class="ghost-btn">بررسی اتصال</button><button id="syncOnlineNow" type="button" class="primary-btn">همگام‌سازی حالا</button></div></div></article>
         </div>
-        <article class="panel roadmap"><div class="panel-head"><div><h3>سازگاری</h3><p>نسخه Native v2.3 برای Windows 10/11 64-bit</p></div></div><div class="roadmap-row"><span>Windows 10 64-bit (2015+)</span><b>فعال</b></div><div class="roadmap-row"><span>Windows 11 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>فونت رابط</span><b>Vazirmatn Variable آفلاین</b></div><div class="roadmap-row"><span>SQLite Native</span><b>WAL + Backup فعال</b></div><div class="roadmap-row"><span>چاپ حرارتی 80mm</span><b>Windows Driver مستقیم</b></div><div class="roadmap-row"><span>بارکدخوان USB HID</span><b>اسکن سریع فعال</b></div><div class="roadmap-row"><span>اتصال آنلاین</span><b>قابل پیکربندی</b></div></article>
+        <article class="panel roadmap"><div class="panel-head"><div><h3>سازگاری</h3><p>نسخه Native v3.0 برای Windows 10/11 64-bit</p></div></div><div class="roadmap-row"><span>Windows 10 64-bit (2015+)</span><b>فعال</b></div><div class="roadmap-row"><span>Windows 11 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>فونت رابط</span><b>Vazirmatn Variable آفلاین</b></div><div class="roadmap-row"><span>SQLite Native</span><b>WAL + Backup فعال</b></div><div class="roadmap-row"><span>چاپ حرارتی 80mm</span><b>Windows Driver مستقیم</b></div><div class="roadmap-row"><span>بارکدخوان USB HID</span><b>اسکن سریع فعال</b></div><div class="roadmap-row"><span>اتصال آنلاین</span><b>قابل پیکربندی</b></div></article>
       </section>
     </main>
   </div>
 
   <div id="modal" class="modal hidden"><div class="modal-card"><div class="modal-head"><h3 id="modalTitle">کالای جدید</h3><button id="modalClose" aria-label="بستن">×</button></div><div id="modalContent"></div></div></div>
-
-  <div id="appDialog" class="app-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="appDialogTitle">
-    <div class="app-dialog-card">
-      <div id="appDialogIcon" class="app-dialog-icon">؟</div>
-      <div class="app-dialog-copy">
-        <h3 id="appDialogTitle">تأیید عملیات</h3>
-        <p id="appDialogMessage"></p>
-      </div>
-      <div class="app-dialog-actions">
-        <button id="appDialogCancel" class="ghost-btn" type="button">انصراف</button>
-        <button id="appDialogConfirm" class="primary-btn" type="button">تأیید</button>
-      </div>
-    </div>
-  </div>
   <div id="toast" class="toast"></div>
   <iframe id="printFrame" class="print-frame"></iframe>
   <script src="native.js"></script>
@@ -299,6 +254,7 @@
       await window.YaranNative.hydrate('hesabdari_asan_v1');
       const app = document.createElement('script');
       app.src = 'app.js';
+      app.onload = function(){ const v3=document.createElement('script'); v3.src='v3-app.js'; document.body.appendChild(v3); };
       document.body.appendChild(app);
     })();
   </script>
