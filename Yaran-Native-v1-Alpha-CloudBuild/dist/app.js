@@ -173,7 +173,7 @@ function unknownProfitSalesCount(period){return periodSales(period).filter(saleH
 
 function applyTheme(){document.documentElement.setAttribute('data-theme',db.settings.theme==='dark'?'dark':'light');$('#themeToggle').textContent=db.settings.theme==='dark'?'☀':'☾';$('#themeToggle').title=db.settings.theme==='dark'?'تم روشن':'دارک'}
 const pageMeta={dashboard:['داشبورد','نمای کلی فروشگاه'],pos:['فروش','صندوق سریع و بارکدخوان'],products:['کالاها','عکس، قیمت، بارکد و موجودی'],inventory:['انبار','کاردکس و گردش موجودی'],parties:['اشخاص','مشتریان و شرکت‌ها'],reports:['گزارش‌ها','فروش، گردش پول و گزارش مالی'],settings:['تنظیمات','ظاهر، آنلاین، چاپگر، بارکد و Backup']};
-function go(page){$$('.page').forEach(function(e){e.classList.remove('active')});$('#page-'+page).classList.add('active');$$('.nav-item').forEach(function(e){e.classList.toggle('active',e.dataset.page===page)});$('#pageTitle').textContent=pageMeta[page][0];$('#pageSubtitle').textContent=pageMeta[page][1];$('.sidebar').classList.remove('open');if(page==='pos'){if(!editingSaleId&&!cart.length){paymentMethod=null;setCustomerSelection('c0');$$('.payment').forEach(function(x){x.classList.remove('active')});renderPaymentRequirement()}setTimeout(function(){$('#barcodeInput').focus()},30)}}
+function go(page){$$('.page').forEach(function(e){e.classList.remove('active')});const target=$('#page-'+page);target.classList.add('active');target.scrollTop=0;$$('.nav-item').forEach(function(e){e.classList.toggle('active',e.dataset.page===page)});$('#pageTitle').textContent=pageMeta[page][0];$('#pageSubtitle').textContent=pageMeta[page][1];$('.sidebar').classList.remove('open');if(page==='pos'){if(!editingSaleId&&!cart.length){paymentMethod=null;setCustomerSelection('c0');$$('.payment').forEach(function(x){x.classList.remove('active')});renderPaymentRequirement()}setTimeout(function(){$('#barcodeInput').focus()},30)}}
 $$('.nav-item').forEach(function(b){b.onclick=function(){go(b.dataset.page)}});$$('[data-go]').forEach(function(b){b.onclick=function(){go(b.dataset.go)}});$('#newSaleTop').onclick=function(){if(!editingSaleId){paymentMethod=null;setCustomerSelection('c0');$$('.payment').forEach(function(x){x.classList.remove('active')});renderPaymentRequirement()}go('pos')};
 
 function salesToday(){return periodSales('today')}
@@ -297,12 +297,32 @@ function cashFlowDay(key){
 }
 function netCashForDay(key){return cashFlowDay(key).net}
 function renderCashFlowMonth(){
- const root=$('#cashFlowBars');if(!root)return;const now=new Date(),lastDay=Math.max(now.getDate(),1),data=[];for(let day=1;day<=lastDay;day++){const key=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(day),v=cashFlowDay(key);data.push({day:day,input:v.input,output:v.output,net:v.net})}
- const W=860,H=300,L=62,R=22,T=22,B=42,pw=W-L-R,ph=H-T-B,maxVal=Math.max.apply(null,[1].concat(data.map(function(x){return Math.max(x.input,x.output,x.net)}))),minVal=Math.min.apply(null,[0].concat(data.map(function(x){return x.net}))),padSpan=Math.max(1,maxVal-minVal),max=maxVal+padSpan*.07,min=minVal<0?minVal-padSpan*.07:0,span=max-min,xStep=pw/Math.max(1,data.length),barW=Math.max(5,Math.min(13,xStep*.24)),y=function(v){return T+((max-v)/span)*ph},zeroY=y(0);
- let grid='',yl='';for(let i=0;i<5;i++){const val=max-span*(i/4),yy=T+ph*(i/4);grid+='<line class="cf-grid" x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'"></line>';yl+='<text class="cf-label" x="'+(L-8)+'" y="'+(yy+4)+'" text-anchor="end">'+(moneyVisible?amount(val):'•••')+'</text>'}
- const netPts=data.map(function(d,i){return {x:L+xStep*(i+.5),y:y(d.net),v:d.net}}),netPath=chartSmoothPath(netPts);let bars='',xl='',hits='';data.forEach(function(d,i){const cx=L+xStep*(i+.5),yi=y(d.input),yo=y(d.output),hi=Math.max(2,zeroY-yi),ho=Math.max(2,zeroY-yo);bars+='<rect class="cf-bar in" x="'+(cx-barW-2)+'" y="'+yi+'" width="'+barW+'" height="'+hi+'" rx="3"></rect><rect class="cf-bar out" x="'+(cx+2)+'" y="'+yo+'" width="'+barW+'" height="'+ho+'" rx="3"></rect>';if(data.length<=16||i%3===0||i===data.length-1)xl+='<text class="cf-x" x="'+cx+'" y="'+(H-14)+'" text-anchor="middle">'+d.day+'</text>';hits+='<rect class="cf-hit" data-cf="'+i+'" x="'+(L+xStep*i)+'" y="'+T+'" width="'+xStep+'" height="'+ph+'"></rect>'});
- root.innerHTML='<div class="cf-stage"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+grid+yl+'<line class="cf-zero" x1="'+L+'" y1="'+zeroY+'" x2="'+(W-R)+'" y2="'+zeroY+'"></line>'+bars+'<path class="cf-net-line" d="'+netPath+'"></path>'+netPts.map(function(p){return '<circle class="cf-net-dot '+(p.v<0?'negative':'')+'" cx="'+p.x+'" cy="'+p.y+'" r="3"></circle>'}).join('')+xl+hits+'</svg><div class="cf-tooltip"></div></div>';
- const tt=root.querySelector('.cf-tooltip'),stage=root.querySelector('.cf-stage');root.querySelectorAll('.cf-hit').forEach(function(hit){hit.onpointerenter=hit.onpointermove=function(e){const d=data[Number(hit.dataset.cf)],r=stage.getBoundingClientRect();tt.innerHTML='<b>روز '+num(d.day)+'</b><span>ورودی <strong>'+maskedMoney(d.input)+'</strong></span><span>خروجی <strong>'+maskedMoney(d.output)+'</strong></span><span>خالص <strong class="'+(d.net<0?'danger-text':'')+'">'+maskedMoney(d.net)+'</strong></span>';tt.classList.add('show');tt.style.left=Math.min(r.width-190,Math.max(8,e.clientX-r.left+10))+'px';tt.style.top=Math.max(8,e.clientY-r.top-70)+'px'};hit.onpointerleave=function(){tt.classList.remove('show')}})
+ const root=$('#cashFlowBars');if(!root)return;
+ const now=new Date(),lastDay=Math.max(now.getDate(),1),data=[];
+ for(let day=1;day<=lastDay;day++){
+  const key=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(day),v=cashFlowDay(key);
+  data.push({day:day,input:v.input,output:v.output,net:v.net});
+ }
+ const totalIn=data.reduce(function(a,d){return a+d.input},0),totalOut=data.reduce(function(a,d){return a+d.output},0),totalNet=totalIn-totalOut;
+ const W=860,H=250,L=58,R=18,T=18,B=34,pw=W-L-R,ph=H-T-B;
+ const values=data.map(function(d){return d.net}),rawMax=Math.max.apply(null,[0].concat(values)),rawMin=Math.min.apply(null,[0].concat(values));
+ let span=Math.max(1,rawMax-rawMin),max=rawMax+span*.12,min=rawMin-span*.12;
+ if(rawMin>=0)min=0;if(rawMax<=0)max=0;if(max===min)max=min+1;
+ span=max-min;
+ const xStep=pw/Math.max(1,data.length-1),x=function(i){return data.length===1?L+pw/2:L+xStep*i},y=function(v){return T+((max-v)/span)*ph},zeroY=y(0);
+ let grid='',yl='';
+ for(let i=0;i<4;i++){
+  const val=max-span*(i/3),yy=T+ph*(i/3);
+  grid+='<line class="cf-grid" x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'"></line>';
+  yl+='<text class="cf-label" x="'+(L-8)+'" y="'+(yy+4)+'" text-anchor="end">'+(moneyVisible?amount(val):'•••')+'</text>';
+ }
+ const pts=data.map(function(d,i){return {x:x(i),y:y(d.net),v:d.net}}),linePath=chartSmoothPath(pts);
+ const areaPath=pts.length?linePath+' L '+pts[pts.length-1].x+' '+zeroY+' L '+pts[0].x+' '+zeroY+' Z':'';
+ let xl='',hits='',dots='';
+ data.forEach(function(d,i){const cx=x(i);if(data.length<=12||i===0||i===data.length-1||d.day%5===0)xl+='<text class="cf-x" x="'+cx+'" y="'+(H-10)+'" text-anchor="middle">'+d.day+'</text>';hits+='<rect class="cf-hit" data-cf="'+i+'" x="'+(i===0?L:cx-xStep/2)+'" y="'+T+'" width="'+(data.length===1?pw:Math.max(10,i===0||i===data.length-1?xStep/2:xStep))+'" height="'+ph+'"></rect>';if(data.length<=12||i===data.length-1||d.day%5===0)dots+='<circle class="cf-net-dot '+(d.net<0?'negative':'')+'" cx="'+cx+'" cy="'+y(d.net)+'" r="2.8"></circle>'});
+ root.innerHTML='<div class="cf-summary"><div class="cf-summary-item"><span>ورودی این ماه</span><b>'+maskedMoney(totalIn)+'</b></div><div class="cf-summary-item out"><span>خروجی این ماه</span><b>'+maskedMoney(totalOut)+'</b></div><div class="cf-summary-item net"><span>خالص گردش نقدی</span><b>'+maskedMoney(totalNet)+'</b></div></div><div class="cf-stage"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><defs><linearGradient id="cfNetGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".18"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>'+grid+yl+'<line class="cf-zero" x1="'+L+'" y1="'+zeroY+'" x2="'+(W-R)+'" y2="'+zeroY+'"></line><path class="cf-net-area" d="'+areaPath+'"></path><path class="cf-net-line" d="'+linePath+'"></path>'+dots+xl+hits+'</svg><div class="cf-tooltip"></div></div>';
+ const tt=root.querySelector('.cf-tooltip'),stage=root.querySelector('.cf-stage');
+ root.querySelectorAll('.cf-hit').forEach(function(hit){hit.onpointerenter=hit.onpointermove=function(e){const d=data[Number(hit.dataset.cf)],r=stage.getBoundingClientRect();tt.innerHTML='<b>روز '+num(d.day)+'</b><span>ورودی <strong>'+maskedMoney(d.input)+'</strong></span><span>خروجی <strong>'+maskedMoney(d.output)+'</strong></span><span>خالص <strong class="'+(d.net<0?'negative':'')+'">'+maskedMoney(d.net)+'</strong></span>';tt.classList.add('show');tt.style.left=Math.min(r.width-180,Math.max(8,e.clientX-r.left+10))+'px';tt.style.top=Math.max(8,e.clientY-r.top-64)+'px'};hit.onpointerleave=function(){tt.classList.remove('show')}});
 }
 function renderBrandIdentity(){const mark=$('.brand-mark'),logo=db.settings.storeLogo||'';mark.classList.toggle('has-logo',!!logo);mark.innerHTML=logo?'<img src="'+esc(logo)+'" alt="لوگو">':'آ';const prev=$('#storeLogoPreview');if(prev)prev.innerHTML=logo?'<img src="'+esc(logo)+'" alt="لوگو">':'آ'}
 function renderAutoBackupStatus(){const x=getLatestAutoBackup(),el=$('#autoBackupStatus');if(el)el.textContent='آخرین پشتیبان خودکار: '+(x&&x.time?formatDateTime(x.time):'—')}
@@ -445,7 +465,7 @@ async function syncOnlineNow(silent){
  if(!db.settings.onlineEnabled){toast('ابتدا اتصال آنلاین را فعال کنید');return}
  const base=normalizedServerUrl(db.settings.onlineServerUrl),code=String(db.settings.onlineStoreCode||'').trim();if(!base||!code){toast('آدرس سرور و کد فروشگاه را کامل کنید');return}
  const btn=$('#syncOnlineNow'),old=btn.textContent;btn.disabled=true;btn.textContent='در حال همگام‌سازی…';
- try{const payload={app:'hesabdari-asan',version:'1.1',storeCode:code,syncedAt:new Date().toISOString(),sales:db.settings.onlineSyncSales?db.sales:[],customers:db.settings.onlineSyncSales?db.customers:[],products:db.settings.onlineSyncInventory?db.products:[],purchases:db.settings.onlineSyncInventory?db.purchases:[],inventory:db.settings.onlineSyncInventory?db.inventory:[]};const controller=new AbortController(),timer=setTimeout(function(){controller.abort()},12000),r=await fetch(base+'/api/v1/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});clearTimeout(timer);if(!r.ok)throw new Error('HTTP '+r.status);db.settings.onlineLastStatus='connected';db.settings.onlineLastCheckAt=new Date().toISOString();db.settings.onlineLastSyncAt=new Date().toISOString();save();if(!silent)toast('همگام‌سازی انجام شد')}catch(e){console.error(e);db.settings.onlineLastStatus='error';db.settings.onlineLastCheckAt=new Date().toISOString();save();if(!silent)toast('همگام‌سازی انجام نشد؛ تنظیمات سرور را بررسی کنید')}finally{btn.disabled=false;btn.textContent=old;renderOnlineSettings()}
+ try{const payload={app:'hesabdari-asan',version:'2.0',storeCode:code,syncedAt:new Date().toISOString(),sales:db.settings.onlineSyncSales?db.sales:[],customers:db.settings.onlineSyncSales?db.customers:[],products:db.settings.onlineSyncInventory?db.products:[],purchases:db.settings.onlineSyncInventory?db.purchases:[],inventory:db.settings.onlineSyncInventory?db.inventory:[]};const controller=new AbortController(),timer=setTimeout(function(){controller.abort()},12000),r=await fetch(base+'/api/v1/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});clearTimeout(timer);if(!r.ok)throw new Error('HTTP '+r.status);db.settings.onlineLastStatus='connected';db.settings.onlineLastCheckAt=new Date().toISOString();db.settings.onlineLastSyncAt=new Date().toISOString();save();if(!silent)toast('همگام‌سازی انجام شد')}catch(e){console.error(e);db.settings.onlineLastStatus='error';db.settings.onlineLastCheckAt=new Date().toISOString();save();if(!silent)toast('همگام‌سازی انجام نشد؛ تنظیمات سرور را بررسی کنید')}finally{btn.disabled=false;btn.textContent=old;renderOnlineSettings()}
 }
 $('#onlineEnabled').onchange=function(e){db.settings.onlineEnabled=e.target.checked;if(!e.target.checked)db.settings.onlineLastStatus='local';save();renderOnlineSettings()};
 ['onlineServerUrl','onlineStoreCode'].forEach(function(k){$('#'+k).onchange=function(e){db.settings[k]=e.target.value.trim();db.settings.onlineLastStatus='ready';save();renderOnlineSettings()}});
@@ -568,13 +588,5 @@ updateInventorySnapshot();applyTheme();renderAll();renderPaymentRequirement();ma
   });
   document.addEventListener('dragstart', function(e){
     if(!(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) e.preventDefault();
-  });
-  document.querySelectorAll('.nav-item').forEach(function(item){
-    item.addEventListener('click', function(){
-      requestAnimationFrame(function(){
-        var active=document.querySelector('.page.active');
-        if(active) active.scrollTop=0;
-      });
-    });
   });
 })();

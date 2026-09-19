@@ -1,14 +1,18 @@
 {
   "name": "hesabdari-asan-native",
   "private": true,
-  "version": "1.2.0",
-  "description": "حسابداری آسان - نسخه رایگان Windows Native",
+  "version": "2.0.0",
+  "description": "حسابداری آسان v2 - نسخه رایگان Windows Native",
   "scripts": {
     "tauri": "tauri",
-    "dev": "tauri dev",
-    "build": "tauri build"
+    "dev": "npm run prepare-font && tauri dev",
+    "build": "npm run prepare-font && tauri build",
+    "prepare-font": "node scripts/prepare-vazirmatn.mjs"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.0.0"
+  },
+  "dependencies": {
+    "@fontsource-variable/vazirmatn": "5.3.0"
   }
 }
