@@ -1,6 +1,6 @@
 [package]
 name = "hesabdari-asan"
-version = "2.0.0"
+version = "3.0.1"
 description = "Hesabdari Asan v2 native free edition"
 authors = ["MNRAHIMI . Ltd"]
 edition = "2021"
