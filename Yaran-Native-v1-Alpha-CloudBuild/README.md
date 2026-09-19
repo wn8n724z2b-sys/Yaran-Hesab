@@ -1,79 +1,41 @@
-# Yaran Financial System — Native v1 Alpha
+# Yaran Financial System — Native v1.0
 
-این پروژه پایه نسخه دسکتاپ Native یاران برای Windows 10/11 64-bit است.
+نسخه v1.0 هسته محلی Yaran برای Windows 10/11 64-bit است. اطلاعات اصلی از اولین اجرا در SQLite داخل AppData ویندوز ذخیره می‌شوند و برای استفاده روزانه به مرورگر، Node.js، Rust یا PowerShell نیاز نیست.
 
-## چه چیزی Native شده؟
-- پوسته Windows با Tauri 2
-- ذخیره اصلی اطلاعات در SQLite (`yaran.sqlite3`)
-- SQLite در حالت WAL و Foreign Keys فعال
-- سیستم Migration برای تغییرات آینده دیتابیس
-- Backup واقعی SQLite با `VACUUM INTO`
-- لایه Native برای شناسایی Printerهای نصب‌شده در Windows
-- UI فعلی v0.6.1 با RTL، Dark/Light، POS، کالا، فاکتور، دوره حسابی و گزارش‌ها
+## امکانات اصلی
+- رابط RTL مینیمال با Light و Telegram Dark
+- POS فروش، بارکدخوان USB HID و جستجوی دری/فارسی
+- کالا، عکس، دسته‌بندی، شرکت تولیدکننده و حداکثر 15 بارکد برای هر کالا
+- خرید تک‌واحدی یا بسته/جعبه و فروش دانه‌ای با میانگین موزون بهای خرید
+- انبار و گردش موجودی
+- مشتری، تأمین‌کننده، قرض مشتری و قرض شرکت
+- هزینه‌ها و گزارش مالی
+- دوره حسابی دستی با ماه‌شمار
+- فاکتورهای قابل ویرایش و حذف همراه Audit Log و نگهداری Revision
+- SQLite WAL و Transaction برای عملیات حساس
+- Backup Native SQLite با نگهداری 30 نسخه آخر و Restore آخرین Backup
+- بررسی سلامت SQLite از داخل تنظیمات
+- چاپ مستقیم رسید 80mm از طریق Windows Driver، مناسب XPrinter و پرینترهای حرارتی نصب‌شده
+- چاپ رسید به‌صورت Raster برای حفظ شکل درست متن دری/فارسی
+- شناسایی پرینترهای Windows از داخل تنظیمات
+- نصب NSIS و اجرای بدون Console/PowerShell در Release
 
-در این Alpha، UI برای سازگاری با نسخه قبلی یک Mirror در LocalStorage هم دارد، اما هنگام اجرا ابتدا داده Canonical از SQLite خوانده می‌شود و هر Save به SQLite نیز فرستاده می‌شود. در مرحله بعد جداول دامنه (`products`, `sales`, `inventory_ledger` و...) مستقیماً جای JSON state را می‌گیرند.
+## رمز بخش داده‌ها و پشتیبانی
+رمز اولیه مدیر: `admin`
 
-## مسیر دیتابیس
-Tauri دیتابیس را در AppData مخصوص برنامه می‌سازد. نام فایل:
+## محل دیتابیس
+Yaran دیتابیس را در AppData کاربر Windows با نام `yaran.sqlite3` نگه می‌دارد. مسیر دقیق از Native Health قابل تشخیص است.
 
-`yaran.sqlite3`
+## چاپ XPrinter
+پرینتر باید Driver ویندوز خود را داشته باشد. از تنظیمات Yaran روی «شناسایی» بزنید و پرینتر نصب‌شده را انتخاب کنید. چاپ Native بدون Print Dialog انجام می‌شود. قابلیت Auto Cut به تنظیم و پشتیبانی Driver/مدل پرینتر وابسته است.
 
-Backupهای Native داخل پوشه `backups` همان AppData ساخته می‌شوند.
+## بارکدخوان
+بارکدخوان‌های USB Laser که در حالت HID Keyboard کار می‌کنند مستقیم پشتیبانی می‌شوند. Suffix پیش‌فرض Enter است.
 
-## اجرای توسعه روی Windows 10/11
-پیش‌نیازهای Tauri روی Windows:
-1. Microsoft C++ Build Tools با workload «Desktop development with C++»
-2. Microsoft Edge WebView2
-3. Rust با toolchain `stable-msvc`
-4. Node.js LTS برای Tauri CLI
+## Build در GitHub Actions
+Repository باید محتویات همین پوشه را در Root داشته باشد. سپس Workflow موجود در `.github/workflows/build-windows.yml` روی Windows GitHub Runner فایل Setup را می‌سازد.
 
-سپس PowerShell را در ریشه پروژه باز کنید:
+خروجی Installer در Artifact با نام `Yaran-Windows-Installer` قرار می‌گیرد.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\SETUP_WINDOWS.ps1
-```
-
-برای اجرای Alpha:
-
-```powershell
-npm run dev
-```
-
-یا `RUN_DEV_WINDOWS.bat` را اجرا کنید.
-
-## ساخت Setup.exe
-
-```powershell
-npm run build
-```
-
-یا `BUILD_WINDOWS.bat`.
-
-خروجی NSIS معمولاً در مسیر زیر ساخته می‌شود:
-
-`src-tauri\target\release\bundle\nsis\`
-
-## ساختار Migration
-- `001_core.sql`: state، audit و backup registry
-- `002_domain.sql`: کالا، دسته، بارکد، اشخاص، فاکتور، اقلام، کاردکس و دوره حسابی
-- `003_indexes.sql`: ایندکس‌های جستجو و گزارش
-
-هر تغییر آینده دیتابیس باید به‌صورت migration جدید اضافه شود؛ فایل‌های migration قبلی نباید تغییر کنند.
-
-## مرحله بعد
-1. انتقال کامل CRUD کالاها از JSON state به جداول SQLite
-2. انتقال فروش به transaction واقعی SQLite
-3. Audit Log واقعی برای ویرایش/حذف فاکتور
-4. چاپ مستقیم XPrinter ESC/POS + Raster فارسی
-5. انتخاب Printer از لیست Windows
-6. Backup retention و Restore داخل خود برنامه
-7. کاربران و Permissionها با Hash رمز
-8. Importer داده محک
-9. Cloud Sync پس از پایدار شدن Desktop
-
-## نکته مهم
-این پوشه سورس Native Alpha است، نه فایل Setup از پیش کامپایل‌شده. تولید `Setup.exe` استاندارد Tauri برای Windows بهتر است روی خود Windows انجام شود.
-
-## Cloud Build (recommended)
-
-This project includes `.github/workflows/build-windows.yml`. Upload the repository to GitHub, open **Actions → Build Yaran for Windows → Run workflow**, then download the `Yaran-Windows-Installer` artifact from the completed run. This avoids installing Visual Studio, Rust and Node.js on the shop PC.
+## محدوده v1.0
+این Release، نسخه Local/Desktop است. Cloud Sync و داشبورد آنلاین به‌عنوان ماژول جداگانه بعداً روی همین دیتابیس و API اضافه می‌شوند و برای کارکرد روزانه نسخه Local لازم نیستند.

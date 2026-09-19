@@ -114,3 +114,174 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 @media(max-width:760px){.invoice-actions{flex-wrap:wrap}.unit-mode-switch{align-items:flex-start}.quick-category-box,.support-unlock-row{flex-direction:column;align-items:stretch}.support-lock{grid-template-columns:auto 1fr}.support-unlock-row{grid-column:1/-1}}
 .cart-price-edit{display:flex;align-items:center;border:1px solid var(--line);background:var(--input);border-radius:9px;overflow:hidden;min-width:95px}.cart-price-edit input{width:72px;border:0!important;background:transparent!important;padding:7px 8px!important;box-shadow:none!important}.cart-price-edit span{padding:0 7px;color:var(--muted);font-size:10px;border-right:1px solid var(--line)}
 .period-month-line{display:block;margin-top:2px;color:var(--muted);font-size:10px;font-weight:600}
+
+/* =========================================================
+   Yaran Desktop UX layer — fixed native shell / Telegram-like
+   ========================================================= */
+:root{
+  --motion-fast:120ms;
+  --motion-normal:180ms;
+  --ease-desktop:cubic-bezier(.2,.78,.25,1);
+}
+html,body{
+  width:100%;
+  height:100%;
+  min-height:0;
+  overflow:hidden;
+  overscroll-behavior:none;
+}
+body{
+  font-family:"Segoe UI Variable Text","Segoe UI",Tahoma,Arial,sans-serif;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-user-drag:none;
+}
+input,textarea,select,[contenteditable="true"],.table-wrap,.list{
+  user-select:text;
+  -webkit-user-select:text;
+}
+.app-shell{
+  width:100vw;
+  height:100vh;
+  min-height:0;
+  overflow:hidden;
+}
+.sidebar{
+  position:relative;
+  top:auto;
+  height:100vh;
+  min-height:0;
+  overflow:hidden;
+  box-shadow:none;
+}
+.main{
+  height:100vh;
+  min-height:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.topbar{
+  position:relative;
+  top:auto;
+  flex:0 0 auto;
+  min-height:72px;
+  padding:10px 22px;
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+.page{
+  flex:1 1 auto;
+  min-height:0;
+  width:100%;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior-y:contain;
+  scrollbar-gutter:stable;
+  padding:22px 24px 30px;
+  opacity:0;
+  transform:translateY(3px);
+}
+.page.active{
+  display:block;
+  opacity:1;
+  transform:none;
+  animation:yaranPageIn var(--motion-normal) var(--ease-desktop) both;
+}
+@keyframes yaranPageIn{
+  from{opacity:0;transform:translateY(4px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.page::-webkit-scrollbar,.table-wrap::-webkit-scrollbar,.modal-card::-webkit-scrollbar{width:9px;height:9px}
+.page::-webkit-scrollbar-track,.table-wrap::-webkit-scrollbar-track,.modal-card::-webkit-scrollbar-track{background:transparent}
+.page::-webkit-scrollbar-thumb,.table-wrap::-webkit-scrollbar-thumb,.modal-card::-webkit-scrollbar-thumb{
+  background:color-mix(in srgb,var(--muted) 32%,transparent);
+  border:3px solid transparent;
+  background-clip:padding-box;
+  border-radius:999px;
+}
+.page::-webkit-scrollbar-thumb:hover,.table-wrap::-webkit-scrollbar-thumb:hover,.modal-card::-webkit-scrollbar-thumb:hover{
+  background:color-mix(in srgb,var(--muted) 48%,transparent);
+  border:2px solid transparent;
+  background-clip:padding-box;
+}
+.panel,.metric-card,.mini-stat{
+  box-shadow:none;
+}
+.panel,.metric-card,.mini-stat,.global-search,.icon-btn,.ghost-btn,.primary-btn,.danger-ghost,.money-toggle,.nav-item{
+  transition:background-color var(--motion-fast) var(--ease-desktop),border-color var(--motion-fast) var(--ease-desktop),color var(--motion-fast) var(--ease-desktop),transform var(--motion-fast) var(--ease-desktop),opacity var(--motion-fast) var(--ease-desktop);
+}
+button:active,.nav-item:active,.icon-btn:active,.primary-btn:active,.ghost-btn:active,.danger-ghost:active,.money-toggle:active{
+  transform:scale(.975);
+}
+.nav-item{
+  min-height:44px;
+}
+.nav-item.active{
+  box-shadow:inset -3px 0 0 var(--accent);
+}
+.metric-card:hover,.mini-stat:hover,.panel:hover{
+  transform:none;
+}
+.work-session{
+  background:var(--panel-soft);
+  border:1px solid var(--line);
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+  border-radius:12px;
+}
+.work-session:after{display:none}
+html[data-theme="dark"] .work-session{
+  background:var(--panel-soft);
+  border-color:var(--line);
+  box-shadow:none;
+}
+.modal{
+  overscroll-behavior:none;
+}
+.modal-card{
+  max-height:min(88vh,850px);
+  overflow:auto;
+  animation:yaranModalIn 160ms var(--ease-desktop) both;
+}
+@keyframes yaranModalIn{
+  from{opacity:0;transform:translateY(8px) scale(.992)}
+  to{opacity:1;transform:none}
+}
+.toast{
+  transition:opacity var(--motion-normal) var(--ease-desktop),transform var(--motion-normal) var(--ease-desktop);
+}
+.table-wrap{
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+
+/* Beta Core about / copyright */
+.about-yaran{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 20px}
+.about-yaran .panel-head{margin:0;flex:1}
+.copyright-mark{direction:ltr;font-weight:700;letter-spacing:.2px;white-space:nowrap;color:var(--text)}
+@media(max-width:760px){.about-yaran{align-items:flex-start;flex-direction:column}.copyright-mark{white-space:normal}}
+
+/* v1 Beta Audit — protected SQLite audit trail */
+.audit-loading,.audit-empty{padding:28px;text-align:center;color:var(--muted);font-size:14px}
+.audit-list{display:flex;flex-direction:column;gap:8px;max-height:58vh;overflow:auto;padding:2px}
+.audit-row{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--panel-soft);transition:transform .16s ease,border-color .16s ease,background .16s ease}
+.audit-row:hover{transform:translateY(-1px);border-color:rgba(51,144,236,.35);background:var(--panel)}
+.audit-dot{width:9px;height:9px;border-radius:50%;margin-top:7px;flex:none;background:var(--accent);box-shadow:0 0 0 4px rgba(51,144,236,.12)}
+.audit-dot.danger{background:#e05a67;box-shadow:0 0 0 4px rgba(224,90,103,.12)}
+.audit-main{min-width:0;flex:1}
+.audit-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.audit-title b{font-size:14px}
+.audit-title span{font-size:12px;color:var(--muted);direction:ltr}
+.audit-main p{margin:4px 0 3px;font-size:13px;color:var(--text)}
+.audit-main small{font-size:11px;color:var(--muted)}
+
+/* v1.0 native printer controls */
+.printer-pick-row{display:flex;gap:8px;align-items:center}
+.printer-pick-row input{flex:1;min-width:0}
+.printer-pick-row .tiny-btn{white-space:nowrap}

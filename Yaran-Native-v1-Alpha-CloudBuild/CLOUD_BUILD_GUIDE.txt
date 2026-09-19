@@ -1,28 +1,34 @@
-YARAN FINANCIAL SYSTEM — CLOUD BUILD GUIDE
+YARAN FINANCIAL SYSTEM v1.0 — CLOUD BUILD GUIDE
 
 You do NOT need Visual Studio, Rust or Node.js on your own PC for this method.
 GitHub Actions builds the Windows installer on a cloud Windows machine.
 
 ONE-TIME SETUP
 1) Create/sign in to a GitHub account.
-2) Create a new PRIVATE repository. Suggested name: yaran-financial-system
+2) Create a PRIVATE repository. Suggested name: yaran-financial-system
 3) Upload the CONTENTS of this folder to the repository root.
-   Important: upload the contents, not one extra parent folder.
 4) Open the repository's Actions tab.
 5) Choose: "Build Yaran for Windows"
-6) Click: "Run workflow" -> "Run workflow"
-7) Wait until the job shows a green check mark.
-8) Open that successful run.
-9) At the bottom, under Artifacts, download: Yaran-Windows-Installer
-10) Extract the downloaded artifact. The NSIS Setup .exe will be inside.
+6) Click: Run workflow -> Run workflow
+7) Wait for a green check mark.
+8) Open the successful run.
+9) Under Artifacts, download: Yaran-Windows-Installer
+10) Extract the artifact and run the NSIS Setup .exe.
 
 AUTOMATIC BUILDS
-Any future push to the main branch also starts a new Windows build automatically.
+Any future push to the main branch starts a new Windows build automatically.
 
-WHERE THE INSTALLER COMES FROM
+INSTALLER OUTPUT
 src-tauri/target/release/bundle/nsis/*.exe
 
-IMPORTANT
-This is still the current Alpha codebase. Do not use it for live accounting until the
-full production SQLite data model, backup/restore validation and direct XPrinter path
-are finalized and tested.
+FIRST RUN
+- Yaran creates yaran.sqlite3 in the Windows AppData directory.
+- Configure store identity, XPrinter/thermal printer and backup frequency.
+- Default protected data/support password: admin
+- Use Settings -> Data & Support -> Database Health Check after installation.
+
+PRINTER
+Install the printer's Windows driver first. In Yaran Settings, use Detect Printers and select the installed XPrinter/thermal printer. Native printing is sent through the Windows driver without opening the print dialog.
+
+BACKUP
+Native SQLite backups are stored under the Yaran AppData backups folder. The app keeps the latest 30 native backups.

@@ -3,18 +3,11 @@ const WORK_KEY='yaran_work_session_v1';
 const AUTO_BACKUP_KEY='yaran_auto_backup_latest_v1';
 const DATA_SUPPORT_PASSWORD='admin';
 const DEFAULT={
- settings:{storeName:'Yaran Store',storeAddress:'',storePhone:'',storeLogo:'',receiptFooter:'سپاس از خرید شما',printerName:'XPrinter 80mm',autoPrint:false,autoCut:true,currency:'؋',theme:'light',hideDashboardMoney:false,scannerSuffix:'Enter',autoBackupPerDay:0},
+ settings:{storeName:'Yaran Store',storeAddress:'',storePhone:'',storeLogo:'',receiptFooter:'سپاس از خرید شما',printerName:'XPrinter 80mm',autoPrint:false,autoCut:true,currency:'؋',theme:'light',hideDashboardMoney:false,scannerSuffix:'Enter',autoBackupPerDay:0,lastAutoBackupAt:''},
  categories:[{id:'cat-general',name:'عمومی'}],
- products:[
-  {id:'p1',name:'Coca Cola 1.5L',barcode:'6291100001001',barcodes:['6291100001001'],image:'',categoryId:'cat-general',producer:'',unitConversionEnabled:true,baseUnit:'دانه',purchaseUnit:'بسته',unitsPerPurchase:6,packageBuyPrice:288,buy:48,sell:65,stock:25,min:8},
-  {id:'p2',name:'آب معدنی',barcode:'6291100001002',barcodes:['6291100001002'],image:'',categoryId:'cat-general',producer:'',baseUnit:'دانه',purchaseUnit:'بسته',unitsPerPurchase:12,packageBuyPrice:144,buy:12,sell:20,stock:54,min:12},
-  {id:'p3',name:'Chocolate',barcode:'6291100001003',barcodes:['6291100001003'],image:'',categoryId:'cat-general',producer:'',baseUnit:'دانه',purchaseUnit:'بسته',unitsPerPurchase:24,packageBuyPrice:744,buy:31,sell:45,stock:7,min:10},
-  {id:'p4',name:'Juice Orange',barcode:'6291100001004',barcodes:['6291100001004'],image:'',categoryId:'cat-general',producer:'',baseUnit:'دانه',purchaseUnit:'بسته',unitsPerPurchase:12,packageBuyPrice:420,buy:35,sell:50,stock:19,min:6},
-  {id:'p5',name:'Milk 1L',barcode:'6291100001005',barcodes:['6291100001005'],image:'',categoryId:'cat-general',producer:'',baseUnit:'دانه',purchaseUnit:'کارتن',unitsPerPurchase:12,packageBuyPrice:468,buy:39,sell:55,stock:4,min:8},
-  {id:'p6',name:'بیسکویت',barcode:'6291100001006',barcodes:['6291100001006'],image:'',categoryId:'cat-general',producer:'',baseUnit:'دانه',purchaseUnit:'بسته',unitsPerPurchase:20,packageBuyPrice:320,buy:16,sell:25,stock:30,min:10}
- ],
- customers:[{id:'c0',name:'مشتری عمومی',phone:'',balance:0},{id:'c1',name:'احمد',phone:'',balance:0}],
- suppliers:[{id:'sp1',name:'شرکت نمونه',phone:'',balance:0}],
+ products:[],
+ customers:[{id:'c0',name:'مشتری عمومی',phone:'',balance:0}],
+ suppliers:[],
  sales:[],deletedSales:[],purchases:[],inventory:[],inventorySnapshots:[],expenses:[],supplierPayments:[],customerReceipts:[],financialPeriods:[],financialPeriod:null
 };
 
@@ -23,20 +16,19 @@ let cart=[];
 let paymentMethod='نقدی';
 let lastSale=null;
 let editingSaleId=null;
+let checkoutBusy=false;
 let dataSupportUnlocked=false;
 let moneyVisible=!db.settings.hideDashboardMoney;
 const workStart=getWorkSessionStart();
 
 const $=s=>document.querySelector(s), $$=s=>Array.prototype.slice.call(document.querySelectorAll(s));
 function clone(x){return JSON.parse(JSON.stringify(x))}
-function loadRaw(){try{return JSON.parse(localStorage.getItem(KEY))||clone(DEFAULT)}catch(e){return clone(DEFAULT)}}
+function loadRaw(){try{if(window.YaranNative&&window.YaranNative.isNative){const raw=window.__YARAN_PRELOADED_STATE__;return raw?JSON.parse(raw):clone(DEFAULT)}return JSON.parse(localStorage.getItem(KEY))||clone(DEFAULT)}catch(e){return clone(DEFAULT)}}
 
 function persistState(state){
  const raw=JSON.stringify(state);
- let ok=true;
- try{localStorage.setItem(KEY,raw)}catch(e){ok=false}
- if(window.YaranNative&&window.YaranNative.isNative)window.YaranNative.persist(raw);
- return ok;
+ if(window.YaranNative&&window.YaranNative.isNative){window.YaranNative.persist(raw).catch(function(e){console.error(e);toast('ذخیره SQLite انجام نشد')});return true}
+ try{localStorage.setItem(KEY,raw);return true}catch(e){return false}
 }
 
 function id(prefix){return prefix+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
@@ -88,6 +80,28 @@ function save(){
  try{ok=persistState(db)}
  catch(e){ok=false;toast('ذخیره اطلاعات انجام نشد؛ اگر عکس بزرگی انتخاب کرده‌اید آن را کوچک‌تر کنید.')}
  renderAll();return ok
+}
+async function saveWithAudit(auditEvent,rollbackState){
+ updateInventorySnapshot();
+ const raw=JSON.stringify(db);
+ try{
+  if(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.commit){
+   await window.YaranNative.commit(raw,auditEvent);
+  }else{
+   persistState(db);
+  }
+  renderAll();
+  return true;
+ }catch(e){
+  console.error('Yaran transactional save failed:',e);
+  if(rollbackState){
+   db=normalizeDB(clone(rollbackState));
+   if(!(window.YaranNative&&window.YaranNative.isNative)){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(ignore){}}
+  }
+  renderAll();
+  toast('ذخیره امن انجام نشد؛ تغییرات فاکتور برگشت داده شد');
+  return false;
+ }
 }
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(function(){e.classList.remove('show')},1900)}
 function currentInventoryValue(){return db.products.reduce(function(a,p){return a+(Number(p.buy)||0)*(Number(p.stock)||0)},0)}
@@ -247,20 +261,32 @@ $('#barcodeInput').addEventListener('input',function(e){renderPosSearch(e.target
 $('#barcodeInput').addEventListener('keydown',function(e){const suffix=db.settings.scannerSuffix||'Enter';if(e.key===suffix||e.key==='Enter'){e.preventDefault();if(findAndAdd(e.target.value)){e.target.value='';renderPosSearch('')}}if(e.key==='Escape'){e.target.value='';renderPosSearch('')}});
 $('#discountInput').oninput=renderCart;$('#clearCart').onclick=function(){cart=[];$('#discountInput').value=0;if(editingSaleId){editingSaleId=null;paymentMethod='نقدی';$$('.payment').forEach(function(x){x.classList.toggle('active',x.dataset.pay==='نقدی')});toast('ویرایش فاکتور لغو شد')}renderCart()};
 $$('.payment').forEach(function(b){b.onclick=function(){$$('.payment').forEach(function(x){x.classList.remove('active')});b.classList.add('active');paymentMethod=b.dataset.pay}});
-function checkout(){
+async function checkout(){
+ if(checkoutBusy)return;
  if(!cart.length){toast('فاکتور خالی است');return}
  const subtotal=cart.reduce(function(a,i){return a+i.sell*i.qty},0),discount=Math.max(0,Number($('#discountInput').value)||0),total=Math.max(0,subtotal-discount),original=getEditingSale(),no=original?original.no:lastSaleNo()+1;
  for(let c=0;c<cart.length;c++){const i=cart[c],p=db.products.find(function(x){return x.id===i.id});if(!p||availableStock(i.id)<i.qty){toast('موجودی '+i.name+' کافی نیست');return}}
- if(original){
-  const revisions=Array.isArray(original.revisions)?original.revisions.slice():[];revisions.push({editedAt:new Date().toISOString(),snapshot:invoiceSnapshot(original)});
-  reverseSaleEffects(original,'برگشت برای ویرایش');
-  const updated={id:original.id,no:original.no,time:original.time,items:clone(cart),subtotal:subtotal,discount:discount,total:total,payment:paymentMethod,customerId:$('#customerSelect').value,editedAt:new Date().toISOString(),revisions:revisions};
-  applySaleEffects(updated,'ویرایش فروش');
-  const idx=db.sales.findIndex(function(x){return x.id===original.id});if(idx>-1)db.sales[idx]=updated;lastSale=updated;editingSaleId=null;
-  if(!save())return;cart=[];$('#discountInput').value=0;renderCart();toast('فاکتور #'+num(no)+' ویرایش شد');if(db.settings.autoPrint)printReceipt(updated);return;
+ checkoutBusy=true;$('#checkoutBtn').disabled=true;
+ const beforeDB=clone(db);
+ try{
+  if(original){
+   const beforeSale=invoiceSnapshot(original),revisions=Array.isArray(original.revisions)?original.revisions.slice():[];revisions.push({editedAt:new Date().toISOString(),snapshot:beforeSale});
+   reverseSaleEffects(original,'برگشت برای ویرایش');
+   const updated={id:original.id,no:original.no,time:original.time,items:clone(cart),subtotal:subtotal,discount:discount,total:total,payment:paymentMethod,customerId:$('#customerSelect').value,editedAt:new Date().toISOString(),revisions:revisions};
+   applySaleEffects(updated,'ویرایش فروش');
+   const idx=db.sales.findIndex(function(x){return x.id===original.id});if(idx>-1)db.sales[idx]=updated;
+   const ok=await saveWithAudit({action:'invoice.update',entityType:'invoice',entityId:updated.id,invoiceNo:Number(updated.no)||0,actor:'Admin',createdAt:updated.editedAt,payload:{before:beforeSale,after:invoiceSnapshot(updated),summary:'ویرایش فاکتور'}},beforeDB);
+   if(!ok)return;
+   lastSale=updated;editingSaleId=null;cart=[];$('#discountInput').value=0;renderCart();toast('فاکتور #'+num(no)+' ویرایش شد');if(db.settings.autoPrint)printReceipt(updated);return;
+  }
+  const sale={id:id('s'),no:no,time:new Date().toISOString(),items:clone(cart),subtotal:subtotal,discount:discount,total:total,payment:paymentMethod,customerId:$('#customerSelect').value,revisions:[]};
+  applySaleEffects(sale,'فروش');db.sales.push(sale);
+  const ok=await saveWithAudit({action:'invoice.create',entityType:'invoice',entityId:sale.id,invoiceNo:Number(sale.no)||0,actor:'Admin',createdAt:sale.time,payload:{after:invoiceSnapshot(sale),summary:'ثبت فاکتور جدید'}},beforeDB);
+  if(!ok)return;
+  lastSale=sale;cart=[];$('#discountInput').value=0;renderCart();toast('فاکتور #'+num(no)+' ثبت شد');if(db.settings.autoPrint)printReceipt(sale)
+ }finally{
+  checkoutBusy=false;$('#checkoutBtn').disabled=false;
  }
- const sale={id:id('s'),no:no,time:new Date().toISOString(),items:clone(cart),subtotal:subtotal,discount:discount,total:total,payment:paymentMethod,customerId:$('#customerSelect').value,revisions:[]};
- applySaleEffects(sale,'فروش');db.sales.push(sale);lastSale=sale;if(!save())return;cart=[];$('#discountInput').value=0;renderCart();toast('فاکتور #'+num(no)+' ثبت شد');if(db.settings.autoPrint)printReceipt(sale)
 }
 $('#checkoutBtn').onclick=checkout;
 function editInvoice(saleId){
@@ -269,7 +295,7 @@ function editInvoice(saleId){
 function deleteInvoice(saleId){
  const sale=db.sales.find(function(s){return s.id===saleId});if(!sale)return;
  openModal('حذف فاکتور #'+num(sale.no),'<div class="confirm-card danger-confirm"><div class="confirm-icon">!</div><h4>فاکتور حذف شود؟</h4><p>موجودی کالاها و قرض مشتری بر اساس این فاکتور برگردانده می‌شود. یک نسخه از فاکتور حذف‌شده در سابقه داخلی Yaran نگه‌داری خواهد شد.</p><div class="confirm-summary"><span>مبلغ فاکتور</span><b>'+money(sale.total)+'</b></div><div class="modal-actions"><button id="cancelDeleteInvoice" class="ghost-btn">انصراف</button><button id="confirmDeleteInvoice" class="danger-btn">حذف فاکتور</button></div></div>');
- $('#cancelDeleteInvoice').onclick=closeModal;$('#confirmDeleteInvoice').onclick=function(){reverseSaleEffects(sale,'حذف فاکتور');db.deletedSales.push(Object.assign({},clone(sale),{deletedAt:new Date().toISOString()}));db.sales=db.sales.filter(function(s){return s.id!==saleId});if(editingSaleId===saleId){editingSaleId=null;cart=[]}if(lastSale&&lastSale.id===saleId)lastSale=null;if(save()){closeModal();toast('فاکتور #'+num(sale.no)+' حذف شد')}}
+ $('#cancelDeleteInvoice').onclick=closeModal;$('#confirmDeleteInvoice').onclick=async function(){const beforeDB=clone(db),beforeSale=invoiceSnapshot(sale),deletedAt=new Date().toISOString();reverseSaleEffects(sale,'حذف فاکتور');db.deletedSales.push(Object.assign({},clone(sale),{deletedAt:deletedAt}));db.sales=db.sales.filter(function(s){return s.id!==saleId});const ok=await saveWithAudit({action:'invoice.delete',entityType:'invoice',entityId:sale.id,invoiceNo:Number(sale.no)||0,actor:'Admin',createdAt:deletedAt,payload:{before:beforeSale,after:{status:'deleted',deletedAt:deletedAt},summary:'حذف فاکتور'}},beforeDB);if(!ok)return;if(editingSaleId===saleId){editingSaleId=null;cart=[]}if(lastSale&&lastSale.id===saleId)lastSale=null;closeModal();renderCart();toast('فاکتور #'+num(sale.no)+' حذف شد')}
 }
 function bindInvoiceActions(){
  $$('.edit-invoice').forEach(function(b){b.onclick=function(){editInvoice(b.dataset.sale)}});$$('.delete-invoice').forEach(function(b){b.onclick=function(){deleteInvoice(b.dataset.sale)}})
@@ -324,6 +350,15 @@ $('#addExpenseBtn').onclick=function(){openModal('ثبت هزینه','<form id="
 $('#unlockDataSupport').onclick=async function(){const password=$('#dataSupportPassword').value;const valid=(window.YaranNative&&window.YaranNative.isNative)?await window.YaranNative.verifyAdmin(password):(password===DATA_SUPPORT_PASSWORD);if(valid){dataSupportUnlocked=true;$('#dataSupportPassword').value='';renderDataSupportAccess();toast('بخش داده‌ها و پشتیبانی باز شد')}else{toast('رمز مدیر نادرست است')}};
 $('#dataSupportPassword').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('#unlockDataSupport').click()}});
 $('#lockDataSupport').onclick=function(){dataSupportUnlocked=false;renderDataSupportAccess();toast('بخش داده‌ها و پشتیبانی قفل شد')};
+if($('#auditLogBtn'))$('#auditLogBtn').onclick=openAuditLog;
+if($('#detectPrinters'))$('#detectPrinters').onclick=async function(){
+ if(!(window.YaranNative&&window.YaranNative.isNative)){toast('شناسایی پرینتر در نسخه Native فعال است');return}
+ try{const list=await window.YaranNative.printers();const dl=$('#printerList');dl.innerHTML=(list||[]).map(function(n){return '<option value="'+esc(n)+'"></option>'}).join('');if(!list.length){toast('پرینتری در Windows پیدا نشد');return}const current=String(db.settings.printerName||'').trim(),match=list.find(function(n){return n===current})||list.find(function(n){return /xprinter/i.test(n)})||list[0];if(!list.some(function(n){return n===current})){db.settings.printerName=match;$('#printerName').value=match;save()}toast(num(list.length)+' پرینتر شناسایی شد')}catch(e){console.error(e);toast('شناسایی پرینتر انجام نشد')}
+};
+if($('#dbHealthBtn'))$('#dbHealthBtn').onclick=async function(){
+ if(!(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.integrityCheck)){toast('بررسی دیتابیس در نسخه Native فعال است');return}
+ try{const r=await window.YaranNative.integrityCheck();toast(r&&r.ok?'دیتابیس SQLite سالم است':'دیتابیس نیاز به بررسی دارد');if(r&&!r.ok)console.error('SQLite integrity:',r)}catch(e){console.error(e);toast('بررسی سلامت دیتابیس انجام نشد')}
+};
 ['storeName','storeAddress','storePhone','receiptFooter','printerName'].forEach(function(k){$('#'+k).onchange=function(e){db.settings[k]=e.target.value;save()}});['autoPrint','autoCut'].forEach(function(k){$('#'+k).onchange=function(e){db.settings[k]=e.target.checked;save()}});$('#themeSelect').onchange=function(e){db.settings.theme=e.target.value;save()};$('#scannerSuffix').onchange=function(e){db.settings.scannerSuffix=e.target.value;save()};$('#autoBackupPerDay').onchange=function(e){db.settings.autoBackupPerDay=Number(e.target.value)||0;save();maybeAutoBackup(true)};$('#themeToggle').onclick=function(){db.settings.theme=db.settings.theme==='dark'?'light':'dark';save()};$('#moneyToggle').onclick=function(){moneyVisible=!moneyVisible;db.settings.hideDashboardMoney=!moneyVisible;persistState(db);renderDashboard()};$('#reportPeriod').onchange=renderReports;
 function openPeriodRestartNotice(){
  const fp=db.financialPeriod,months=financialPeriodMonths();
@@ -332,18 +367,63 @@ function openPeriodRestartNotice(){
 }
 $('#startNewPeriodBtn').onclick=openPeriodRestartNotice;
 
+function auditActionLabel(action){if(action==='invoice.create')return 'ثبت فاکتور';if(action==='invoice.update')return 'ویرایش فاکتور';if(action==='invoice.delete')return 'حذف فاکتور';return action||'رویداد'}
+async function openAuditLog(){
+ if(!(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.auditLog)){toast('سابقه امن در نسخه Native در دسترس است');return}
+ openModal('سابقه تغییرات فاکتورها','<div class="audit-loading">در حال خواندن سابقه امن SQLite…</div>');
+ try{
+  const rows=await window.YaranNative.auditLog(200);
+  const html=!rows.length?'<div class="audit-empty">هنوز تغییر ثبت‌شده‌ای وجود ندارد.</div>':'<div class="audit-list">'+rows.map(function(r){const p=r.payload||{},before=p.before||null,after=p.after||null;let detail=p.summary||'';if(r.action==='invoice.update'&&before&&after){detail='مبلغ '+money(before.total||0)+' → '+money(after.total||0)}if(r.action==='invoice.delete')detail='فاکتور حذف شد و نسخه قبل از حذف محفوظ است';return '<div class="audit-row"><div class="audit-dot '+(r.action==='invoice.delete'?'danger':'')+'"></div><div class="audit-main"><div class="audit-title"><b>'+auditActionLabel(r.action)+'</b>'+(r.invoiceNo!=null?'<span>#'+num(r.invoiceNo)+'</span>':'')+'</div><p>'+esc(detail||'ثبت امن تغییر')+'</p><small>'+formatDateTime(r.createdAt)+' · '+esc(r.actor||'Admin')+'</small></div></div>'}).join('')+'</div>';
+  $('#modalContent').innerHTML=html;
+ }catch(e){console.error(e);$('#modalContent').innerHTML='<div class="audit-empty">خواندن سابقه تغییرات انجام نشد.</div>'}
+}
+
 function receiptHtml(sale){const set=db.settings;return '<!doctype html><html dir="rtl"><head><meta charset="utf-8"><style>@page{size:80mm auto;margin:2mm}body{width:72mm;margin:0 auto;font-family:"Segoe UI",Tahoma,Arial,sans-serif;font-size:11px;color:#000}.c{text-align:center}.h{font-size:17px;font-weight:700;margin:4px 0}.line{border-top:1px dashed #000;margin:7px 0}.row{display:flex;justify-content:space-between;gap:8px;margin:4px 0}.items{width:100%;border-collapse:collapse}.items th,.items td{font-size:10px;padding:3px 0;text-align:right}.items td:last-child,.items th:last-child{text-align:left}.total{font-size:14px;font-weight:bold}.foot{margin-top:10px;text-align:center}</style></head><body>'+(set.storeLogo?'<div class="c"><img src="'+esc(set.storeLogo)+'" style="width:46px;height:46px;object-fit:contain;margin:2px auto 4px"></div>':'')+'<div class="c h">'+esc(set.storeName)+'</div>'+(set.storeAddress?'<div class="c">'+esc(set.storeAddress)+'</div>':'')+(set.storePhone?'<div class="c">'+esc(set.storePhone)+'</div>':'')+'<div class="line"></div><div class="row"><span>فاکتور #'+num(sale.no)+'</span><span>'+formatDateTime(sale.time)+'</span></div><div class="line"></div><table class="items"><thead><tr><th>کالا</th><th>تعداد</th><th>مبلغ</th></tr></thead><tbody>'+sale.items.map(function(i){return '<tr><td>'+esc(i.name)+'</td><td>'+num(i.qty)+' '+esc(i.baseUnit||'دانه')+'</td><td>'+num(i.sell*i.qty)+' ؋</td></tr>'}).join('')+'</tbody></table><div class="line"></div><div class="row"><span>جمع</span><b>'+money(sale.subtotal)+'</b></div>'+(sale.discount?'<div class="row"><span>تخفیف</span><b>'+money(sale.discount)+'</b></div>':'')+'<div class="row total"><span>قابل پرداخت</span><span>'+money(sale.total)+'</span></div><div class="row"><span>پرداخت</span><span>'+esc(sale.payment)+'</span></div><div class="line"></div><div class="foot">'+esc(set.receiptFooter||'')+'</div><script>onload=function(){print()}<\/script></body></html>'}
-function printReceipt(s){s=s||lastSale||(db.sales.length?db.sales[db.sales.length-1]:null);if(!s){toast('رسیدی برای چاپ وجود ندارد');return}const f=$('#printFrame'),d=f.contentWindow.document;d.open();d.write(receiptHtml(s));d.close()}
-$('#testPrint').onclick=function(){printReceipt({no:'TEST',time:new Date().toISOString(),items:[{name:'چاپ آزمایشی Yaran',qty:1,sell:100,buy:80}],subtotal:100,discount:0,total:100,payment:'نقدی'})};$('#printLastReceipt').onclick=function(){printReceipt()};
-function getLatestAutoBackup(){try{return JSON.parse(localStorage.getItem(AUTO_BACKUP_KEY)||'null')}catch(e){return null}}
-function createAutoBackup(showToast){try{localStorage.setItem(AUTO_BACKUP_KEY,JSON.stringify({time:new Date().toISOString(),data:db}));if(window.YaranNative&&window.YaranNative.isNative)window.YaranNative.backup(JSON.stringify(db));renderAutoBackupStatus();if(showToast)toast('پشتیبان خودکار ثبت شد');return true}catch(e){if(showToast)toast('ثبت پشتیبان انجام نشد');return false}}
+function loadReceiptImage(src){return new Promise(function(resolve,reject){if(!src){resolve(null);return}const im=new Image();im.onload=function(){resolve(im)};im.onerror=reject;im.src=src})}
+function fitCanvasText(ctx,text,maxWidth){text=String(text||'');if(ctx.measureText(text).width<=maxWidth)return text;let out=text;while(out.length>1&&ctx.measureText(out+'…').width>maxWidth)out=out.slice(0,-1);return out+'…'}
+async function receiptPngBase64(sale){
+ const set=db.settings,W=576,itemH=52,logoExtra=set.storeLogo?92:0,H=470+logoExtra+(sale.items||[]).length*itemH+(sale.discount?34:0);const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#000';x.textBaseline='middle';x.direction='rtl';let y=24;
+ if(set.storeLogo){try{const logo=await loadReceiptImage(set.storeLogo);if(logo){const size=72;x.drawImage(logo,(W-size)/2,y,size,size);y+=84}}catch(e){}}
+ x.textAlign='center';x.font='700 31px "Segoe UI", Tahoma, Arial';x.fillText(set.storeName||'Yaran Store',W/2,y);y+=39;
+ x.font='18px "Segoe UI", Tahoma, Arial';if(set.storeAddress){x.fillText(fitCanvasText(x,set.storeAddress,W-50),W/2,y);y+=27}if(set.storePhone){x.direction='ltr';x.fillText(String(set.storePhone),W/2,y);x.direction='rtl';y+=27}
+ function dash(){y+=9;x.save();x.setLineDash([8,7]);x.strokeStyle='#222';x.lineWidth=1;x.beginPath();x.moveTo(22,y);x.lineTo(W-22,y);x.stroke();x.restore();y+=14}
+ dash();x.font='18px "Segoe UI", Tahoma, Arial';x.textAlign='right';x.fillText('فاکتور #'+num(sale.no),W-24,y);x.textAlign='left';x.direction='ltr';x.fillText(formatDateTime(sale.time),24,y);x.direction='rtl';y+=26;dash();
+ x.font='700 17px "Segoe UI", Tahoma, Arial';x.textAlign='right';x.fillText('کالا',W-24,y);x.textAlign='center';x.fillText('تعداد',180,y);x.textAlign='left';x.fillText('مبلغ',24,y);y+=28;
+ (sale.items||[]).forEach(function(i){x.font='19px "Segoe UI", Tahoma, Arial';x.textAlign='right';x.fillText(fitCanvasText(x,i.name,310),W-24,y);x.textAlign='center';x.direction='rtl';x.fillText(num(i.qty)+' '+String(i.baseUnit||'دانه'),180,y);x.textAlign='left';x.direction='ltr';x.fillText(amount((Number(i.sell)||0)*(Number(i.qty)||0))+' ؋',24,y);x.direction='rtl';y+=itemH});
+ dash();function summary(label,val,bold){x.font=(bold?'700 24px':'19px')+' "Segoe UI", Tahoma, Arial';x.textAlign='right';x.fillText(label,W-24,y);x.textAlign='left';x.direction='ltr';x.fillText(val,24,y);x.direction='rtl';y+=bold?36:31}
+ summary('جمع',money(sale.subtotal),false);if(sale.discount)summary('تخفیف',money(sale.discount),false);summary('قابل پرداخت',money(sale.total),true);summary('پرداخت',String(sale.payment||'نقدی'),false);dash();x.font='18px "Segoe UI", Tahoma, Arial';x.textAlign='center';x.fillText(fitCanvasText(x,set.receiptFooter||'',W-50),W/2,y);return c.toDataURL('image/png').split(',')[1]
+}
+async function printReceipt(s){
+ s=s||lastSale||(db.sales.length?db.sales[db.sales.length-1]:null);if(!s){toast('رسیدی برای چاپ وجود ندارد');return}
+ if(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.printReceiptPng&&String(db.settings.printerName||'').trim()){
+  try{const png=await receiptPngBase64(s);await window.YaranNative.printReceiptPng(db.settings.printerName,png);toast('رسید مستقیم چاپ شد');return}catch(e){console.error('Direct print failed:',e);toast('چاپ مستقیم انجام نشد؛ حالت چاپ ویندوز باز می‌شود')}
+ }
+ const f=$('#printFrame'),d=f.contentWindow.document;d.open();d.write(receiptHtml(s));d.close()
+}
+$('#testPrint').onclick=function(){printReceipt({no:'TEST',time:new Date().toISOString(),items:[{name:'چاپ آزمایشی Yaran',qty:1,sell:100,buy:80,baseUnit:'دانه'}],subtotal:100,discount:0,total:100,payment:'نقدی'})};$('#printLastReceipt').onclick=function(){printReceipt()};
+function getLatestAutoBackup(){
+ if(window.YaranNative&&window.YaranNative.isNative)return db.settings.lastAutoBackupAt?{time:db.settings.lastAutoBackupAt}:null;
+ try{return JSON.parse(localStorage.getItem(AUTO_BACKUP_KEY)||'null')}catch(e){return null}
+}
+async function createAutoBackup(showToast){
+ try{
+  const now=new Date().toISOString();
+  if(window.YaranNative&&window.YaranNative.isNative){const path=await window.YaranNative.backup(JSON.stringify(db));if(!path)throw new Error('backup failed');db.settings.lastAutoBackupAt=now;persistState(db)}
+  else localStorage.setItem(AUTO_BACKUP_KEY,JSON.stringify({time:now,data:db}));
+  renderAutoBackupStatus();if(showToast)toast('پشتیبان خودکار ثبت شد');return true
+ }catch(e){console.error(e);if(showToast)toast('ثبت پشتیبان انجام نشد');return false}
+}
 function maybeAutoBackup(force){const per=Number(db.settings.autoBackupPerDay)||0;if(!per){renderAutoBackupStatus();return}const latest=getLatestAutoBackup(),interval=86400000/per;if(force||!latest||!latest.time||Date.now()-new Date(latest.time).getTime()>=interval)createAutoBackup(false)}
-$('#restoreAutoBackup').onclick=function(){const x=getLatestAutoBackup();if(!x||!x.data){toast('پشتیبان خودکاری وجود ندارد');return}if(!confirm('آخرین پشتیبان خودکار بازیابی شود؟'))return;db=normalizeDB(clone(x.data));moneyVisible=!db.settings.hideDashboardMoney;save();toast('پشتیبان خودکار بازیابی شد')};
+$('#restoreAutoBackup').onclick=async function(){
+ if(!confirm('آخرین پشتیبان خودکار بازیابی شود؟ اطلاعات فعلی با نسخه پشتیبان جایگزین می‌شود.'))return;
+ if(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.restoreLatestBackup){try{const ok=await window.YaranNative.restoreLatestBackup();if(!ok){toast('پشتیبان Native وجود ندارد');return}toast('پشتیبان بازیابی شد؛ Yaran دوباره بارگذاری می‌شود');setTimeout(function(){location.reload()},700)}catch(e){console.error(e);toast('بازیابی پشتیبان انجام نشد')}return}
+ const x=getLatestAutoBackup();if(!x||!x.data){toast('پشتیبان خودکاری وجود ندارد');return}db=normalizeDB(clone(x.data));moneyVisible=!db.settings.hideDashboardMoney;save();toast('پشتیبان خودکار بازیابی شد')
+};
 $('#storeLogoInput').onchange=async function(e){const f=e.target.files[0];if(!f)return;try{db.settings.storeLogo=await resizeImage(f);save();toast('لوگو ذخیره شد')}catch(err){toast('فایل لوگو معتبر نیست')}};
 $('#removeStoreLogo').onclick=function(){db.settings.storeLogo='';$('#storeLogoInput').value='';save()};
 $('#backupBtn').onclick=function(){if(window.YaranNative&&window.YaranNative.isNative)window.YaranNative.backup(JSON.stringify(db));const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='yaran-backup-'+dateKey()+'.json';a.click();URL.revokeObjectURL(a.href)};
 $('#restoreFile').onchange=async function(e){const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!x.products||!x.settings)throw new Error('bad');db=normalizeDB(x);moneyVisible=!db.settings.hideDashboardMoney;save();toast('Backup بازیابی شد')}catch(err){toast('فایل Backup معتبر نیست')}};
-$('#resetDemo').onclick=function(){if(confirm('داده‌های این نسخه آزمایشی بازنشانی شود؟')){db=normalizeDB(clone(DEFAULT));moneyVisible=true;save();toast('بازنشانی شد')}};
+$('#resetDemo').onclick=function(){if(confirm('تمام اطلاعات Yaran به حالت اولیه بازنشانی شود؟ این کار قابل برگشت نیست.')){db=normalizeDB(clone(DEFAULT));moneyVisible=true;save();toast('Yaran به حالت اولیه بازنشانی شد')}};
 $('#exportCsv').onclick=function(){const list=periodSales($('#reportPeriod').value||'financial'),lines=[['invoice','time','customer','payment','items','total'],...list.map(function(s){const c=db.customers.find(function(x){return x.id===s.customerId});return [s.no,s.time,c?c.name:'',s.payment,s.items.reduce(function(a,i){return a+i.qty},0),s.total]})],csv='\ufeff'+lines.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='yaran-financial-report-'+dateKey()+'.csv';a.click();URL.revokeObjectURL(a.href)};
 
 $('#globalSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){const q=e.target.value.trim();if(q){go('pos');$('#barcodeInput').value=q;renderPosSearch(q);$('#barcodeInput').focus();e.target.value=''}}});
@@ -352,3 +432,24 @@ let scanBuffer='',scanLast=0;document.addEventListener('keydown',function(e){if(
 $('#menuBtn').onclick=function(){$('.sidebar').classList.toggle('open')};
 setInterval(renderWorkSession,1000);setInterval(function(){maybeAutoBackup(false)},60000);
 updateInventorySnapshot();applyTheme();renderAll();maybeAutoBackup(false);
+
+/* Desktop-native interaction guards */
+(function(){
+  document.addEventListener('wheel', function(e){
+    if(e.ctrlKey) e.preventDefault();
+  }, {passive:false});
+  document.addEventListener('keydown', function(e){
+    if(e.ctrlKey && ['+','=','-','0'].includes(e.key)) e.preventDefault();
+  });
+  document.addEventListener('dragstart', function(e){
+    if(!(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) e.preventDefault();
+  });
+  document.querySelectorAll('.nav-item').forEach(function(item){
+    item.addEventListener('click', function(){
+      requestAnimationFrame(function(){
+        var active=document.querySelector('.page.active');
+        if(active) active.scrollTop=0;
+      });
+    });
+  });
+})();

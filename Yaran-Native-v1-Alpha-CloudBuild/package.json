@@ -1,8 +1,8 @@
 {
   "name": "yaran-financial-system-native",
   "private": true,
-  "version": "1.0.0-alpha.1",
-  "description": "Yaran Financial System - Windows native desktop alpha",
+  "version": "1.0.0",
+  "description": "Yaran Financial System - Windows native local production release",
   "scripts": {
     "tauri": "tauri",
     "dev": "tauri dev",
