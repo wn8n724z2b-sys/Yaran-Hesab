@@ -28,9 +28,9 @@
         <button class="nav-item" data-page="settings"><span>⚙</span><b>تنظیمات</b></button>
       </nav>
 
-      <div class="sidebar-footer creator-footer" title="© MNRAHIMI . Ltd">
-        <div class="creator-copy"><small>ساخته شده توسط</small><strong>© MNRAHIMI . Ltd</strong></div>
-      </div>
+      <a id="creatorContact" class="sidebar-footer creator-footer" href="https://t.me/Naman_Rahimi" title="ارتباط با سازنده">
+        <div class="creator-copy"><small>ساخته شده توسط</small><strong>© MNRAHIMI . Ltd</strong><em>ارتباط مستقیم</em></div>
+      </a>
     </aside>
 
     <main class="main">
@@ -49,7 +49,7 @@
             <input id="globalSearch" placeholder="جستجو: کالا، بارکد، فاکتور..." />
             <kbd>Ctrl K</kbd>
           </div>
-          <div id="workSession" class="work-session work-session-solid" title="از لحظه باز شدن برنامه محاسبه می‌شود">
+          <div id="workSession" class="work-session work-session-solid" title="از اولین اجرای امروز محاسبه می‌شود">
             <span class="work-door" aria-hidden="true">
               <svg viewBox="0 0 32 32" width="24" height="24" fill="none"><path d="M8 5.5h10.5v21H8z" stroke="currentColor" stroke-width="1.8"/><path d="M18.5 7.2 25 10v14l-6.5 2.8V7.2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="21.5" cy="17" r="1" fill="currentColor"/></svg>
             </span>
@@ -127,8 +127,9 @@
             <div class="summary-line"><span>جمع کالا</span><b id="sumSubtotal">0 ؋</b></div>
             <div class="summary-line"><span>تخفیف</span><div class="inline-input"><input id="discountInput" type="number" min="0" value="0" inputmode="numeric" /><span>؋</span></div></div>
             <div class="summary-line total"><span>قابل پرداخت</span><b id="sumTotal">0 ؋</b></div>
-            <label class="field"><span>مشتری</span><select id="customerSelect"></select></label>
-            <div class="payment-tabs"><button class="payment active" data-pay="نقدی">نقدی</button><button class="payment" data-pay="نسیه">نسیه</button></div>
+            <label class="field customer-field"><span>مشتری</span><div class="customer-picker"><input id="customerSearch" list="customerDatalist" autocomplete="off" placeholder="مشتری عمومی" /><datalist id="customerDatalist"></datalist><input id="customerSelect" type="hidden" value="c0" /></div><small class="field-help">برای فاکتور جدید «مشتری عمومی» پیش‌فرض است؛ نام یا شماره را برای جستجوی سریع بنویسید.</small></label>
+            <div class="payment-required-note" id="paymentRequiredNote">روش پرداخت را انتخاب کنید</div>
+            <div class="payment-tabs"><button class="payment" data-pay="نقدی">نقدی</button><button class="payment" data-pay="نسیه">نسیه</button></div>
             <button id="checkoutBtn" class="pay-btn">ثبت و پرداخت</button>
             <div class="pos-shortcuts"><span><kbd>F4</kbd> پرداخت</span><span><kbd>Ctrl P</kbd> چاپ</span></div>
           </aside>
@@ -139,18 +140,25 @@
         <article class="panel">
           <div class="panel-head"><div><h3>کالاها</h3><p>عکس، دسته‌بندی، شرکت تولیدکننده، قیمت و بارکد</p></div><button id="addProductBtn" class="primary-btn">+ کالای جدید</button></div>
           <div class="toolbar product-toolbar"><input id="productSearch" placeholder="نام کالا، شرکت تولیدکننده یا هر بارکد را بنویسید..." /><select id="categoryFilter"><option value="all">همه دسته‌ها</option></select><select id="productFilter"><option value="all">همه کالاها</option><option value="low">موجودی کم</option><option value="packaged">تبدیل واحد فعال</option></select><button id="manageCategoriesBtn" class="ghost-btn">+ ایجاد دسته</button></div>
-          <div class="table-wrap"><table><thead><tr><th>کالا</th><th>بارکد اصلی</th><th>بارکدها</th><th>بهای هر واحد</th><th>قیمت فروش</th><th>واحد خرید</th><th>موجودی</th><th></th></tr></thead><tbody id="productsBody"></tbody></table></div>
+          <div class="table-wrap product-table-wrap"><table class="products-table"><thead><tr><th>کالا</th><th>بارکد اصلی</th><th>بارکدها</th><th>بهای هر واحد</th><th>قیمت فروش</th><th>واحد خرید</th><th>موجودی</th><th></th></tr></thead><tbody id="productsBody"></tbody></table></div>
         </article>
       </section>
 
       <section id="page-inventory" class="page">
         <div class="metric-grid compact">
-          <article class="metric-card"><span>تعداد کالا</span><strong id="invProductCount">0</strong></article>
-          <article class="metric-card"><span>تعداد موجودی</span><strong id="invUnits">0</strong></article>
-          <article class="metric-card"><span>ارزش موجودی</span><strong id="invCost">0 ؋</strong></article>
-          <article class="metric-card"><span>هشدار</span><strong id="invLow">0</strong></article>
+          <article class="metric-card"><span>تعداد کالا</span><strong id="invProductCount">0</strong><small>کالاهای فعال</small></article>
+          <article class="metric-card"><span>تعداد موجودی</span><strong id="invUnits">0</strong><small>مجموع واحدها</small></article>
+          <article class="metric-card"><span>ارزش موجودی</span><strong id="invCost">0 ؋</strong><small>بر اساس بهای خرید</small></article>
+          <article class="metric-card"><span>هشدار موجودی</span><strong id="invLow">0</strong><small id="invOutOfStockMeta">0 ناموجود</small></article>
         </div>
-        <article class="panel"><div class="panel-head"><div><h3>کاردکس موجودی</h3><p>ورود و خروج‌های اخیر کالا</p></div></div><div class="table-wrap"><table><thead><tr><th>زمان</th><th>کالا</th><th>نوع</th><th>تغییر</th><th>مرجع</th></tr></thead><tbody id="inventoryBody"></tbody></table></div></article>
+        <article class="panel inventory-overview-panel">
+          <div class="panel-head"><div><h3>وضعیت انبار</h3><p>موجودی، ارزش و وضعیت هر کالا</p></div><div class="inventory-tools"><input id="inventorySearch" placeholder="جستجوی کالا یا بارکد..." /><select id="inventoryStatusFilter"><option value="all">همه وضعیت‌ها</option><option value="out">ناموجود</option><option value="low">رو به اتمام</option><option value="ok">موجود</option></select><button id="adjustInventoryBtn" class="ghost-btn">اصلاح موجودی</button></div></div>
+          <div class="table-wrap"><table class="inventory-stock-table"><thead><tr><th>کالا</th><th>دسته</th><th>موجودی</th><th>حداقل</th><th>ارزش خرید</th><th>ارزش فروش</th><th>وضعیت</th></tr></thead><tbody id="inventoryStockBody"></tbody></table></div>
+        </article>
+        <div class="inventory-grid">
+          <article class="panel"><div class="panel-head"><div><h3>کاردکس موجودی</h3><p>ورود، خروج و اصلاح‌های اخیر</p></div></div><div class="table-wrap"><table><thead><tr><th>زمان</th><th>کالا</th><th>نوع</th><th>تغییر</th><th>مرجع</th></tr></thead><tbody id="inventoryBody"></tbody></table></div></article>
+          <article class="panel"><div class="panel-head"><div><h3>خریدهای اخیر</h3><p>آخرین ورود کالا به انبار</p></div></div><div id="inventoryPurchases" class="list"></div></article>
+        </div>
       </section>
 
       <section id="page-parties" class="page">
@@ -187,9 +195,9 @@
         </div>
 
         <div class="report-grid">
-          <article class="panel">
-            <div class="panel-head"><div><h3>گردش نقدی ماه جاری</h3><p>خالص ورودی و خروجی نقدی هر روز</p></div></div>
-            <div id="cashFlowBars" class="bars monthly-bars"></div>
+          <article class="panel cashflow-pro-panel">
+            <div class="panel-head cashflow-head"><div><h3>گردش نقدی ماه جاری</h3><p>ورودی، خروجی و خالص نقدینگی به تفکیک روز</p></div><div class="cashflow-legend"><span><i class="cf-dot in"></i>ورودی</span><span><i class="cf-dot out"></i>خروجی</span><span><i class="cf-dot net"></i>خالص</span></div></div>
+            <div id="cashFlowBars" class="cashflow-pro-chart"></div>
           </article>
           <article class="panel financial-summary">
             <div class="panel-head"><div><h3 id="financialSummaryTitle">خلاصه مالی دوره</h3><p>اعداد بر اساس بازه انتخاب‌شده</p></div></div>
@@ -198,7 +206,8 @@
         </div>
 
         <article class="panel sales-report-panel">
-          <div class="panel-head"><div><h3>فاکتورهای فروش</h3><p>فروش‌های ثبت‌شده در بازه انتخاب‌شده</p></div><div class="report-actions"><button id="exportCsv" class="ghost-btn">CSV</button><button id="printLastReceipt" class="ghost-btn">چاپ آخرین رسید</button></div></div>
+          <div class="panel-head"><div><h3>فاکتورهای فروش</h3><p>گزارش حرفه‌ای فروش با جستجو و خروجی قابل استفاده در Excel</p></div><div class="report-actions"><button id="exportCsv" class="ghost-btn" title="CSV یک فایل جدولی است که در Excel باز می‌شود">خروجی Excel (CSV)</button><button id="printLastReceipt" class="ghost-btn">چاپ آخرین رسید</button></div></div>
+          <div class="invoice-report-toolbar"><input id="invoiceReportSearch" placeholder="شماره فاکتور، مشتری یا مبلغ..." /><select id="invoicePaymentFilter"><option value="all">همه روش‌ها</option><option value="نقدی">نقدی</option><option value="نسیه">نسیه</option></select><div id="invoiceReportStats" class="invoice-report-stats"></div></div>
           <div class="table-wrap"><table><thead><tr><th>فاکتور</th><th>تاریخ/زمان</th><th>مشتری</th><th>روش</th><th>اقلام</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="salesBody"></tbody></table></div>
         </article>
       </section>
@@ -208,11 +217,11 @@
           <article class="panel settings-card"><div class="panel-head"><div><h3>ظاهر برنامه</h3><p>انتخاب حالت روشن یا دارک</p></div></div><label class="field"><span>تم برنامه</span><select id="themeSelect"><option value="light">روشن</option><option value="dark">دارک</option></select></label><div class="theme-preview"><span class="preview-dot"></span><div><b>رابط مینیمال دسکتاپ</b><small>RTL، منوی ثابت و حرکت‌های نرم</small></div></div></article>
           <article class="panel settings-card identity-card"><div class="panel-head"><div><h3>هویت فروشگاه</h3><p>لوگو و اطلاعاتی که در داشبورد و رسید استفاده می‌شود</p></div></div><div class="identity-editor"><label class="store-logo-uploader"><input id="storeLogoInput" type="file" accept="image/*"><span id="storeLogoPreview" class="store-logo-preview">Y</span><small>لوگو</small></label><div class="identity-fields"><label class="field"><span>نام فروشگاه</span><input id="storeName" /></label><label class="field"><span>آدرس فروشگاه</span><input id="storeAddress" placeholder="اختیاری" /></label><label class="field"><span>شماره تماس</span><input id="storePhone" /></label></div></div><button id="removeStoreLogo" class="tiny-btn identity-remove" type="button">حذف لوگو</button><label class="field"><span>متن پایین رسید</span><input id="receiptFooter" /></label></article>
           <article class="panel settings-card"><div class="panel-head"><div><h3>پرینتر رسید</h3><p>XPrinter و پرینترهای حرارتی نصب‌شده در Windows</p></div><span class="pill success">80mm</span></div><label class="field"><span>نام پرینتر</span><div class="printer-pick-row"><input id="printerName" list="printerList" placeholder="مثلاً XPrinter XP-Q200" /><button id="detectPrinters" type="button" class="tiny-btn accent">شناسایی</button></div><datalist id="printerList"></datalist></label><label class="switch-row"><span><b>چاپ خودکار</b><small>بعد از ثبت فروش رسید مستقیم چاپ شود</small></span><input id="autoPrint" type="checkbox" /></label><label class="switch-row"><span><b>برش خودکار</b><small>در مدل‌هایی که Driver برش خودکار را پشتیبانی می‌کند.</small></span><input id="autoCut" type="checkbox" /></label><button id="testPrint" class="ghost-btn wide">چاپ آزمایشی 80mm</button><div class="scan-test">چاپ Native به‌صورت تصویری انجام می‌شود تا متن دری/فارسی به‌هم نریزد.</div></article>
-          <article class="panel settings-card"><div class="panel-head"><div><h3>بارکدخوان</h3><p>USB HID / Laser Scanner</p></div><span class="pill success">USB HID</span></div><div class="hardware-status"><span class="pulse"></span><div><b>Scanner Listener فعال است</b><small>در صفحه فروش، اسکن بدون کلیک اضافی تشخیص داده می‌شود.</small></div></div><label class="field"><span>Suffix</span><select id="scannerSuffix"><option value="Enter">Enter</option><option value="Tab">Tab</option></select></label><div id="lastScan" class="scan-test">آخرین اسکن: —</div></article>
+          <article class="panel settings-card"><div class="panel-head"><div><h3>بارکدخوان</h3><p>USB HID / Laser Scanner</p></div><span id="scannerStatusPill" class="pill warning">شناسایی نشده</span></div><div class="hardware-status" id="scannerHardwareStatus"><span class="pulse muted-pulse"></span><div><b id="scannerStatusTitle">منتظر اولین اسکن</b><small id="scannerStatusHint">بارکدخوان USB را وصل کنید و یک بارکد اسکن کنید؛ سیستم اسکن سریع را خودکار تشخیص می‌دهد.</small></div></div><label class="field"><span>Suffix</span><select id="scannerSuffix"><option value="Enter">Enter</option><option value="Tab">Tab</option></select></label><div id="lastScan" class="scan-test">آخرین اسکن: —</div></article>
           <article class="panel settings-card online-card"><div class="panel-head"><div><h3>آنلاین</h3><p>اتصال اختیاری به سرور و داشبورد آنلاین</p></div><span id="onlineStatusPill" class="pill">محلی</span></div><label class="switch-row"><span><b>فعال‌سازی اتصال آنلاین</b><small>در حالت خاموش، برنامه کاملاً محلی و بدون اینترنت کار می‌کند.</small></span><input id="onlineEnabled" type="checkbox" /></label><div id="onlineFields" class="online-fields"><label class="field"><span>آدرس سرور</span><input id="onlineServerUrl" type="url" dir="ltr" placeholder="https://example.com" /></label><label class="field"><span>کد فروشگاه</span><input id="onlineStoreCode" dir="ltr" placeholder="STORE-001" /></label><label class="field"><span>فاصله همگام‌سازی</span><select id="onlineSyncMinutes"><option value="5">هر 5 دقیقه</option><option value="15">هر 15 دقیقه</option><option value="30">هر 30 دقیقه</option><option value="60">هر 60 دقیقه</option></select></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی فروش‌ها</b><small>فاکتورها و دریافت‌های مرتبط</small></span><input id="onlineSyncSales" type="checkbox" /></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی موجودی</b><small>کالاها، خریدها و موجودی</small></span><input id="onlineSyncInventory" type="checkbox" /></label><div id="onlineStatusText" class="scan-test">وضعیت: حالت محلی</div><div class="online-actions"><button id="testOnlineConnection" type="button" class="ghost-btn">بررسی اتصال</button><button id="syncOnlineNow" type="button" class="primary-btn">همگام‌سازی حالا</button></div></div></article>
-          <article class="panel settings-card data-support-card"><div class="panel-head"><div><h3>داده‌ها و پشتیبانی</h3><p>این بخش با رمز مدیر محافظت می‌شود</p></div><span class="pill">ADMIN</span></div><div id="dataSupportLock" class="support-lock"><div class="support-lock-icon">⌁</div><div><b>بخش محافظت‌شده</b><small>برای دسترسی به Backup، بازیابی و بازنشانی رمز مدیر را وارد کنید.</small></div><div class="support-unlock-row"><input id="dataSupportPassword" type="password" placeholder="رمز مدیر"><button id="unlockDataSupport" class="primary-btn">باز کردن</button></div></div><div id="dataSupportControls" class="hidden"><label class="field"><span>پشتیبان خودکار</span><select id="autoBackupPerDay"><option value="0">خاموش</option><option value="1">1 بار در روز</option><option value="2">2 بار در روز</option><option value="3">3 بار در روز</option><option value="4">4 بار در روز</option><option value="6">6 بار در روز</option><option value="8">8 بار در روز</option><option value="12">12 بار در روز</option><option value="24">24 بار در روز</option></select></label><div id="autoBackupStatus" class="scan-test">آخرین پشتیبان خودکار: —</div><button id="backupBtn" class="ghost-btn wide">دانلود Backup JSON</button><label class="upload wide">بازیابی Backup<input id="restoreFile" type="file" accept="application/json" /></label><button id="restoreAutoBackup" class="ghost-btn wide">بازیابی آخرین پشتیبان خودکار</button><button id="dbHealthBtn" class="ghost-btn wide">بررسی سلامت دیتابیس</button><button id="auditLogBtn" class="ghost-btn wide">سابقه تغییرات فاکتورها</button><button id="lockDataSupport" class="ghost-btn wide">قفل کردن بخش</button><button id="resetDemo" class="danger-ghost wide">بازنشانی به حالت اولیه</button></div></article>
+          <article class="panel settings-card data-support-card"><div class="panel-head"><div><h3>داده‌ها و پشتیبانی</h3><p>این بخش با رمز مدیر محافظت می‌شود</p></div><span class="pill">ADMIN</span></div><div id="dataSupportLock" class="support-lock"><div class="support-lock-icon">⌁</div><div><b>بخش محافظت‌شده</b><small>برای دسترسی به Backup، بازیابی و بازنشانی رمز مدیر را وارد کنید.</small></div><div class="support-unlock-row"><input id="dataSupportPassword" type="password" placeholder="رمز مدیر"><button id="unlockDataSupport" class="primary-btn">باز کردن</button></div></div><div id="dataSupportControls" class="hidden"><label class="field"><span>پشتیبان خودکار</span><select id="autoBackupPerDay"><option value="0">خاموش</option><option value="1">1 بار در روز</option><option value="2">2 بار در روز</option><option value="3">3 بار در روز</option><option value="4">4 بار در روز</option><option value="6">6 بار در روز</option><option value="8">8 بار در روز</option><option value="12">12 بار در روز</option><option value="24">24 بار در روز</option></select></label><div id="autoBackupStatus" class="scan-test">آخرین پشتیبان خودکار: —</div><button id="backupBtn" class="ghost-btn wide">ذخیره دستی Backup</button><label class="upload wide" title="برای فایل‌های پشتیبان JSON نسخه‌های قبلی">بازیابی Backup قدیمی (JSON)<input id="restoreFile" type="file" accept="application/json" /></label><button id="restoreAutoBackup" class="ghost-btn wide">بازیابی آخرین پشتیبان خودکار</button><button id="dbHealthBtn" class="ghost-btn wide">بررسی سلامت دیتابیس</button><button id="auditLogBtn" class="ghost-btn wide">فعالیت‌های اخیر فاکتورها</button><button id="loadTrainingDemo" class="ghost-btn wide">نمونه آموزشی زنده 35 روزه</button><button id="lockDataSupport" class="ghost-btn wide">قفل کردن بخش</button><button id="resetDemo" class="danger-ghost wide">بازنشانی به حالت اولیه</button></div></article>
         </div>
-        <article class="panel roadmap"><div class="panel-head"><div><h3>سازگاری</h3><p>نسخه Native v1.1 برای Windows 10 و Windows 11 64-bit</p></div></div><div class="roadmap-row"><span>Windows 10 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>Windows 11 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>SQLite Native</span><b>WAL + Backup فعال</b></div><div class="roadmap-row"><span>چاپ حرارتی 80mm</span><b>Windows Driver مستقیم</b></div><div class="roadmap-row"><span>بارکدخوان USB HID</span><b>فعال</b></div><div class="roadmap-row"><span>اتصال آنلاین</span><b>قابل پیکربندی</b></div></article>
+        <article class="panel roadmap"><div class="panel-head"><div><h3>سازگاری</h3><p>نسخه Native v1.2 برای ویندوزهای 64-bit عرضه‌شده از 2015 به بعد</p></div></div><div class="roadmap-row"><span>Windows 10 64-bit (2015+)</span><b>فعال</b></div><div class="roadmap-row"><span>Windows 11 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>فونت رابط</span><b>Segoe UI داخلی Windows + fallback فارسی</b></div><div class="roadmap-row"><span>SQLite Native</span><b>WAL + Backup فعال</b></div><div class="roadmap-row"><span>چاپ حرارتی 80mm</span><b>Windows Driver مستقیم</b></div><div class="roadmap-row"><span>بارکدخوان USB HID</span><b>اسکن سریع فعال</b></div><div class="roadmap-row"><span>اتصال آنلاین</span><b>قابل پیکربندی</b></div></article>
       </section>
     </main>
   </div>

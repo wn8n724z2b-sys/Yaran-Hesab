@@ -34,6 +34,28 @@ fn create_backup(app: AppHandle) -> Result<String, String> {
 }
 
 #[tauri::command]
+fn export_backup(app: AppHandle) -> Result<String, String> {
+    db::export_backup_impl(&app)
+}
+
+#[tauri::command]
+fn export_text_file(app: AppHandle, filename: String, content: String) -> Result<String, String> {
+    db::export_text_file_impl(&app, &filename, &content)
+}
+
+#[tauri::command]
+fn open_external(url: String) -> Result<(), String> {
+    if !(url.starts_with("https://") || url.starts_with("http://")) {
+        return Err("invalid external url".to_string());
+    }
+    std::process::Command::new("explorer")
+        .arg(url)
+        .spawn()
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
 fn verify_admin_password(app: AppHandle, password: String) -> Result<bool, String> {
     db::verify_admin_password_impl(&app, &password)
 }
@@ -79,6 +101,9 @@ pub fn run() {
             list_audit_log,
             list_invoice_revisions,
             create_backup,
+            export_backup,
+            export_text_file,
+            open_external,
             restore_latest_backup,
             verify_admin_password,
             database_integrity,

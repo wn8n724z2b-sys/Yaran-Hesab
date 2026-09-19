@@ -70,6 +70,27 @@
     }
   }
 
+
+  async function exportBackup(raw) {
+    if (!hasTauri) return null;
+    try {
+      if (raw) await queueWrite(function () { return invoke('save_state', { json: raw }); });
+      return await invoke('export_backup');
+    } catch (error) { console.error(error); return null; }
+  }
+
+  async function exportText(filename, content) {
+    if (!hasTauri) return null;
+    try { return await invoke('export_text_file', { filename: String(filename || ''), content: String(content || '') }); }
+    catch (error) { console.error(error); return null; }
+  }
+
+  async function openExternal(url) {
+    if (!hasTauri) { window.open(url, '_blank'); return true; }
+    await invoke('open_external', { url: String(url || '') });
+    return true;
+  }
+
   async function restoreLatestBackup() {
     if (!hasTauri) return false;
     return await queueWrite(function () { return invoke('restore_latest_backup'); });
@@ -108,6 +129,9 @@
     auditLog: auditLog,
     invoiceRevisions: invoiceRevisions,
     backup: backup,
+    exportBackup: exportBackup,
+    exportText: exportText,
+    openExternal: openExternal,
     restoreLatestBackup: restoreLatestBackup,
     verifyAdmin: verifyAdmin,
     printers: printers,

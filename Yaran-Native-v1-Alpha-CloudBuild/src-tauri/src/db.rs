@@ -553,6 +553,16 @@ fn insert_audit_event(tx: &Transaction<'_>, audit: &Value) -> Result<(), String>
             .map_err(|e| e.to_string())?;
         }
     }
+
+    // Keep the lightweight activity feed bounded. Full invoice revisions remain
+    // available per invoice, while the global recent-activity list keeps only
+    // the newest events so long-term use does not slow down the app.
+    tx.execute(
+        "DELETE FROM audit_log WHERE id NOT IN (SELECT id FROM audit_log ORDER BY id DESC LIMIT 2000)",
+        [],
+    )
+    .map_err(|e| e.to_string())?;
+
     Ok(())
 }
 
@@ -670,7 +680,7 @@ pub fn create_backup_impl(app: &AppHandle) -> Result<String, String> {
     .map_err(|e| e.to_string())?;
 
     let mut stmt = conn
-        .prepare("SELECT id, file_path FROM backup_registry ORDER BY id DESC LIMIT -1 OFFSET 30")
+        .prepare("SELECT id, file_path FROM backup_registry ORDER BY id DESC LIMIT -1 OFFSET 12")
         .map_err(|e| e.to_string())?;
     let old = stmt
         .query_map([], |row| Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?)))
@@ -683,6 +693,25 @@ pub fn create_backup_impl(app: &AppHandle) -> Result<String, String> {
         let _ = conn.execute("DELETE FROM backup_registry WHERE id = ?1", params![id]);
     }
 
+    Ok(target.to_string_lossy().to_string())
+}
+
+pub fn export_backup_impl(app: &AppHandle) -> Result<String, String> {
+    let source = PathBuf::from(create_backup_impl(app)?);
+    let downloads = app.path().download_dir().map_err(|e| e.to_string())?;
+    fs::create_dir_all(&downloads).map_err(|e| e.to_string())?;
+    let stamp = Local::now().format("%Y-%m-%d_%H-%M-%S").to_string();
+    let target = downloads.join(format!("HesabdariAsan_Backup_{stamp}.sqlite3"));
+    fs::copy(&source, &target).map_err(|e| e.to_string())?;
+    Ok(target.to_string_lossy().to_string())
+}
+
+pub fn export_text_file_impl(app: &AppHandle, filename: &str, content: &str) -> Result<String, String> {
+    let safe: String = filename.chars().map(|c| if "\\/:*?\"<>|".contains(c) { '_' } else { c }).collect();
+    let downloads = app.path().download_dir().map_err(|e| e.to_string())?;
+    fs::create_dir_all(&downloads).map_err(|e| e.to_string())?;
+    let target = downloads.join(if safe.trim().is_empty() { "hesabdari-asan-export.txt" } else { safe.as_str() });
+    fs::write(&target, content.as_bytes()).map_err(|e| e.to_string())?;
     Ok(target.to_string_lossy().to_string())
 }
 
