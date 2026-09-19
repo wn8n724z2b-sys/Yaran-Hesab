@@ -1,0 +1,241 @@
+/* =========================================================
+   Hesabdari Asan v2 — final desktop/minimal UI layer
+   Keeps business logic intact while normalizing shell, scroll,
+   spacing, typography and report presentation.
+   ========================================================= */
+:root{
+  --sidebar:238px;
+  --radius:12px;
+  --radius-sm:9px;
+  --shadow:none;
+  --motion-fast:110ms;
+  --motion-normal:165ms;
+  --ease-desktop:cubic-bezier(.22,.72,.24,1);
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  margin:0;
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+  background:var(--bg);
+}
+body{
+  font-family:var(--app-font,"Vazirmatn Variable","Nirmala UI",Tahoma,"Segoe UI",Arial,sans-serif)!important;
+  font-size:14px;
+  line-height:1.65;
+  letter-spacing:-.006em;
+}
+button,input,select,textarea{font-family:inherit!important}
+button{-webkit-tap-highlight-color:transparent}
+
+/* Native desktop shell: only page content scrolls vertically. */
+.app-shell{
+  width:100vw;
+  height:100vh;
+  min-height:0!important;
+  max-height:100vh;
+  overflow:hidden!important;
+  display:flex;
+  flex-direction:row-reverse;
+}
+.sidebar{
+  width:var(--sidebar)!important;
+  flex:0 0 var(--sidebar)!important;
+  height:100vh!important;
+  min-height:0!important;
+  position:relative!important;
+  top:auto!important;
+  overflow:hidden!important;
+  padding:14px 12px;
+  border-left:1px solid var(--line);
+  box-shadow:none!important;
+}
+.brand{padding:3px 7px 14px;gap:10px}
+.brand-mark{width:39px;height:39px;border-radius:11px;font-size:18px}
+.brand-title{font-size:18px;font-weight:720}
+.brand-sub{font-size:9.5px;margin-top:1px}
+.nav{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior-y:contain;
+  padding:12px 0;
+  gap:3px;
+  scrollbar-width:thin;
+}
+.nav-item{
+  min-height:42px;
+  padding:9px 11px;
+  border-radius:10px;
+  gap:10px;
+}
+.nav-item span{width:23px;font-size:18px}
+.nav-item b{font-size:13.5px;font-weight:600}
+.nav-item.active{box-shadow:inset -2px 0 0 var(--accent)}
+.creator-footer{min-height:54px!important;padding:10px 5px!important;border-radius:9px}
+.creator-footer small{font-size:9px!important}.creator-footer strong{font-size:10px!important}.creator-footer em{font-size:8px!important}
+
+.main{
+  flex:1 1 auto;
+  width:calc(100vw - var(--sidebar));
+  height:100vh!important;
+  min-width:0;
+  min-height:0!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+.topbar{
+  flex:0 0 68px;
+  height:68px;
+  min-height:68px!important;
+  position:relative!important;
+  top:auto!important;
+  padding:8px 20px;
+  gap:12px;
+  background:var(--panel);
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  box-shadow:none!important;
+}
+.page-title-wrap{min-width:155px}.page-title-wrap h1{font-size:19px;margin-bottom:1px}.page-title-wrap p{font-size:10.5px}
+.top-actions{gap:7px}
+.global-search{height:40px;width:min(350px,30vw);border-radius:10px;padding:0 10px}
+.global-search input{font-size:12.5px}
+.work-session.work-session-solid{height:42px;min-width:174px;padding:5px 8px;border-radius:10px;box-shadow:none!important}
+.work-session.work-session-solid .work-door{width:31px;height:31px;border-radius:8px}.work-session.work-session-solid .work-copy small{font-size:9.5px}.work-session.work-session-solid b{font-size:12.5px}
+.icon-btn{width:38px;height:38px;border-radius:9px}.primary-btn,.ghost-btn,.danger-ghost,.pay-btn,.money-toggle{border-radius:9px;padding:9px 12px}
+
+.page{
+  display:none;
+  flex:1 1 auto;
+  width:100%;
+  min-height:0!important;
+  height:auto!important;
+  padding:18px 20px 28px;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:auto!important;
+  overscroll-behavior-x:none;
+  scrollbar-gutter:auto!important;
+  scroll-behavior:auto!important;
+  opacity:1!important;
+  transform:none!important;
+  animation:none!important;
+  touch-action:pan-y;
+}
+.page.active{display:block!important;opacity:1!important;transform:none!important;animation:none!important}
+.page::-webkit-scrollbar,.modal-card::-webkit-scrollbar,.nav::-webkit-scrollbar{width:8px;height:8px}
+.page::-webkit-scrollbar-track,.modal-card::-webkit-scrollbar-track,.nav::-webkit-scrollbar-track{background:transparent}
+.page::-webkit-scrollbar-thumb,.modal-card::-webkit-scrollbar-thumb,.nav::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--muted) 28%,transparent);border:2px solid transparent;background-clip:padding-box;border-radius:999px}
+.page::-webkit-scrollbar-thumb:hover,.modal-card::-webkit-scrollbar-thumb:hover,.nav::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb,var(--muted) 45%,transparent);border:2px solid transparent;background-clip:padding-box}
+
+/* Important: tables may scroll horizontally, but must never trap mouse-wheel vertical scrolling. */
+.table-wrap{
+  max-width:100%;
+  overflow-x:auto!important;
+  overflow-y:visible!important;
+  overscroll-behavior-x:contain!important;
+  overscroll-behavior-y:auto!important;
+  scrollbar-gutter:auto!important;
+  touch-action:pan-x pan-y;
+}
+.table-wrap::-webkit-scrollbar{height:8px;width:0}
+.table-wrap::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--muted) 30%,transparent);border-radius:999px}
+.table-wrap table{margin:0}
+
+/* Minimal visual system */
+.panel,.metric-card,.mini-stat{
+  background:var(--panel);
+  border:1px solid var(--line);
+  box-shadow:none!important;
+}
+.panel{border-radius:var(--radius);overflow:hidden}
+.metric-card{border-radius:var(--radius);padding:15px 16px}
+.metric-card strong{font-size:24px;margin:7px 0 3px}.metric-card>span,.metric-label span{font-size:12px}.metric-card small{font-size:10px}
+.mini-stat{border-radius:10px;padding:10px 12px}.mini-stat span{font-size:11px}.mini-stat b{font-size:12.5px}
+.metric-grid{gap:10px;margin-bottom:10px}.dashboard-mini-grid{gap:8px;margin-bottom:10px}
+.dashboard-grid,.report-grid{gap:10px}.recent-panel,.sales-report-panel{margin-top:10px}
+.panel-head{padding:13px 15px;gap:10px}.panel-head h3{font-size:14.5px}.panel-head p{font-size:10.5px;margin-top:3px}
+.dashboard-control-row{margin-bottom:10px}.status-chip{font-size:11px}
+.list{padding:5px 13px}.list-row{padding:10px 2px}.list-row strong{font-size:12.5px}.list-row small{font-size:10px}
+.table-wrap th,.table-wrap td{padding:11px 14px;font-size:12.5px}.table-wrap th{font-size:10.5px}
+.toolbar{padding:11px 14px}.field{margin:10px 15px}.field>span{font-size:10.5px}
+input,select,textarea{border-radius:9px!important}
+.settings-grid,.party-grid{gap:10px}.settings-card{min-width:0}
+.roadmap{margin-top:10px}
+
+/* POS: checkout belongs to the page scroll context, not the browser/window. */
+.pos-layout{gap:10px;align-items:start}.pos-main{min-height:0!important}.checkout{top:0!important;padding:15px}.scanner-row{padding:13px}.quick-products{padding:10px 13px;gap:6px}.quick-product{border-radius:9px}
+
+/* Reports — calm and focused */
+.reports-hero{margin-bottom:10px}.reports-hero h2{font-size:18px}.reports-hero p{font-size:10.5px}
+.period-card{margin-bottom:10px;padding:13px 15px;box-shadow:none;gap:14px}
+.report-metrics{gap:10px}
+.financial-summary .summary-list{padding:4px 14px}.summary-item{padding:9px 0}.summary-item span{font-size:11px}.summary-item b{font-size:12px}
+.invoice-report-toolbar{padding:10px 14px;background:transparent}.invoice-report-stats span,.invoice-report-stats b{padding:5px 8px;font-size:9.5px}
+
+/* v2 monthly cashflow: one clear net-flow curve + compact totals. */
+.cashflow-pro-panel{min-width:0}
+.cashflow-pro-chart{height:auto!important;padding:0!important;direction:rtl!important}
+.cf-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px 14px 4px}
+.cf-summary-item{min-width:0;border:1px solid var(--line);background:var(--panel-soft);border-radius:10px;padding:9px 11px}
+.cf-summary-item span{display:block;color:var(--muted);font-size:9.5px;margin-bottom:3px}.cf-summary-item b{display:block;font-size:12.5px;direction:ltr;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cf-summary-item.net b{color:var(--accent)}.cf-summary-item.out b{color:var(--danger)}
+.cf-stage{position:relative;width:100%;height:250px;overflow:hidden;padding:0 4px 6px;direction:ltr}
+.cf-stage svg{width:100%;height:100%;display:block;overflow:visible}
+.cf-grid{stroke:var(--chart-grid);stroke-width:1;vector-effect:non-scaling-stroke}
+.cf-zero{stroke:color-mix(in srgb,var(--muted) 32%,transparent);stroke-width:1;stroke-dasharray:4 5;vector-effect:non-scaling-stroke}
+.cf-label,.cf-x{fill:var(--muted);font-family:var(--app-font);font-size:9px}
+.cf-net-area{fill:url(#cfNetGradient);opacity:.9}
+.cf-net-line{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.cf-net-dot{fill:var(--accent);stroke:var(--panel);stroke-width:1.3;vector-effect:non-scaling-stroke}.cf-net-dot.negative{fill:var(--danger)}
+.cf-hit{fill:transparent;cursor:crosshair}
+.cf-tooltip{position:absolute;z-index:7;min-width:168px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:0 10px 26px rgba(25,44,62,.12);opacity:0;transform:translateY(2px);pointer-events:none;transition:opacity 80ms,transform 80ms;direction:rtl}
+.cf-tooltip.show{opacity:1;transform:none}.cf-tooltip>b{display:block;margin-bottom:4px;font-size:10.5px}.cf-tooltip span{display:flex;justify-content:space-between;gap:16px;padding:2px 0;font-size:10px;color:var(--muted)}.cf-tooltip strong{color:var(--text);direction:ltr}.cf-tooltip .negative{color:var(--danger)}
+.cashflow-legend{display:none!important}
+
+/* Forms, modals and activities remain light. */
+.modal{overscroll-behavior:none}.modal-card{max-height:min(86vh,820px);overflow-y:auto;overflow-x:hidden;border-radius:14px;box-shadow:0 24px 70px rgba(0,0,0,.20)}
+.modal-head{padding:13px 15px}.modal-form{padding:15px}.form-grid{gap:7px 10px}
+.activity-feed{overscroll-behavior-y:auto!important}.audit-list{overscroll-behavior-y:auto!important}
+
+/* Native dropdown, exactly one Windows arrow. */
+select{-webkit-appearance:auto!important;appearance:auto!important;background-image:none!important;padding-left:10px!important}
+html[data-theme="dark"] select{background-image:none!important}
+
+/* Responsive: preserve full sidebar longer; compact only when actually needed. */
+@media(max-width:1240px){
+  :root{--sidebar:218px}
+  .global-search{width:min(290px,27vw)}
+  .report-grid{grid-template-columns:1fr}
+}
+@media(max-width:1050px){
+  :root{--sidebar:76px}
+  .brand-copy,.nav-item b,.creator-footer .creator-copy{display:none!important}
+  .brand,.nav-item,.creator-footer{justify-content:center!important}
+  .nav-item{padding:9px}.nav-item span{font-size:18px}
+  .work-session{display:none!important}
+  .dashboard-grid,.inventory-grid{grid-template-columns:1fr}
+  .metric-grid,.dashboard-mini-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pos-layout{grid-template-columns:1fr}.checkout{position:static!important}
+  .party-grid,.settings-grid{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .app-shell{display:block}.main{width:100vw}
+  .sidebar{position:fixed!important;right:0;top:0;width:245px!important;transform:translateX(105%);transition:transform var(--motion-normal) var(--ease-desktop);z-index:80}
+  .sidebar.open{transform:none}.brand-copy,.nav-item b,.creator-footer .creator-copy{display:block!important}.brand,.nav-item{justify-content:flex-start!important}
+  .topbar{height:62px;min-height:62px!important;padding:7px 10px}.global-search,.clock{display:none}.page{padding:12px 12px 22px}
+  .metric-grid,.dashboard-mini-grid,.report-metrics{grid-template-columns:1fr 1fr}
+  .reports-hero,.dashboard-control-row{align-items:stretch;flex-direction:column}.report-hero-actions{flex-wrap:wrap}.report-grid{display:block}.financial-summary{margin-top:10px}
+  .cf-summary{grid-template-columns:1fr 1fr 1fr}.cf-stage{height:225px}
+}
+@media(max-width:500px){
+  .metric-grid,.dashboard-mini-grid,.report-metrics,.cf-summary{grid-template-columns:1fr}
+  .theme-toggle{display:none}.quick-products{grid-template-columns:1fr}.page-title-wrap p{display:none}
+}

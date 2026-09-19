@@ -1,0 +1,4 @@
+حسابداری آسان v3.0
+فونت اصلی رابط: Vazirmatn Variable
+فونت هنگام Build به‌صورت آفلاین داخل برنامه بسته‌بندی می‌شود.
+Fallback: Nirmala UI / Tahoma / Segoe UI

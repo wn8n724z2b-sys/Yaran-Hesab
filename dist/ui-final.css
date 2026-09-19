@@ -1,0 +1,97 @@
+/* حسابداری آسان v2.1 — Final UI coherence layer */
+:root{
+  --ui-gap-1:6px;--ui-gap-2:10px;--ui-gap-3:14px;--ui-gap-4:18px;--ui-gap-5:24px;
+  --ui-radius-sm:9px;--ui-radius:13px;--ui-radius-lg:16px;
+  --ui-shadow:0 8px 28px rgba(28,45,63,.055);
+}
+html,body{height:100%;overflow:hidden}
+body{font-size:14px;line-height:1.65}
+.app-shell{height:100vh;min-height:0}
+.sidebar{padding:16px 12px}
+.brand{padding:3px 7px 15px;gap:10px}.brand-mark{width:40px;height:40px;border-radius:12px}.brand-title{font-size:18px}.brand-sub{font-size:10px}
+.nav{padding:13px 0;gap:4px}.nav-item{min-height:42px;padding:9px 11px;gap:10px}.nav-item span{width:24px;font-size:18px}.nav-item b{font-size:13.5px}
+.creator-footer{padding:11px 8px}
+.main{height:100vh;overflow:hidden}
+.topbar{flex:0 0 70px!important;height:70px!important;min-height:70px!important;padding:8px 18px!important}
+.page{padding:18px 20px 30px!important;scrollbar-gutter:stable}
+.page>*{max-width:100%}
+.panel,.metric-card,.mini-stat,.report-kpi{border-color:var(--line);box-shadow:none!important}
+.panel{border-radius:var(--ui-radius-lg)}
+.panel-head{padding:14px 16px}.panel-head h3{font-size:14px}.panel-head p{font-size:10.5px}
+.primary-btn,.ghost-btn,.danger-ghost,.pay-btn,.money-toggle,.tiny-btn{min-height:36px;border-radius:var(--ui-radius-sm)}
+.primary-btn,.ghost-btn,.danger-ghost{padding:8px 12px}
+input,select,textarea{min-height:40px}
+.table-wrap{border-top:1px solid var(--line)}
+.table-wrap table{table-layout:fixed}
+.table-wrap th{background:var(--panel-soft);font-size:10.5px;color:var(--muted);font-weight:650;white-space:nowrap}
+.table-wrap td{font-size:12px;vertical-align:middle}.table-wrap tbody tr:hover{background:color-mix(in srgb,var(--accent) 3%,transparent)}
+.table-wrap th,.table-wrap td{padding:10px 12px}
+.invoice-actions{display:flex;gap:5px;align-items:center;justify-content:flex-start;white-space:nowrap}
+.invoice-actions .tiny-btn{min-height:30px;padding:4px 8px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:10.5px}
+.invoice-actions .tiny-btn:hover{color:var(--text);background:var(--hover)}
+.invoice-actions .tiny-btn.danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 24%,var(--line))}
+
+/* Section hierarchy */
+.ui-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:2px 2px 0}
+.ui-section-head .eyebrow{display:block;color:var(--accent);font-size:10px;font-weight:700;margin-bottom:2px}
+.ui-section-head h2{margin:0;font-size:20px}.ui-section-head p{margin:4px 0 0;color:var(--muted);font-size:11px}
+.report-hero-actions{display:flex;align-items:flex-end;gap:8px}.period-picker{margin:0!important;min-width:180px}.period-picker span{font-size:9.5px}
+
+/* Reports redesigned */
+.compact-period-card{display:grid;grid-template-columns:minmax(190px,.7fr) minmax(260px,1.4fr) auto;align-items:center;gap:16px;padding:12px 15px!important;border:1px solid var(--line);border-radius:var(--ui-radius);background:var(--panel);box-shadow:none!important}
+.period-main>span,.period-main small{display:block;color:var(--muted);font-size:10px}.period-main strong{display:block;font-size:13.5px;margin:2px 0}
+.period-progress-wrap{min-width:0}.period-progress{height:6px;border-radius:999px;background:var(--panel-soft);overflow:hidden}.period-progress span{display:block;height:100%;background:var(--accent);border-radius:999px}.period-progress-wrap small{display:block;margin-top:5px;color:var(--muted);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.period-new-btn{white-space:nowrap}
+.report-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:10px 0}
+.report-kpi{min-width:0;padding:13px 14px;border:1px solid var(--line);border-radius:var(--ui-radius);background:var(--panel)}
+.report-kpi span{display:block;color:var(--muted);font-size:10.5px}.report-kpi strong{display:block;font-size:21px;direction:ltr;text-align:right;margin:5px 0 1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.report-kpi small{display:block;color:var(--muted);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.report-kpi.accent{border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}.report-kpi.success strong{color:var(--success)}
+.clean-report-panel{margin-top:10px}
+.cashflow-pro-panel .panel-head{border-bottom:0;padding-bottom:4px}.soft-badge{border:1px solid var(--line);background:var(--panel-soft);color:var(--muted);border-radius:999px;padding:4px 8px;font-size:9.5px}
+.cashflow-pro-chart{padding:0 0 8px!important}
+.cf-summary{padding:8px 14px 5px!important;gap:7px!important}.cf-summary-item{padding:7px 10px!important;border:0!important;background:var(--panel-soft)!important}.cf-summary-item span{font-size:9px!important}.cf-summary-item b{font-size:12px!important}
+.cf-stage{height:205px!important;padding:0 8px 2px!important}.cf-label{display:none}.cf-x{font-size:8.5px!important}.cf-net-line{stroke-width:2.2!important}.cf-grid{opacity:.65}.cf-zero{opacity:.8}
+.chart-empty-state{height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--muted);padding:20px}
+.chart-empty-icon{width:36px;height:36px;border-radius:12px;background:var(--panel-soft);display:grid;place-items:center;color:var(--accent);font-size:18px;margin-bottom:8px}
+.chart-empty-state b{color:var(--text);font-size:12.5px}.chart-empty-state span{font-size:10.5px;margin-top:4px;max-width:420px}
+.report-detail-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,.55fr);gap:10px;margin-top:10px}
+.report-summary-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px;padding:4px 14px 10px!important}.report-summary-grid .summary-item{padding:8px 0!important}.report-summary-grid .summary-item:nth-last-child(-n+2){border-bottom:0}
+.balance-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px}.balance-cards>div{padding:10px;border-radius:10px;background:var(--panel-soft);min-width:0}.balance-cards span{display:block;color:var(--muted);font-size:9.5px}.balance-cards strong{display:block;font-size:13px;direction:ltr;text-align:right;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sales-report-panel{overflow:hidden}.sales-report-head{align-items:flex-start}.report-actions{display:flex;gap:6px}.compact-action{min-height:32px!important;padding:5px 9px!important;font-size:10.5px;color:var(--muted)}
+.invoice-report-toolbar{display:grid!important;grid-template-columns:minmax(220px,1fr) 140px auto;align-items:center;gap:8px;padding:9px 14px!important;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel-soft)!important}
+.invoice-search-wrap{display:flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:0 9px;min-width:0}.invoice-search-wrap>span{color:var(--accent)}.invoice-search-wrap input{border:0;background:transparent;min-width:0;width:100%;height:36px;min-height:36px;outline:0}
+.invoice-report-toolbar select{height:36px;min-height:36px}
+.invoice-report-stats{display:flex;align-items:center;justify-content:flex-end;gap:5px;min-width:0;flex-wrap:wrap}.invoice-report-stats span,.invoice-report-stats b{border:0!important;background:transparent!important;padding:2px 5px!important;font-size:9.5px!important;white-space:nowrap}.invoice-report-stats b{color:var(--accent)}
+.report-sales-table{min-width:850px!important}.report-sales-table th:nth-child(1){width:82px}.report-sales-table th:nth-child(2){width:145px}.report-sales-table th:nth-child(3){width:170px}.report-sales-table th:nth-child(4){width:80px}.report-sales-table th:nth-child(5){width:65px}.report-sales-table th:nth-child(6){width:120px}.report-sales-table th:nth-child(7){width:130px}
+
+/* Settings and forms */
+.settings-grid{align-items:start}.settings-card{overflow:hidden}.settings-card .panel-head{min-height:67px}.theme-preview,.scan-test,.hardware-status{border-radius:10px}
+.support-unlock-row{gap:7px}.support-unlock-row input{min-width:0}
+.switch-row{padding:11px 15px}
+
+/* Products / inventory */
+.product-toolbar,.inventory-tools{gap:7px}.product-toolbar input{min-width:240px}
+.products-table{min-width:980px!important}.products-table td,.products-table th{overflow:hidden;text-overflow:ellipsis}.products-table td:nth-child(2),.products-table td:nth-child(3){font-family:"Vazirmatn Variable",Tahoma,sans-serif;direction:ltr;text-align:right}
+.inventory-stock-table{min-width:820px!important}
+
+/* Desktop scrolling: exactly one vertical scroll surface per page. */
+.page{overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:none!important}
+.page .table-wrap{overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain!important}
+.page .list,.page .summary-list{overflow:visible!important;max-height:none!important}
+.modal-card{overscroll-behavior:contain}
+
+/* Friendly responsive behavior */
+@media(max-width:1260px){
+  .report-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .report-detail-grid{grid-template-columns:1fr}
+  .report-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:900px){
+  .compact-period-card{grid-template-columns:1fr}.period-new-btn{justify-self:start}
+  .invoice-report-toolbar{grid-template-columns:1fr 130px}.invoice-report-stats{grid-column:1/-1;justify-content:flex-start}
+}
+@media(max-width:760px){
+  .report-kpi-grid,.balance-cards,.report-summary-grid{grid-template-columns:1fr}
+  .report-hero-actions{width:100%;align-items:stretch}.period-picker{flex:1}
+  .cf-stage{height:190px!important}
+}
