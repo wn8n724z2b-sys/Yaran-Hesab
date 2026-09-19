@@ -32,7 +32,7 @@
         <div class="brand-copy">
           <div class="brand-title">حسابداری آسان</div>
           <div class="brand-sub">مدیریت ساده، کسب‌وکار موفق</div>
-          <span class="release-badge">نسخه رایگان · 3.2</span>
+          <span class="release-badge">نسخه رایگان · 3.3</span>
         </div>
       </div>
 
@@ -64,7 +64,7 @@
         <div class="top-actions v3-top-actions">
           <button id="newSaleTop" class="primary-btn top-sale-btn">+ فروش جدید</button>
           <button id="themeToggle" class="icon-btn theme-toggle" title="تغییر تم" aria-label="تغییر تم">☾</button>
-          <div id="clock" class="clock"></div>
+          <div id="clock" class="clock clock-glass" title="ساعت سیستم"><span class="clock-symbol">◷</span><span class="clock-copy"><small>ساعت سیستم</small><b id="clockValue">00:00</b></span></div>
           <div id="workSession" class="work-session v3-work-session" title="از اولین اجرای امروز محاسبه می‌شود">
             <span class="work-door" aria-hidden="true">▥</span>
             <span class="work-copy"><small>ساعات کاری امروز</small><b id="workSessionValue">00:00:00</b></span>
@@ -150,7 +150,7 @@
               <button id="clearCart" class="danger-ghost">پاک کردن</button>
             </div>
             <div id="posSearchResults" class="pos-search-results hidden"></div>
-            <div class="table-wrap cart-wrap"><table><thead><tr><th>کالا</th><th>تعداد</th><th>قیمت</th><th>جمع</th><th></th></tr></thead><tbody id="cartBody"></tbody></table></div>
+            <div class="table-wrap cart-wrap"><table><thead><tr><th class="cart-line-col">#</th><th>کالا</th><th>تعداد</th><th>قیمت</th><th>جمع</th><th></th></tr></thead><tbody id="cartBody"></tbody></table></div>
             <div id="emptyCart" class="empty"><div>▣</div><strong>فاکتور خالی است</strong><span>یک کالا را اسکن یا جستجو کنید</span></div>
           </div>
           <aside class="panel checkout">
@@ -158,7 +158,7 @@
             <div class="summary-line"><span>جمع کالا</span><b id="sumSubtotal">0 ؋</b></div>
             <div class="summary-line"><span>تخفیف</span><div class="inline-input"><input id="discountInput" type="number" min="0" value="0" inputmode="numeric" /><span>؋</span></div></div>
             <div class="summary-line total"><span>قابل پرداخت</span><b id="sumTotal">0 ؋</b></div>
-            <label class="field customer-field"><span>مشتری</span><div class="customer-picker"><input id="customerSearch" list="customerDatalist" autocomplete="off" placeholder="مشتری عمومی" /><datalist id="customerDatalist"></datalist><input id="customerSelect" type="hidden" value="c0" /></div><small class="field-help">مشتری عمومی به‌صورت پیش‌فرض انتخاب شده است.</small></label>
+            <label class="field customer-field"><span>مشتری</span><div id="customerPicker" class="customer-picker asan-combobox"><button id="customerPickerButton" type="button" class="customer-picker-button" aria-expanded="false"><span class="customer-picker-copy"><b id="customerPickerText">مشتری عمومی</b><small id="customerPickerMeta">مشتری پیش‌فرض</small></span><span class="customer-picker-chevron">⌄</span></button><div id="customerPickerMenu" class="customer-picker-menu hidden"><div class="customer-picker-search"><span>⌕</span><input id="customerSearch" autocomplete="off" placeholder="نام یا شماره مشتری..." /></div><div id="customerPickerResults" class="customer-picker-results"></div></div><input id="customerSelect" type="hidden" value="c0" /></div><small class="field-help">برای فاکتورهای عادی، مشتری عمومی انتخاب شده است.</small></label>
             <div class="payment-required-note" id="paymentRequiredNote">روش پرداخت را انتخاب کنید</div>
             <div class="payment-tabs"><button class="payment" data-pay="نقدی">نقدی</button><button class="payment" data-pay="نسیه">نسیه</button></div>
             <button id="checkoutBtn" class="pay-btn">ثبت و پرداخت</button>
@@ -280,7 +280,7 @@
           <section class="settings-section hardware-section">
             <div class="settings-section-title"><div><span class="eyebrow">سخت‌افزار</span><h3>چاپ و بارکد</h3><p>پرینتر رسید و بارکدخوان در دو کارت هم‌اندازه.</p></div></div>
             <div class="settings-grid hardware-grid">
-              <article class="panel settings-card"><div class="panel-head"><div><h3>پرینتر رسید</h3><p>XPrinter و پرینترهای حرارتی Windows</p></div><span class="pill success">80mm</span></div><label class="field"><span>نام پرینتر</span><div class="printer-pick-row"><input id="printerName" list="printerList" placeholder="مثلاً XPrinter XP-Q200" /><button id="detectPrinters" type="button" class="tiny-btn accent">شناسایی</button></div><datalist id="printerList"></datalist></label><label class="switch-row"><span><b>چاپ خودکار</b><small>بعد از ثبت فروش رسید مستقیم چاپ شود</small></span><input id="autoPrint" type="checkbox" /></label><label class="switch-row"><span><b>برش خودکار</b><small>در مدل‌هایی که Driver پشتیبانی می‌کند.</small></span><input id="autoCut" type="checkbox" /></label><button id="testPrint" class="ghost-btn wide">چاپ آزمایشی 80mm</button><div class="scan-test">چاپ Native تصویری برای حفظ درست متن دری/فارسی</div></article>
+              <article class="panel settings-card"><div class="panel-head"><div><h3>پرینتر رسید</h3><p>XPrinter و پرینترهای حرارتی Windows</p></div><span class="pill success">80mm</span></div><label class="field"><span>نام پرینتر</span><div class="printer-pick-row"><input id="printerName" list="printerList" placeholder="مثلاً XPrinter XP-Q200" /><button id="detectPrinters" type="button" class="tiny-btn accent">شناسایی</button></div><datalist id="printerList"></datalist></label><label class="switch-row"><span><b>چاپ خودکار</b><small>بعد از ثبت فروش رسید مستقیم چاپ شود</small></span><input id="autoPrint" type="checkbox" /></label><button id="testPrint" class="ghost-btn wide">چاپ آزمایشی 80mm</button><div class="scan-test">چاپ Native تصویری برای حفظ درست متن دری/فارسی</div></article>
               <article class="panel settings-card"><div class="panel-head"><div><h3>بارکدخوان</h3><p>USB HID / Laser Scanner</p></div><span id="scannerStatusPill" class="pill warning">شناسایی نشده</span></div><div class="hardware-status" id="scannerHardwareStatus"><span class="pulse muted-pulse"></span><div><b id="scannerStatusTitle">منتظر اولین اسکن</b><small id="scannerStatusHint">بارکدخوان را وصل کنید و یک بارکد اسکن کنید.</small></div></div><label class="field"><span>Suffix</span><select id="scannerSuffix"><option value="Enter">Enter</option><option value="Tab">Tab</option></select></label><div id="lastScan" class="scan-test">آخرین اسکن: —</div></article>
             </div>
           </section>
@@ -290,7 +290,7 @@
             <article class="panel settings-card online-card"><div class="panel-head"><div><h3>آنلاین</h3><p>اتصال اختیاری به سرور و داشبورد آنلاین</p></div><span id="onlineStatusPill" class="pill">محلی</span></div><label class="switch-row"><span><b>فعال‌سازی اتصال آنلاین</b><small>در حالت خاموش برنامه کاملاً محلی است.</small></span><input id="onlineEnabled" type="checkbox" /></label><div id="onlineFields" class="online-fields"><label class="field"><span>آدرس سرور</span><input id="onlineServerUrl" type="url" dir="ltr" placeholder="https://example.com" /></label><label class="field"><span>کد فروشگاه</span><input id="onlineStoreCode" dir="ltr" placeholder="STORE-001" /></label><label class="field"><span>فاصله همگام‌سازی</span><select id="onlineSyncMinutes"><option value="5">هر 5 دقیقه</option><option value="15">هر 15 دقیقه</option><option value="30">هر 30 دقیقه</option><option value="60">هر 60 دقیقه</option></select></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی فروش‌ها</b><small>فاکتورها و دریافت‌ها</small></span><input id="onlineSyncSales" type="checkbox" /></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی موجودی</b><small>کالاها، خریدها و موجودی</small></span><input id="onlineSyncInventory" type="checkbox" /></label><div id="onlineStatusText" class="scan-test">وضعیت: حالت محلی</div><div class="online-actions"><button id="testOnlineConnection" type="button" class="ghost-btn">بررسی اتصال</button><button id="syncOnlineNow" type="button" class="primary-btn">همگام‌سازی حالا</button></div></div></article>
           </section>
         </div>
-        <article class="panel roadmap"><div class="panel-head"><div><h3>سازگاری</h3><p>نسخه Native 3.2 برای Windows 10/11 64-bit</p></div></div><div class="roadmap-row"><span>Windows 10 64-bit (2015+)</span><b>فعال</b></div><div class="roadmap-row"><span>Windows 11 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>فونت رابط</span><b>Vazirmatn Variable آفلاین</b></div><div class="roadmap-row"><span>SQLite Native</span><b>WAL + Backup فعال</b></div><div class="roadmap-row"><span>چاپ حرارتی 80mm</span><b>Windows Driver مستقیم</b></div><div class="roadmap-row"><span>بارکدخوان USB HID</span><b>اسکن سریع فعال</b></div><div class="roadmap-row"><span>اتصال آنلاین</span><b>قابل پیکربندی</b></div></article>
+        <article class="panel roadmap"><div class="panel-head"><div><h3>سازگاری</h3><p>نسخه Native 3.3 برای Windows 10/11 64-bit</p></div></div><div class="roadmap-row"><span>Windows 10 64-bit (2015+)</span><b>فعال</b></div><div class="roadmap-row"><span>Windows 11 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>فونت رابط</span><b>Vazirmatn Variable آفلاین</b></div><div class="roadmap-row"><span>SQLite Native</span><b>WAL + Backup فعال</b></div><div class="roadmap-row"><span>چاپ حرارتی 80mm</span><b>Windows Driver مستقیم</b></div><div class="roadmap-row"><span>بارکدخوان USB HID</span><b>اسکن سریع فعال</b></div><div class="roadmap-row"><span>اتصال آنلاین</span><b>قابل پیکربندی</b></div></article>
       </section>
     </main>
   </div>
