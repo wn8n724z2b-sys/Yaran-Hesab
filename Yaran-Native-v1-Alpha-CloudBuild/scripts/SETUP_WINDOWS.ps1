@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-Write-Host "Yaran Native - Windows development setup" -ForegroundColor Cyan
+Write-Host "Hesabdari Asan - Windows development setup" -ForegroundColor Cyan
 Write-Host "1) Installing Rustup (if missing)..."
 if (-not (Get-Command rustup -ErrorAction SilentlyContinue)) {
   winget install --id Rustlang.Rustup --accept-package-agreements --accept-source-agreements

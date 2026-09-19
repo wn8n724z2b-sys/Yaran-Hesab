@@ -6,21 +6,39 @@
   <meta name="color-scheme" content="light dark" />
   <title>حسابداری آسان</title>
   <link rel="stylesheet" href="vendor/vazirmatn/wght.css" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="v2.css" />
-  <link rel="stylesheet" href="ui-final.css" />
-  <link rel="stylesheet" href="v3.css" />
+  <link rel="stylesheet" href="app.css" />
 </head>
 <body>
+  <section id="firstRun" class="first-run hidden" aria-label="راه‌اندازی اولیه حسابداری آسان">
+    <div class="first-run-card">
+      <div class="first-run-brand"><div class="brand-mark app-mark"><img src="app-icon.png" alt="حسابداری آسان"></div><div><h1>حسابداری آسان</h1><p>راه‌اندازی اولیه فروشگاه</p></div></div>
+      <form id="firstRunForm" class="first-run-form">
+        <div class="first-run-intro"><b>چند مورد را یک‌بار تنظیم کنید</b><span>بعداً همه این موارد از تنظیمات قابل تغییر است.</span></div>
+        <label class="field"><span>نام فروشگاه *</span><input id="firstRunStoreName" required placeholder="مثلاً فروشگاه بهار"></label>
+        <div class="first-run-grid"><label class="field"><span>آدرس</span><input id="firstRunAddress" placeholder="اختیاری"></label><label class="field"><span>شماره تماس</span><input id="firstRunPhone" placeholder="اختیاری"></label></div>
+        <div class="first-run-grid"><label class="field"><span>رمز مدیر *</span><input id="firstRunPassword" type="password" minlength="4" required></label><label class="field"><span>تکرار رمز *</span><input id="firstRunPasswordConfirm" type="password" minlength="4" required></label></div>
+        <div class="first-run-grid"><label class="field"><span>تم</span><select id="firstRunTheme"><option value="light">روشن</option><option value="dark">دارک</option></select></label><label class="field"><span>Backup خودکار</span><select id="firstRunBackup"><option value="1">1 بار در روز</option><option value="2">2 بار در روز</option><option value="3">3 بار در روز</option><option value="4" selected>4 بار در روز</option><option value="5">5 بار در روز</option><option value="6">6 بار در روز</option></select></label></div>
+        <label class="field"><span>پرینتر رسید</span><div class="first-run-printer"><select id="firstRunPrinter"><option value="">بعداً تنظیم می‌کنم</option></select><button id="firstRunDetectPrinters" type="button" class="ghost-btn">شناسایی پرینترها</button></div></label>
+        <div class="first-run-note">اطلاعات واقعی از صفر شروع می‌شوند و Backupها از مرکز داده‌ها قابل مدیریت هستند.</div>
+        <button class="primary-btn first-run-submit">شروع استفاده از حسابداری آسان</button>
+      </form>
+    </div>
+  </section>
+
   <div class="app-shell v3-shell">
     <aside class="sidebar v3-sidebar">
       <div class="brand v3-brand">
-        <div class="brand-mark">آ</div>
+        <div class="brand-mark app-mark"><img src="app-icon.png" alt="حسابداری آسان"></div>
         <div class="brand-copy">
           <div class="brand-title">حسابداری آسان</div>
           <div class="brand-sub">مدیریت ساده، کسب‌وکار موفق</div>
-          <span class="free-badge">نسخه رایگان</span>
+          <span class="release-badge">نسخه رایگان · 3.2</span>
         </div>
+      </div>
+
+      <div class="sidebar-manager" id="sidebarManager">
+        <span id="sidebarManagerAvatar" class="manager-avatar">م</span>
+        <span class="manager-copy"><b id="sidebarManagerName">مدیر سیستم</b><small>مدیر سیستم</small></span>
       </div>
 
       <nav id="nav" class="nav v3-nav">
@@ -132,7 +150,6 @@
               <button id="clearCart" class="danger-ghost">پاک کردن</button>
             </div>
             <div id="posSearchResults" class="pos-search-results hidden"></div>
-            <div id="quickProducts" class="quick-products"></div>
             <div class="table-wrap cart-wrap"><table><thead><tr><th>کالا</th><th>تعداد</th><th>قیمت</th><th>جمع</th><th></th></tr></thead><tbody id="cartBody"></tbody></table></div>
             <div id="emptyCart" class="empty"><div>▣</div><strong>فاکتور خالی است</strong><span>یک کالا را اسکن یا جستجو کنید</span></div>
           </div>
@@ -157,7 +174,7 @@
       <section id="page-products" class="page">
         <div class="page-section-head"><div><span class="eyebrow">مدیریت کالا</span><h2>کالاها</h2><p>کالا، قیمت، بارکد و موجودی در یک جدول منظم</p></div><button id="addProductBtn" class="primary-btn">+ کالای جدید</button></div>
         <article class="panel">
-          <div class="toolbar unified-toolbar product-toolbar"><div class="search-control"><span>⌕</span><input id="productSearch" placeholder="جستجوی نام، شرکت یا بارکد..." /></div><select id="categoryFilter"><option value="all">همه دسته‌ها</option></select><select id="productFilter"><option value="all">همه کالاها</option><option value="low">موجودی کم</option><option value="packaged">تبدیل واحد فعال</option></select><select id="productPageSize" class="page-size-select"><option value="10">10 ردیف</option><option value="20" selected>20 ردیف</option><option value="50">50 ردیف</option></select><button id="manageCategoriesBtn" class="ghost-btn">مدیریت دسته‌ها</button></div>
+          <div class="toolbar unified-toolbar product-toolbar"><div class="search-control"><span>⌕</span><input id="productSearch" placeholder="جستجوی نام، شرکت یا بارکد..." /></div><select id="categoryFilter"><option value="all">همه دسته‌ها</option></select><select id="productFilter"><option value="all">همه کالاها</option><option value="low">موجودی کم</option><option value="packaged">تبدیل واحد فعال</option></select><select id="productPageSize" class="page-size-select"><option value="20" selected>20 ردیف</option><option value="50">50 ردیف</option></select><button id="manageCategoriesBtn" class="ghost-btn">مدیریت دسته‌ها</button></div>
           <div class="table-wrap product-table-wrap"><table class="products-table"><thead><tr><th>کالا</th><th>بارکد اصلی</th><th>بارکدها</th><th>بهای واحد</th><th>قیمت فروش</th><th>واحد خرید</th><th>موجودی</th><th>عملیات</th></tr></thead><tbody id="productsBody"></tbody></table></div>
           <div id="productsPagination" class="pagination"></div>
         </article>
@@ -206,7 +223,7 @@
 
         <article class="panel sales-report-panel">
           <div class="panel-head"><div><h3>فاکتورهای فروش</h3><p>برای کار روزانه فقط تعداد محدود نمایش داده می‌شود.</p></div><div class="report-actions"><button id="exportCsv" class="ghost-btn compact-action">خروجی Excel</button><button id="printLastReceipt" class="ghost-btn compact-action">چاپ آخرین رسید</button><button class="primary-btn compact-action" data-go="archive">آرشیو کامل</button></div></div>
-          <div class="unified-toolbar invoice-report-toolbar"><div class="search-control invoice-search-wrap"><span>⌕</span><input id="invoiceReportSearch" placeholder="شماره فاکتور، مشتری یا مبلغ..." /></div><select id="invoicePaymentFilter"><option value="all">همه روش‌ها</option><option value="نقدی">نقدی</option><option value="نسیه">نسیه</option></select><select id="reportInvoicePageSize"><option value="10">10 فاکتور</option><option value="20" selected>20 فاکتور</option><option value="50">50 فاکتور</option></select><div id="invoiceReportStats" class="invoice-report-stats"></div></div>
+          <div class="unified-toolbar invoice-report-toolbar"><div class="search-control invoice-search-wrap"><span>⌕</span><input id="invoiceReportSearch" placeholder="شماره فاکتور، مشتری یا مبلغ..." /></div><select id="invoicePaymentFilter"><option value="all">همه روش‌ها</option><option value="نقدی">نقدی</option><option value="نسیه">نسیه</option></select><select id="reportInvoicePageSize"><option value="20" selected>20 فاکتور</option><option value="50">50 فاکتور</option></select><div id="invoiceReportStats" class="invoice-report-stats"></div></div>
           <div class="table-wrap report-table-wrap"><table class="report-sales-table"><thead><tr><th>فاکتور</th><th>تاریخ/زمان</th><th>مشتری</th><th>روش</th><th>اقلام</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="salesBody"></tbody></table></div><div id="reportSalesPagination" class="pagination"></div>
         </article>
 
@@ -216,7 +233,7 @@
 
       <section id="page-archive" class="page">
         <div class="page-section-head"><div><span class="eyebrow">بایگانی</span><h2>آرشیو فاکتورها</h2><p>تمام فاکتورها با صفحه‌بندی و فیلتر کامل</p></div><button class="ghost-btn" data-go="reports">بازگشت به گزارش‌ها</button></div>
-        <article class="panel"><div class="unified-toolbar archive-toolbar"><div class="search-control"><span>⌕</span><input id="archiveSearch" placeholder="شماره فاکتور، مشتری یا مبلغ..." /></div><select id="archivePaymentFilter"><option value="all">همه روش‌ها</option><option value="نقدی">نقدی</option><option value="نسیه">نسیه</option></select><label class="date-control">از <input id="archiveFrom" type="date" /></label><label class="date-control">تا <input id="archiveTo" type="date" /></label><select id="archivePageSize"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option><option value="100">100</option></select></div><div class="table-wrap"><table><thead><tr><th>فاکتور</th><th>تاریخ/زمان</th><th>مشتری</th><th>روش</th><th>اقلام</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="archiveBody"></tbody></table></div><div id="archivePagination" class="pagination"></div></article>
+        <article class="panel"><div class="unified-toolbar archive-toolbar"><div class="search-control"><span>⌕</span><input id="archiveSearch" placeholder="شماره فاکتور، مشتری یا مبلغ..." /></div><select id="archivePaymentFilter"><option value="all">همه روش‌ها</option><option value="نقدی">نقدی</option><option value="نسیه">نسیه</option></select><label class="date-control">از <input id="archiveFrom" type="date" /></label><label class="date-control">تا <input id="archiveTo" type="date" /></label><select id="archivePageSize"><option value="20" selected>20 فاکتور</option><option value="50">50 فاکتور</option></select></div><div class="table-wrap"><table><thead><tr><th>فاکتور</th><th>تاریخ/زمان</th><th>مشتری</th><th>روش</th><th>اقلام</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="archiveBody"></tbody></table></div><div id="archivePagination" class="pagination"></div></article>
       </section>
 
       <section id="page-inventory" class="page">
@@ -227,20 +244,53 @@
       </section>
 
       <section id="page-data" class="page">
-        <div class="page-section-head"><div><span class="eyebrow">امنیت اطلاعات</span><h2>داده‌ها و پشتیبانی</h2><p>Backup، بازیابی، سلامت دیتابیس و نسخه آموزشی</p></div></div>
-        <article class="panel settings-card data-support-card data-page-card"><div class="panel-head"><div><h3>مرکز داده‌ها</h3><p>این بخش با رمز مدیر محافظت می‌شود</p></div><span class="pill">ADMIN</span></div><div id="dataSupportLock" class="support-lock"><div class="support-lock-icon">⌁</div><div><b>بخش محافظت‌شده</b><small>برای دسترسی به Backup، بازیابی و بازنشانی رمز مدیر را وارد کنید.</small></div><div class="support-unlock-row"><input id="dataSupportPassword" type="password" placeholder="رمز مدیر"><button id="unlockDataSupport" class="primary-btn">باز کردن</button></div></div><div id="dataSupportControls" class="hidden"><label class="field"><span>پشتیبان خودکار</span><select id="autoBackupPerDay"><option value="0">خاموش</option><option value="1">1 بار در روز</option><option value="2">2 بار در روز</option><option value="3">3 بار در روز</option><option value="4">4 بار در روز</option><option value="6">6 بار در روز</option><option value="8">8 بار در روز</option><option value="12">12 بار در روز</option><option value="24">24 بار در روز</option></select></label><div id="autoBackupStatus" class="scan-test">آخرین پشتیبان خودکار: —</div><div class="data-action-grid"><button id="backupBtn" class="ghost-btn">ذخیره دستی Backup</button><label class="upload" title="برای فایل‌های پشتیبان JSON نسخه‌های قبلی">بازیابی Backup قدیمی (JSON)<input id="restoreFile" type="file" accept="application/json" /></label><button id="restoreAutoBackup" class="ghost-btn">بازیابی آخرین پشتیبان خودکار</button><button id="dbHealthBtn" class="ghost-btn">بررسی سلامت دیتابیس</button><button id="auditLogBtn" class="ghost-btn">فعالیت‌های اخیر فاکتورها</button><button id="loadTrainingDemo" class="ghost-btn">نسخه آموزشی 2 ماه و 10 روزه</button><button id="lockDataSupport" class="ghost-btn">قفل کردن بخش</button><button id="resetDemo" class="danger-ghost">بازنشانی به حالت اولیه</button></div></div></article>
+        <div class="page-section-head"><div><span class="eyebrow">امنیت اطلاعات</span><h2>داده‌ها و پشتیبانی</h2><p>Backup، بازیابی و سلامت دیتابیس</p></div></div>
+        <article class="panel settings-card data-support-card data-page-card"><div class="panel-head"><div><h3>مرکز داده‌ها</h3><p>این بخش با رمز مدیر محافظت می‌شود</p></div><span class="pill">ADMIN</span></div><div id="dataSupportLock" class="support-lock"><div class="support-lock-icon">⌁</div><div><b>بخش محافظت‌شده</b><small>برای دسترسی به Backup، بازیابی و بازنشانی رمز مدیر را وارد کنید.</small></div><div class="support-unlock-row"><input id="dataSupportPassword" type="password" placeholder="رمز مدیر"><button id="unlockDataSupport" class="primary-btn">باز کردن</button></div></div><div id="dataSupportControls" class="hidden"><label class="field"><span>پشتیبان خودکار</span><select id="autoBackupPerDay"><option value="1">1 بار در روز</option><option value="2">2 بار در روز</option><option value="3">3 بار در روز</option><option value="4" selected>4 بار در روز</option><option value="5">5 بار در روز</option><option value="6">6 بار در روز</option></select></label><div id="autoBackupStatus" class="scan-test">آخرین پشتیبان خودکار: —</div><div class="data-action-grid"><button id="backupBtn" class="ghost-btn">ذخیره دستی Backup</button><label class="upload" title="انتخاب فایل Backup معتبر">بازیابی فایل Backup<input id="restoreFile" type="file" accept="application/json" /></label><button id="restoreAutoBackup" class="ghost-btn">بازیابی آخرین پشتیبان خودکار</button><button id="dbHealthBtn" class="ghost-btn">بررسی سلامت دیتابیس</button><button id="auditLogBtn" class="ghost-btn">فعالیت‌های اخیر فاکتورها</button><button id="changeAdminPassword" class="ghost-btn">تغییر رمز مدیر</button><button id="lockDataSupport" class="ghost-btn">قفل کردن بخش</button><button id="resetApp" class="danger-ghost">پاک‌کردن همه اطلاعات</button></div></div></article>
       </section>
 
       <section id="page-settings" class="page">
         <div class="page-section-head"><div><span class="eyebrow">تنظیمات</span><h2>تنظیمات برنامه</h2><p>ظاهر، هویت فروشگاه، چاپ، بارکدخوان و آنلاین</p></div></div>
-        <div class="settings-grid">
-          <article class="panel settings-card"><div class="panel-head"><div><h3>ظاهر برنامه</h3><p>انتخاب حالت روشن یا دارک</p></div></div><label class="field"><span>تم برنامه</span><select id="themeSelect"><option value="light">روشن</option><option value="dark">دارک</option></select></label><div class="theme-preview"><span class="preview-dot"></span><div><b>رابط مینیمال دسکتاپ</b><small>RTL، منوی ثابت و حرکت‌های نرم</small></div></div></article>
-          <article class="panel settings-card identity-card"><div class="panel-head"><div><h3>هویت فروشگاه</h3><p>لوگو و اطلاعات رسید</p></div></div><div class="identity-editor"><label class="store-logo-uploader"><input id="storeLogoInput" type="file" accept="image/*"><span id="storeLogoPreview" class="store-logo-preview">آ</span><small>لوگو</small></label><div class="identity-fields"><label class="field"><span>نام فروشگاه</span><input id="storeName" /></label><label class="field"><span>آدرس فروشگاه</span><input id="storeAddress" placeholder="اختیاری" /></label><label class="field"><span>شماره تماس</span><input id="storePhone" /></label></div></div><button id="removeStoreLogo" class="tiny-btn identity-remove" type="button">حذف لوگو</button><label class="field"><span>متن پایین رسید</span><input id="receiptFooter" /></label></article>
-          <article class="panel settings-card"><div class="panel-head"><div><h3>پرینتر رسید</h3><p>XPrinter و پرینترهای حرارتی Windows</p></div><span class="pill success">80mm</span></div><label class="field"><span>نام پرینتر</span><div class="printer-pick-row"><input id="printerName" list="printerList" placeholder="مثلاً XPrinter XP-Q200" /><button id="detectPrinters" type="button" class="tiny-btn accent">شناسایی</button></div><datalist id="printerList"></datalist></label><label class="switch-row"><span><b>چاپ خودکار</b><small>بعد از ثبت فروش رسید مستقیم چاپ شود</small></span><input id="autoPrint" type="checkbox" /></label><label class="switch-row"><span><b>برش خودکار</b><small>در مدل‌هایی که Driver پشتیبانی می‌کند.</small></span><input id="autoCut" type="checkbox" /></label><button id="testPrint" class="ghost-btn wide">چاپ آزمایشی 80mm</button><div class="scan-test">چاپ Native تصویری برای حفظ درست متن دری/فارسی</div></article>
-          <article class="panel settings-card"><div class="panel-head"><div><h3>بارکدخوان</h3><p>USB HID / Laser Scanner</p></div><span id="scannerStatusPill" class="pill warning">شناسایی نشده</span></div><div class="hardware-status" id="scannerHardwareStatus"><span class="pulse muted-pulse"></span><div><b id="scannerStatusTitle">منتظر اولین اسکن</b><small id="scannerStatusHint">بارکدخوان را وصل کنید و یک بارکد اسکن کنید.</small></div></div><label class="field"><span>Suffix</span><select id="scannerSuffix"><option value="Enter">Enter</option><option value="Tab">Tab</option></select></label><div id="lastScan" class="scan-test">آخرین اسکن: —</div></article>
-          <article class="panel settings-card online-card"><div class="panel-head"><div><h3>آنلاین</h3><p>اتصال اختیاری به سرور و داشبورد آنلاین</p></div><span id="onlineStatusPill" class="pill">محلی</span></div><label class="switch-row"><span><b>فعال‌سازی اتصال آنلاین</b><small>در حالت خاموش برنامه کاملاً محلی است.</small></span><input id="onlineEnabled" type="checkbox" /></label><div id="onlineFields" class="online-fields"><label class="field"><span>آدرس سرور</span><input id="onlineServerUrl" type="url" dir="ltr" placeholder="https://example.com" /></label><label class="field"><span>کد فروشگاه</span><input id="onlineStoreCode" dir="ltr" placeholder="STORE-001" /></label><label class="field"><span>فاصله همگام‌سازی</span><select id="onlineSyncMinutes"><option value="5">هر 5 دقیقه</option><option value="15">هر 15 دقیقه</option><option value="30">هر 30 دقیقه</option><option value="60">هر 60 دقیقه</option></select></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی فروش‌ها</b><small>فاکتورها و دریافت‌ها</small></span><input id="onlineSyncSales" type="checkbox" /></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی موجودی</b><small>کالاها، خریدها و موجودی</small></span><input id="onlineSyncInventory" type="checkbox" /></label><div id="onlineStatusText" class="scan-test">وضعیت: حالت محلی</div><div class="online-actions"><button id="testOnlineConnection" type="button" class="ghost-btn">بررسی اتصال</button><button id="syncOnlineNow" type="button" class="primary-btn">همگام‌سازی حالا</button></div></div></article>
+        <div class="settings-layout">
+          <section class="settings-section">
+            <div class="settings-section-title"><div><span class="eyebrow">پروفایل</span><h3>مدیر سیستم</h3><p>نام و تصویر مدیر فقط برای نمایش داخل برنامه استفاده می‌شود.</p></div></div>
+            <article class="panel settings-card manager-settings-card">
+              <div class="manager-settings-layout">
+                <label class="manager-photo-picker"><input id="managerPhotoInput" type="file" accept="image/*"><span id="managerPhotoPreview" class="manager-photo-preview">م</span><small>انتخاب عکس</small></label>
+                <div class="manager-fields"><label class="field"><span>نام مدیر</span><input id="managerName" placeholder="مدیر سیستم" /></label><div class="manager-role-note"><b>مدیر سیستم</b><small>پروفایل نمایشی برنامه</small></div></div>
+              </div>
+              <button id="removeManagerPhoto" type="button" class="ghost-btn compact-action">حذف عکس مدیر</button>
+            </article>
+          </section>
+
+          <section class="settings-section">
+            <div class="settings-section-title"><div><span class="eyebrow">رابط</span><h3>ظاهر برنامه</h3><p>تنظیم ساده روشن یا دارک.</p></div></div>
+            <article class="panel settings-card appearance-card"><div class="appearance-row"><div><b>حالت نمایش</b><small>فونت Vazirmatn آفلاین همراه برنامه است.</small></div><select id="themeSelect"><option value="light">روشن</option><option value="dark">دارک</option></select></div></article>
+          </section>
+
+          <section class="settings-section">
+            <div class="settings-section-title"><div><span class="eyebrow">فروشگاه</span><h3>هویت فروشگاه</h3><p>اطلاعاتی که روی رسید و گزارش‌های فروشگاه استفاده می‌شود.</p></div></div>
+            <article class="panel settings-card identity-card clean-identity-card">
+              <div class="store-identity-layout">
+                <div class="store-logo-column"><label class="store-logo-uploader compact-logo-uploader"><input id="storeLogoInput" type="file" accept="image/*"><span id="storeLogoPreview" class="store-logo-preview">ف</span><b>لوگوی فروشگاه</b><small>PNG یا JPG · حداکثر 1MB</small></label><button id="removeStoreLogo" class="ghost-btn compact-action" type="button">حذف لوگو</button></div>
+                <div class="store-identity-fields"><label class="field span-2"><span>نام فروشگاه</span><input id="storeName" placeholder="نام فروشگاه" /></label><label class="field span-2"><span>آدرس فروشگاه</span><input id="storeAddress" placeholder="اختیاری" /></label><label class="field"><span>شماره تماس</span><input id="storePhone" placeholder="اختیاری" /></label><label class="field"><span>متن پایین رسید</span><input id="receiptFooter" placeholder="سپاس از خرید شما" /></label></div>
+              </div>
+            </article>
+          </section>
+
+          <section class="settings-section hardware-section">
+            <div class="settings-section-title"><div><span class="eyebrow">سخت‌افزار</span><h3>چاپ و بارکد</h3><p>پرینتر رسید و بارکدخوان در دو کارت هم‌اندازه.</p></div></div>
+            <div class="settings-grid hardware-grid">
+              <article class="panel settings-card"><div class="panel-head"><div><h3>پرینتر رسید</h3><p>XPrinter و پرینترهای حرارتی Windows</p></div><span class="pill success">80mm</span></div><label class="field"><span>نام پرینتر</span><div class="printer-pick-row"><input id="printerName" list="printerList" placeholder="مثلاً XPrinter XP-Q200" /><button id="detectPrinters" type="button" class="tiny-btn accent">شناسایی</button></div><datalist id="printerList"></datalist></label><label class="switch-row"><span><b>چاپ خودکار</b><small>بعد از ثبت فروش رسید مستقیم چاپ شود</small></span><input id="autoPrint" type="checkbox" /></label><label class="switch-row"><span><b>برش خودکار</b><small>در مدل‌هایی که Driver پشتیبانی می‌کند.</small></span><input id="autoCut" type="checkbox" /></label><button id="testPrint" class="ghost-btn wide">چاپ آزمایشی 80mm</button><div class="scan-test">چاپ Native تصویری برای حفظ درست متن دری/فارسی</div></article>
+              <article class="panel settings-card"><div class="panel-head"><div><h3>بارکدخوان</h3><p>USB HID / Laser Scanner</p></div><span id="scannerStatusPill" class="pill warning">شناسایی نشده</span></div><div class="hardware-status" id="scannerHardwareStatus"><span class="pulse muted-pulse"></span><div><b id="scannerStatusTitle">منتظر اولین اسکن</b><small id="scannerStatusHint">بارکدخوان را وصل کنید و یک بارکد اسکن کنید.</small></div></div><label class="field"><span>Suffix</span><select id="scannerSuffix"><option value="Enter">Enter</option><option value="Tab">Tab</option></select></label><div id="lastScan" class="scan-test">آخرین اسکن: —</div></article>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <div class="settings-section-title"><div><span class="eyebrow">همگام‌سازی</span><h3>آنلاین</h3><p>اختیاری؛ در حالت خاموش برنامه کاملاً محلی است.</p></div></div>
+            <article class="panel settings-card online-card"><div class="panel-head"><div><h3>آنلاین</h3><p>اتصال اختیاری به سرور و داشبورد آنلاین</p></div><span id="onlineStatusPill" class="pill">محلی</span></div><label class="switch-row"><span><b>فعال‌سازی اتصال آنلاین</b><small>در حالت خاموش برنامه کاملاً محلی است.</small></span><input id="onlineEnabled" type="checkbox" /></label><div id="onlineFields" class="online-fields"><label class="field"><span>آدرس سرور</span><input id="onlineServerUrl" type="url" dir="ltr" placeholder="https://example.com" /></label><label class="field"><span>کد فروشگاه</span><input id="onlineStoreCode" dir="ltr" placeholder="STORE-001" /></label><label class="field"><span>فاصله همگام‌سازی</span><select id="onlineSyncMinutes"><option value="5">هر 5 دقیقه</option><option value="15">هر 15 دقیقه</option><option value="30">هر 30 دقیقه</option><option value="60">هر 60 دقیقه</option></select></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی فروش‌ها</b><small>فاکتورها و دریافت‌ها</small></span><input id="onlineSyncSales" type="checkbox" /></label><label class="switch-row compact-online-switch"><span><b>همگام‌سازی موجودی</b><small>کالاها، خریدها و موجودی</small></span><input id="onlineSyncInventory" type="checkbox" /></label><div id="onlineStatusText" class="scan-test">وضعیت: حالت محلی</div><div class="online-actions"><button id="testOnlineConnection" type="button" class="ghost-btn">بررسی اتصال</button><button id="syncOnlineNow" type="button" class="primary-btn">همگام‌سازی حالا</button></div></div></article>
+          </section>
         </div>
-        <article class="panel roadmap"><div class="panel-head"><div><h3>سازگاری</h3><p>نسخه Native v3.0 برای Windows 10/11 64-bit</p></div></div><div class="roadmap-row"><span>Windows 10 64-bit (2015+)</span><b>فعال</b></div><div class="roadmap-row"><span>Windows 11 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>فونت رابط</span><b>Vazirmatn Variable آفلاین</b></div><div class="roadmap-row"><span>SQLite Native</span><b>WAL + Backup فعال</b></div><div class="roadmap-row"><span>چاپ حرارتی 80mm</span><b>Windows Driver مستقیم</b></div><div class="roadmap-row"><span>بارکدخوان USB HID</span><b>اسکن سریع فعال</b></div><div class="roadmap-row"><span>اتصال آنلاین</span><b>قابل پیکربندی</b></div></article>
+        <article class="panel roadmap"><div class="panel-head"><div><h3>سازگاری</h3><p>نسخه Native 3.2 برای Windows 10/11 64-bit</p></div></div><div class="roadmap-row"><span>Windows 10 64-bit (2015+)</span><b>فعال</b></div><div class="roadmap-row"><span>Windows 11 64-bit</span><b>فعال</b></div><div class="roadmap-row"><span>فونت رابط</span><b>Vazirmatn Variable آفلاین</b></div><div class="roadmap-row"><span>SQLite Native</span><b>WAL + Backup فعال</b></div><div class="roadmap-row"><span>چاپ حرارتی 80mm</span><b>Windows Driver مستقیم</b></div><div class="roadmap-row"><span>بارکدخوان USB HID</span><b>اسکن سریع فعال</b></div><div class="roadmap-row"><span>اتصال آنلاین</span><b>قابل پیکربندی</b></div></article>
       </section>
     </main>
   </div>
@@ -248,13 +298,13 @@
   <div id="modal" class="modal hidden"><div class="modal-card"><div class="modal-head"><h3 id="modalTitle">کالای جدید</h3><button id="modalClose" aria-label="بستن">×</button></div><div id="modalContent"></div></div></div>
   <div id="toast" class="toast"></div>
   <iframe id="printFrame" class="print-frame"></iframe>
-  <script src="native.js"></script>
+  <script src="bridge.js"></script>
   <script>
     (async function () {
-      await window.YaranNative.hydrate('hesabdari_asan_v1');
+      await window.AsanNative.hydrate();
       const app = document.createElement('script');
       app.src = 'app.js';
-      app.onload = function(){ const v3=document.createElement('script'); v3.src='v3-app.js'; document.body.appendChild(v3); };
+      
       document.body.appendChild(app);
     })();
   </script>

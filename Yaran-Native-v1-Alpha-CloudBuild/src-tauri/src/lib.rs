@@ -60,6 +60,10 @@ fn verify_admin_password(app: AppHandle, password: String) -> Result<bool, Strin
     db::verify_admin_password_impl(&app, &password)
 }
 
+#[tauri::command]
+fn change_admin_password(app: AppHandle, password: String) -> Result<(), String> {
+    db::change_admin_password_impl(&app, &password)
+}
 
 #[tauri::command]
 fn restore_latest_backup(app: AppHandle) -> Result<bool, String> {
@@ -106,6 +110,7 @@ pub fn run() {
             open_external,
             restore_latest_backup,
             verify_admin_password,
+            change_admin_password,
             database_integrity,
             native_health,
             list_printers,

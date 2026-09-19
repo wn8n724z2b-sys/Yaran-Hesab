@@ -488,6 +488,21 @@ pub fn verify_admin_password_impl(app: &AppHandle, password: &str) -> Result<boo
     Ok(stored == entered)
 }
 
+
+pub fn change_admin_password_impl(app: &AppHandle, password: &str) -> Result<(), String> {
+    if password.chars().count() < 4 {
+        return Err("password must be at least 4 characters".to_string());
+    }
+    let conn = open(app)?;
+    let hash = format!("{:x}", Sha256::digest(password.as_bytes()));
+    conn.execute(
+        "UPDATE security_settings SET admin_password_hash = ?1, updated_at = ?2 WHERE id = 1",
+        params![hash, Local::now().to_rfc3339()],
+    )
+    .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 pub fn load_state_impl(app: &AppHandle) -> Result<Option<String>, String> {
     let conn = open(app)?;
     let mut stmt = conn

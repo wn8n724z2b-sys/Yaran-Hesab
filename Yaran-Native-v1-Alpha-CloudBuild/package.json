@@ -1,8 +1,8 @@
 {
-  "name": "hesabdari-asan-native",
+  "name": "hesabdari-asan-free",
   "private": true,
-  "version": "3.0.0",
-  "description": "حسابداری آسان v3 - Minimal Pro UI رایگان Windows Native",
+  "version": "3.2.0",
+  "description": "حسابداری آسان 3.2 — نسخه رایگان پایدار Windows Native",
   "scripts": {
     "tauri": "tauri",
     "dev": "npm run prepare-font && tauri dev",

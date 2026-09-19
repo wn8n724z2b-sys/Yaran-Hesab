@@ -1,0 +1,12 @@
+حسابداری آسان 3.1 — راهنمای Build
+
+GitHub Actions:
+1. پروژه را در Repository خصوصی قرار دهید.
+2. فایل .github/workflows/build-windows.yml به صورت خودکار Installer ویندوز را می‌سازد.
+3. خروجی از Artifacts با نام Hesabdari-Asan-Windows-Installer دریافت می‌شود.
+
+Windows محلی:
+npm install
+npm run build
+
+داده‌های واقعی داخل Installer قرار ندارند. فایل نمونه آموزشی باید جداگانه از «داده‌ها و پشتیبانی» بازیابی شود.

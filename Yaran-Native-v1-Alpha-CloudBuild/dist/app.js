@@ -1,8 +1,5 @@
-const KEY='hesabdari_asan_v1';
-const AUTO_BACKUP_KEY='hesabdari_asan_auto_backup_latest_v1';
-const DATA_SUPPORT_PASSWORD='admin';
 const DEFAULT={
- settings:{storeName:'فروشگاه من',storeAddress:'',storePhone:'',storeLogo:'',receiptFooter:'سپاس از خرید شما',printerName:'XPrinter 80mm',autoPrint:false,autoCut:true,currency:'؋',theme:'light',hideDashboardMoney:false,scannerSuffix:'Enter',autoBackupPerDay:0,lastAutoBackupAt:'',onlineEnabled:false,onlineServerUrl:'',onlineStoreCode:'',onlineSyncMinutes:15,onlineSyncSales:true,onlineSyncInventory:true,onlineLastCheckAt:'',onlineLastSyncAt:'',onlineLastStatus:'local',workDayDate:'',workDayStartedAt:'',demoMode:false},
+ settings:{managerName:'مدیر سیستم',managerPhoto:'',storeName:'',storeAddress:'',storePhone:'',storeLogo:'',receiptFooter:'سپاس از خرید شما',printerName:'',autoPrint:false,autoCut:true,currency:'؋',theme:'light',hideDashboardMoney:false,scannerSuffix:'Enter',autoBackupPerDay:4,lastAutoBackupAt:'',onlineEnabled:false,onlineServerUrl:'',onlineStoreCode:'',onlineSyncMinutes:15,onlineSyncSales:true,onlineSyncInventory:true,onlineLastCheckAt:'',onlineLastSyncAt:'',onlineLastStatus:'local',workDayDate:'',workDayStartedAt:'',onboardingComplete:false},
  categories:[{id:'cat-general',name:'عمومی'}],
  products:[],
  customers:[{id:'c0',name:'مشتری عمومی',phone:'',balance:0}],
@@ -24,12 +21,17 @@ let scannerDetectedAt=0;
 
 const $=s=>document.querySelector(s), $$=s=>Array.prototype.slice.call(document.querySelectorAll(s));
 function clone(x){return JSON.parse(JSON.stringify(x))}
-function loadRaw(){try{if(window.YaranNative&&window.YaranNative.isNative){const raw=window.__YARAN_PRELOADED_STATE__;return raw?JSON.parse(raw):clone(DEFAULT)}return JSON.parse(localStorage.getItem(KEY))||clone(DEFAULT)}catch(e){return clone(DEFAULT)}}
+function loadRaw(){
+ try{
+  if(window.AsanNative&&window.AsanNative.isNative){const raw=window.__ASAN_PRELOADED_STATE__;return raw?JSON.parse(raw):clone(DEFAULT)}
+  return clone(DEFAULT)
+ }catch(e){return clone(DEFAULT)}
+}
 
 function persistState(state){
  const raw=JSON.stringify(state);
- if(window.YaranNative&&window.YaranNative.isNative){window.YaranNative.persist(raw).catch(function(e){console.error(e);toast('ذخیره SQLite انجام نشد')});return true}
- try{localStorage.setItem(KEY,raw);return true}catch(e){return false}
+ if(window.AsanNative&&window.AsanNative.isNative){window.AsanNative.persist(raw).catch(function(e){console.error(e);toast('ذخیره SQLite انجام نشد')});return true}
+ return true
 }
 
 function id(prefix){return prefix+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
@@ -52,7 +54,11 @@ function accountingMonthName(){return 'ماه '+ordinalFa(financialPeriodMonths(
 
 function normalizeDB(raw){
  const d=raw&&typeof raw==='object'?raw:clone(DEFAULT);
- d.settings=Object.assign({},DEFAULT.settings,d.settings||{});
+ const originalSettings=(d.settings&&typeof d.settings==='object')?d.settings:{};
+ const hadOnboarding=Object.prototype.hasOwnProperty.call(originalSettings,'onboardingComplete');
+ d.settings=Object.assign({},DEFAULT.settings,originalSettings);
+ const backupCount=Number(d.settings.autoBackupPerDay)||4;d.settings.autoBackupPerDay=Math.max(1,Math.min(6,backupCount));
+ if(!hadOnboarding&&String(d.settings.storeName||'').trim()&&d.settings.storeName!=='فروشگاه من')d.settings.onboardingComplete=true;
  d.categories=Array.isArray(d.categories)&&d.categories.length?d.categories:clone(DEFAULT.categories);
  if(!d.categories.some(function(c){return c.id==='cat-general'}))d.categories.unshift({id:'cat-general',name:'عمومی'});
  d.products=(Array.isArray(d.products)?d.products:[]).map(function(p){
@@ -64,7 +70,7 @@ function normalizeDB(raw){
  d.customers=Array.isArray(d.customers)?d.customers:clone(DEFAULT.customers);
  if(!d.customers.some(function(c){return c.id==='c0'}))d.customers.unshift({id:'c0',name:'مشتری عمومی',phone:'',balance:0});
  d.suppliers=Array.isArray(d.suppliers)?d.suppliers:clone(DEFAULT.suppliers);
- d.sales=(Array.isArray(d.sales)?d.sales:[]).map(function(s){if(s.payment==='کارت')s.payment='نقدی';return s});
+ d.sales=Array.isArray(d.sales)?d.sales:[];
  d.deletedSales=Array.isArray(d.deletedSales)?d.deletedSales:[];
  d.purchases=Array.isArray(d.purchases)?d.purchases:[];
  d.inventory=Array.isArray(d.inventory)?d.inventory:[];
@@ -87,8 +93,8 @@ async function saveWithAudit(auditEvent,rollbackState){
  updateInventorySnapshot();
  const raw=JSON.stringify(db);
  try{
-  if(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.commit){
-   await window.YaranNative.commit(raw,auditEvent);
+  if(window.AsanNative&&window.AsanNative.isNative&&window.AsanNative.commit){
+   await window.AsanNative.commit(raw,auditEvent);
   }else{
    persistState(db);
   }
@@ -98,7 +104,6 @@ async function saveWithAudit(auditEvent,rollbackState){
   console.error('Hesabdari Asan transactional save failed:',e);
   if(rollbackState){
    db=normalizeDB(clone(rollbackState));
-   if(!(window.YaranNative&&window.YaranNative.isNative)){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(ignore){}}
   }
   renderAll();
   toast('ذخیره امن انجام نشد؛ تغییرات فاکتور برگشت داده شد');
@@ -201,20 +206,15 @@ function chartSmoothPath(points){
 function chartValueLabel(v){if(!moneyVisible)return '••••';return amount(v)+' ؋'}
 function renderFinanceChart(){
  const root=$('#financeChart');if(!root)return;
- const days=dashboardChartDays(dashboardChartRange),data=days.map(dailyFinancialPoint),W=820,H=286,L=62,R=18,T=18,B=43,plotW=W-L-R,plotH=H-T-B;
- const values=[];data.forEach(function(x){values.push(x.sales,x.debt);if(x.profit!=null)values.push(x.profit)});
- let min=Math.min.apply(null,[0].concat(values)),max=Math.max.apply(null,[1].concat(values));if(max===min)max=min+1;const rawSpan=max-min;max+=rawSpan*.08;if(min<0)min-=rawSpan*.06;else min=0;const span=max-min||1;
- const xFor=function(i){return data.length===1?L+plotW/2:L+(i/(data.length-1))*plotW},yFor=function(v){return T+((max-v)/span)*plotH},zeroY=yFor(0);
- const series=function(key){return data.map(function(x,i){return x[key]==null?null:{x:xFor(i),y:yFor(x[key]),v:x[key],i:i}}).filter(Boolean)};
- const salesPts=series('sales'),debtPts=series('debt'),profitPts=series('profit'),salesPath=chartSmoothPath(salesPts),debtPath=chartSmoothPath(debtPts),profitPath=chartSmoothPath(profitPts);
- const area=salesPts.length?salesPath+' L '+salesPts[salesPts.length-1].x.toFixed(2)+' '+zeroY.toFixed(2)+' L '+salesPts[0].x.toFixed(2)+' '+zeroY.toFixed(2)+' Z':'';
- let grid='',yLabels='';for(let i=0;i<5;i++){const ratio=i/4,y=T+plotH*ratio,v=max-span*ratio;grid+='<line class="chart-grid-line" x1="'+L+'" y1="'+y.toFixed(2)+'" x2="'+(W-R)+'" y2="'+y.toFixed(2)+'"></line>';yLabels+='<text class="chart-y-label" x="'+(L-10)+'" y="'+(y+4).toFixed(2)+'" text-anchor="end">'+(moneyVisible?esc(amount(v)):'•••')+'</text>'}
- const step=data.length<=8?1:data.length<=16?2:Math.max(3,Math.ceil(data.length/6));let xLabels='';data.forEach(function(x,i){if(i%step!==0&&i!==data.length-1)return;const label=data.length<=8?DAY_NAMES[x.date.getDay()]:pad(x.date.getDate())+'/'+pad(x.date.getMonth()+1);xLabels+='<text class="chart-x-label" x="'+xFor(i).toFixed(2)+'" y="'+(H-15)+'" text-anchor="middle">'+label+'</text>'});
- let hits='';data.forEach(function(x,i){const cx=xFor(i),half=data.length>1?plotW/(data.length-1)/2:plotW/2;hits+='<rect class="chart-hit" data-chart-index="'+i+'" x="'+Math.max(L,cx-half).toFixed(2)+'" y="'+T+'" width="'+Math.min(plotW,half*2).toFixed(2)+'" height="'+plotH+'"></rect>'});
- const dotSet=function(points,cls){if(data.length>14)return '';return points.map(function(p){return '<circle class="chart-point '+cls+'" cx="'+p.x.toFixed(2)+'" cy="'+p.y.toFixed(2)+'" r="3.5"></circle>'}).join('')};
- root.innerHTML='<div class="finance-chart-stage"><svg class="finance-svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img"><defs><linearGradient id="salesAreaGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--chart-sales)" stop-opacity=".20"></stop><stop offset="100%" stop-color="var(--chart-sales)" stop-opacity="0"></stop></linearGradient></defs>'+grid+'<line class="chart-zero-line" x1="'+L+'" y1="'+zeroY.toFixed(2)+'" x2="'+(W-R)+'" y2="'+zeroY.toFixed(2)+'"></line>'+yLabels+xLabels+(area?'<path class="chart-sales-area" d="'+area+'"></path>':'')+(salesPath?'<path class="chart-line sales" d="'+salesPath+'"></path>':'')+(debtPath?'<path class="chart-line debt" d="'+debtPath+'"></path>':'')+(profitPath?'<path class="chart-line profit" d="'+profitPath+'"></path>':'')+dotSet(salesPts,'sales')+dotSet(debtPts,'debt')+dotSet(profitPts,'profit')+hits+'</svg><div class="chart-hover-line"></div><div class="finance-chart-tooltip"></div></div>';
- const tooltip=root.querySelector('.finance-chart-tooltip'),hoverLine=root.querySelector('.chart-hover-line'),stage=root.querySelector('.finance-chart-stage');
- root.querySelectorAll('.chart-hit').forEach(function(hit){hit.onpointerenter=hit.onpointermove=function(e){const i=Number(hit.dataset.chartIndex),d=data[i],sr=stage.getBoundingClientRect(),svgX=xFor(i)/W*sr.width;hoverLine.style.left=svgX+'px';hoverLine.classList.add('show');const profitText=d.profit==null?'نامشخص':chartValueLabel(d.profit);tooltip.innerHTML='<b>'+formatDate(d.date)+'</b><span><i class="legend-dot sales"></i>فروش <strong>'+chartValueLabel(d.sales)+'</strong></span><span><i class="legend-dot debt"></i>قرض‌ها <strong>'+chartValueLabel(d.debt)+'</strong></span><span><i class="legend-dot profit"></i>مفاد خالص <strong>'+profitText+'</strong></span>';tooltip.classList.add('show');const desired=svgX+12,maxLeft=sr.width-190;tooltip.style.left=Math.max(8,Math.min(desired,maxLeft))+'px';tooltip.style.top='18px'};hit.onpointerleave=function(){tooltip.classList.remove('show');hoverLine.classList.remove('show')}});
+ const days=dashboardChartDays(dashboardChartRange),data=days.map(dailyFinancialPoint);
+ const hasValue=data.some(function(d){return Math.abs(d.sales||0)>0||Math.abs(d.debt||0)>0||Math.abs(d.profit||0)>0});
+ if(!hasValue){root.innerHTML='<div class="chart-empty-state"><div class="chart-empty-icon">⌁</div><b>هنوز داده‌ای برای نمودار ثبت نشده</b><span>با ثبت اولین فروش، روند روزانه اینجا نمایش داده می‌شود.</span></div>';return}
+ const W=900,H=290,L=64,R=18,T=18,B=42,pw=W-L-R,ph=H-T-B,vals=[];data.forEach(function(d){vals.push(d.sales||0,d.debt||0);if(d.profit!=null)vals.push(d.profit)});let min=Math.min.apply(null,[0].concat(vals)),max=Math.max.apply(null,[1].concat(vals));if(max===min)max=min+1;const span0=max-min;max+=span0*.08;if(min<0)min-=span0*.08;else min=0;const span=max-min||1,x=function(i){return data.length===1?L+pw/2:L+i/(data.length-1)*pw},y=function(v){return T+(max-v)/span*ph};
+ let grid='',yl='',xl='';for(let i=0;i<5;i++){const yy=T+ph*i/4,v=max-span*i/4;grid+='<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="currentColor" stroke-opacity=".16" stroke-width="1"/>';yl+='<text x="'+(L-10)+'" y="'+(yy+4)+'" text-anchor="end" fill="currentColor" opacity=".72" font-size="10">'+(moneyVisible?esc(amount(v)):'•••')+'</text>'}const step=data.length<=8?1:Math.max(1,Math.ceil(data.length/6));data.forEach(function(d,i){if(i%step&&i!==data.length-1)return;xl+='<text x="'+x(i)+'" y="'+(H-13)+'" text-anchor="middle" fill="currentColor" opacity=".75" font-size="10">'+esc(data.length<=8?DAY_NAMES[d.date.getDay()]:pad(d.date.getDate())+'/'+pad(d.date.getMonth()+1))+'</text>'});
+ function seriesPath(key){const pts=data.map(function(d,i){return d[key]==null?null:{x:x(i),y:y(d[key])}}).filter(Boolean);return chartSmoothPath(pts)}
+ const salesPath=seriesPath('sales'),debtPath=seriesPath('debt'),profitPath=seriesPath('profit');let hits='';data.forEach(function(d,i){const cx=x(i),half=data.length>1?pw/(data.length-1)/2:pw/2;hits+='<rect class="chart-hit" data-chart-index="'+i+'" x="'+Math.max(L,cx-half)+'" y="'+T+'" width="'+Math.min(pw,half*2)+'" height="'+ph+'" fill="transparent"/>'});
+ root.innerHTML='<div class="finance-chart-stage"><svg class="finance-svg clean-svg-chart" viewBox="0 0 '+W+' '+H+'" role="img" style="background:transparent;color:var(--muted)">'+grid+'<line x1="'+L+'" y1="'+y(0)+'" x2="'+(W-R)+'" y2="'+y(0)+'" stroke="currentColor" stroke-opacity=".26" stroke-dasharray="4 4"/>'+yl+xl+(salesPath?'<path d="'+salesPath+'" fill="none" stroke="#2f80ed" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>':'')+(debtPath?'<path d="'+debtPath+'" fill="none" stroke="#e05260" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>':'')+(profitPath?'<path d="'+profitPath+'" fill="none" stroke="#26a269" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>':'')+hits+'</svg><div class="chart-hover-line"></div><div class="finance-chart-tooltip"></div></div>';
+ const tt=root.querySelector('.finance-chart-tooltip'),line=root.querySelector('.chart-hover-line'),stage=root.querySelector('.finance-chart-stage');root.querySelectorAll('.chart-hit').forEach(function(hit){hit.onpointerenter=hit.onpointermove=function(){const i=Number(hit.dataset.chartIndex),d=data[i],r=stage.getBoundingClientRect(),xx=x(i)/W*r.width;line.style.left=xx+'px';line.classList.add('show');tt.innerHTML='<b>'+formatDate(d.date)+'</b><span><i class="legend-dot sales"></i>فروش <strong>'+chartValueLabel(d.sales)+'</strong></span><span><i class="legend-dot debt"></i>قرض <strong>'+chartValueLabel(d.debt)+'</strong></span><span><i class="legend-dot profit"></i>سود خالص <strong>'+(d.profit==null?'نامشخص':chartValueLabel(d.profit))+'</strong></span>';tt.classList.add('show');tt.style.left=Math.max(8,Math.min(r.width-195,xx+10))+'px';tt.style.top='18px'};hit.onpointerleave=function(){tt.classList.remove('show');line.classList.remove('show')}});
  $$('.chart-range-btn').forEach(function(btn){btn.classList.toggle('active',btn.dataset.chartRange===dashboardChartRange);btn.onclick=function(){dashboardChartRange=btn.dataset.chartRange;renderFinanceChart()}});
 }
 function renderDashboard(){
@@ -243,7 +243,7 @@ function renderProducts(){
  let rows=db.products.filter(function(p){const special=filter==='low'?p.stock<=p.min:filter==='packaged'?!!p.unitConversionEnabled:true;return (!q||productMatches(p,q))&&special&&(catFilter==='all'||p.categoryId===catFilter)});if(q)rows=searchProducts(q).filter(function(p){const special=filter==='low'?p.stock<=p.min:filter==='packaged'?!!p.unitConversionEnabled:true;return special&&(catFilter==='all'||p.categoryId===catFilter)});
  $('#productsBody').innerHTML=rows.map(function(p){const enabled=!!p.unitConversionEnabled,units=Math.max(1,Number(p.unitsPerPurchase)||1),packLabel=enabled?num(units)+' '+esc(p.baseUnit)+' / '+esc(p.purchaseUnit):'تک‌واحد · '+esc(p.baseUnit);const meta='<div class="product-meta-line"><span class="meta-pill">'+esc(categoryName(p.categoryId))+'</span>'+(p.producer?'<span class="meta-pill">'+esc(p.producer)+'</span>':'')+(enabled?'<span class="meta-pill pack">تبدیل واحد فعال</span>':'<span class="meta-pill">تک‌واحد</span>')+'</div>';return '<tr><td><div class="product-name-cell">'+productImageHtml(p,'product-thumb')+'<div><b>'+esc(p.name)+'</b>'+meta+'</div></div></td><td><code class="barcode-code" title="'+esc(p.barcode||'—')+'">'+esc(p.barcode||'—')+'</code></td><td>'+num((p.barcodes||[]).length)+'/15</td><td><b>'+money(p.buy)+'</b><small class="table-sub">هر '+esc(p.baseUnit)+'</small></td><td>'+productPriceText(p)+'</td><td><span class="unit-conversion">'+packLabel+'</span></td><td><span class="pill '+(p.stock<=p.min?'danger':'success')+'">'+num(p.stock)+' '+esc(p.baseUnit)+'</span></td><td><div class="row-actions"><button class="tiny-btn purchase-product" data-id="'+p.id+'">+ خرید</button><button class="ghost-btn edit-product" data-id="'+p.id+'">ویرایش</button></div></td></tr>'}).join('')||'<tr><td colspan="8" class="muted">کالایی پیدا نشد.</td></tr>';
  $$('.edit-product').forEach(function(b){b.onclick=function(){openProduct(b.dataset.id)}});$$('.purchase-product').forEach(function(b){b.onclick=function(){openPurchase(b.dataset.id)}});
- $('#quickProducts').innerHTML=db.products.slice(0,8).map(function(p){return '<button class="quick-product" data-id="'+p.id+'">'+(p.image?'<img src="'+esc(p.image)+'" alt="">':'<span class="mini-placeholder">'+esc((p.name||'آ').charAt(0))+'</span>')+'<span><b>'+esc(p.name)+'</b><small>'+productPriceText(p)+' · موجودی '+num(p.stock)+' '+esc(p.baseUnit)+'</small></span></button>'}).join('');
+ const quick=$('#quickProducts');if(quick){quick.innerHTML='';quick.classList.add('hidden')}
  $$('.quick-product').forEach(function(b){b.onclick=function(){addToCart(b.dataset.id)}});
 }
 function inventoryStatus(p){if((Number(p.stock)||0)<=0)return 'out';if((Number(p.stock)||0)<=(Number(p.min)||0))return 'low';return 'ok'}
@@ -338,10 +338,17 @@ function renderCashFlowMonth(){
   hit.onpointerleave=function(){tt.classList.remove('show')}
  });
 }
-function renderBrandIdentity(){const mark=$('.brand-mark'),logo=db.settings.storeLogo||'';mark.classList.toggle('has-logo',!!logo);mark.innerHTML=logo?'<img src="'+esc(logo)+'" alt="لوگو">':'آ';const prev=$('#storeLogoPreview');if(prev)prev.innerHTML=logo?'<img src="'+esc(logo)+'" alt="لوگو">':'آ'}
+function renderBrandIdentity(){
+ const logo=db.settings.storeLogo||'',managerPhoto=db.settings.managerPhoto||'',managerName=String(db.settings.managerName||'مدیر سیستم').trim()||'مدیر سیستم';
+ const prev=$('#storeLogoPreview');if(prev)prev.innerHTML=logo?'<img src="'+esc(logo)+'" alt="لوگوی فروشگاه">':'ف';
+ const mprev=$('#managerPhotoPreview');if(mprev)mprev.innerHTML=managerPhoto?'<img src="'+esc(managerPhoto)+'" alt="تصویر مدیر">':esc(managerName.charAt(0)||'م');
+ const sav=$('#sidebarManagerAvatar');if(sav)sav.innerHTML=managerPhoto?'<img src="'+esc(managerPhoto)+'" alt="تصویر مدیر">':esc(managerName.charAt(0)||'م');
+ const sn=$('#sidebarManagerName');if(sn)sn.textContent=managerName;
+ const mn=$('#managerName');if(mn&&document.activeElement!==mn)mn.value=managerName;
+}
 function renderAutoBackupStatus(){const x=getLatestAutoBackup(),el=$('#autoBackupStatus');if(el)el.textContent='آخرین پشتیبان خودکار: '+(x&&x.time?formatDateTime(x.time):'—')}
 function renderDataSupportAccess(){const lock=$('#dataSupportLock'),controls=$('#dataSupportControls');if(!lock||!controls)return;lock.classList.toggle('hidden',dataSupportUnlocked);controls.classList.toggle('hidden',!dataSupportUnlocked)}
-function renderSettings(){const s=db.settings;$('#storeName').value=s.storeName;$('#storeAddress').value=s.storeAddress||'';$('#storePhone').value=s.storePhone;$('#receiptFooter').value=s.receiptFooter;$('#printerName').value=s.printerName;$('#autoPrint').checked=!!s.autoPrint;$('#autoCut').checked=!!s.autoCut;$('#themeSelect').value=s.theme||'light';$('#scannerSuffix').value=s.scannerSuffix||'Enter';$('#autoBackupPerDay').value=String(s.autoBackupPerDay||0);renderBrandIdentity();renderAutoBackupStatus();renderDataSupportAccess();renderOnlineSettings();applyTheme()}
+function renderSettings(){const s=db.settings;if($('#managerName'))$('#managerName').value=s.managerName||'مدیر سیستم';$('#storeName').value=s.storeName||'';$('#storeAddress').value=s.storeAddress||'';$('#storePhone').value=s.storePhone||'';$('#receiptFooter').value=s.receiptFooter||'';$('#printerName').value=s.printerName||'';$('#autoPrint').checked=!!s.autoPrint;$('#autoCut').checked=!!s.autoCut;$('#themeSelect').value=s.theme||'light';$('#scannerSuffix').value=s.scannerSuffix||'Enter';$('#autoBackupPerDay').value=String(Math.max(1,Math.min(6,Number(s.autoBackupPerDay)||4)));renderBrandIdentity();renderAutoBackupStatus();renderDataSupportAccess();renderOnlineSettings();applyTheme()}
 function pulseCart(){const el=$('.pos-main');if(!el)return;el.classList.remove('soft-pulse');void el.offsetWidth;el.classList.add('soft-pulse');setTimeout(function(){el.classList.remove('soft-pulse')},430)}
 function renderCart(){
  const body=$('#cartBody'),editing=!!getEditingSale();
@@ -412,7 +419,7 @@ function openModal(title,html){$('#modalTitle').textContent=title;$('#modalConte
 function closeModal(){$('#modal').classList.add('hidden')}
 $('#modalClose').onclick=closeModal;$('#modal').onclick=function(e){if(e.target===$('#modal'))closeModal()};
 function barcodeRowsHtml(codes){return codes.map(function(code,i){return '<div class="barcode-row"><span class="barcode-index">'+num(i+1)+'</span><input class="barcode-entry" value="'+esc(code)+'" placeholder="بارکد '+num(i+1)+'"><button class="remove-barcode" type="button" title="حذف">×</button></div>'}).join('')}
-function resizeImage(file){return new Promise(function(resolve,reject){if(!file||!file.type||file.type.indexOf('image/')!==0){reject(new Error('invalid'));return}const reader=new FileReader();reader.onload=function(){const img=new Image();img.onload=function(){const max=520,scale=Math.min(1,max/Math.max(img.width,img.height)),w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale)),canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);resolve(canvas.toDataURL('image/jpeg',.82))};img.onerror=reject;img.src=reader.result};reader.onerror=reject;reader.readAsDataURL(file)})}
+function resizeImage(file,maxSize){return new Promise(function(resolve,reject){if(!file||!file.type||file.type.indexOf('image/')!==0){reject(new Error('invalid'));return}const reader=new FileReader();reader.onload=function(){const img=new Image();img.onload=function(){const max=Math.max(96,Number(maxSize)||520),scale=Math.min(1,max/Math.max(img.width,img.height)),w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale)),canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);resolve(canvas.toDataURL('image/jpeg',.82))};img.onerror=reject;img.src=reader.result};reader.onerror=reject;reader.readAsDataURL(file)})}
 function openProduct(pid){
  pid=pid||null;const original=pid?db.products.find(function(x){return x.id===pid}):null,p=original||{name:'',barcodes:[''],image:'',categoryId:'cat-general',producer:'',unitConversionEnabled:false,baseUnit:'دانه',purchaseUnit:'بسته',unitsPerPurchase:1,packageBuyPrice:0,buy:0,sell:0,stock:0,min:0};let imageData=p.image||'',codes=(p.barcodes&&p.barcodes.length?p.barcodes:['']).slice(0,15),categoryOptions=db.categories.map(function(c){return '<option value="'+c.id+'" '+(c.id===p.categoryId?'selected':'')+'>'+esc(c.name)+'</option>'}).join('');
  const unitsList=['دانه','عدد','بسته','جعبه','کارتن','دوجین','رول','متر','کیلو','لیتر'];
@@ -489,17 +496,17 @@ $('#testOnlineConnection').onclick=testOnlineConnection;$('#syncOnlineNow').oncl
 function maybeAutoOnlineSync(){const s=db.settings;if(!s.onlineEnabled||!normalizedServerUrl(s.onlineServerUrl)||!String(s.onlineStoreCode||'').trim())return;const mins=Math.max(5,Number(s.onlineSyncMinutes)||15),last=s.onlineLastSyncAt?new Date(s.onlineLastSyncAt).getTime():0;if(!last||Date.now()-last>=mins*60000)syncOnlineNow(true)}
 setInterval(maybeAutoOnlineSync,60000);setTimeout(maybeAutoOnlineSync,5000);
 
-$('#unlockDataSupport').onclick=async function(){const password=$('#dataSupportPassword').value;const valid=(window.YaranNative&&window.YaranNative.isNative)?await window.YaranNative.verifyAdmin(password):(password===DATA_SUPPORT_PASSWORD);if(valid){dataSupportUnlocked=true;$('#dataSupportPassword').value='';renderDataSupportAccess();toast('بخش داده‌ها و پشتیبانی باز شد')}else{toast('رمز مدیر نادرست است')}};
+$('#unlockDataSupport').onclick=async function(){const password=$('#dataSupportPassword').value;const valid=(window.AsanNative&&window.AsanNative.isNative)?await window.AsanNative.verifyAdmin(password):false;if(valid){dataSupportUnlocked=true;$('#dataSupportPassword').value='';renderDataSupportAccess();toast('بخش داده‌ها و پشتیبانی باز شد')}else{toast('رمز مدیر نادرست است')}};
 $('#dataSupportPassword').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('#unlockDataSupport').click()}});
 $('#lockDataSupport').onclick=function(){dataSupportUnlocked=false;renderDataSupportAccess();toast('بخش داده‌ها و پشتیبانی قفل شد')};
 if($('#auditLogBtn'))$('#auditLogBtn').onclick=openAuditLog;
 if($('#detectPrinters'))$('#detectPrinters').onclick=async function(){
- if(!(window.YaranNative&&window.YaranNative.isNative)){toast('شناسایی پرینتر در نسخه Native فعال است');return}
- try{const list=await window.YaranNative.printers();const dl=$('#printerList');dl.innerHTML=(list||[]).map(function(n){return '<option value="'+esc(n)+'"></option>'}).join('');if(!list.length){toast('پرینتری در Windows پیدا نشد');return}const current=String(db.settings.printerName||'').trim(),match=list.find(function(n){return n===current})||list.find(function(n){return /xprinter/i.test(n)})||list[0];if(!list.some(function(n){return n===current})){db.settings.printerName=match;$('#printerName').value=match;save()}toast(num(list.length)+' پرینتر شناسایی شد')}catch(e){console.error(e);toast('شناسایی پرینتر انجام نشد')}
+ if(!(window.AsanNative&&window.AsanNative.isNative)){toast('شناسایی پرینتر در نسخه Native فعال است');return}
+ try{const list=await window.AsanNative.printers();const dl=$('#printerList');dl.innerHTML=(list||[]).map(function(n){return '<option value="'+esc(n)+'"></option>'}).join('');if(!list.length){toast('پرینتری در Windows پیدا نشد');return}const current=String(db.settings.printerName||'').trim(),match=list.find(function(n){return n===current})||list.find(function(n){return /xprinter/i.test(n)})||list[0];if(!list.some(function(n){return n===current})){db.settings.printerName=match;$('#printerName').value=match;save()}toast(num(list.length)+' پرینتر شناسایی شد')}catch(e){console.error(e);toast('شناسایی پرینتر انجام نشد')}
 };
 if($('#dbHealthBtn'))$('#dbHealthBtn').onclick=async function(){
- if(!(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.integrityCheck)){toast('بررسی دیتابیس در نسخه Native فعال است');return}
- try{const r=await window.YaranNative.integrityCheck();toast(r&&r.ok?'دیتابیس SQLite سالم است':'دیتابیس نیاز به بررسی دارد');if(r&&!r.ok)console.error('SQLite integrity:',r)}catch(e){console.error(e);toast('بررسی سلامت دیتابیس انجام نشد')}
+ if(!(window.AsanNative&&window.AsanNative.isNative&&window.AsanNative.integrityCheck)){toast('بررسی دیتابیس در نسخه Native فعال است');return}
+ try{const r=await window.AsanNative.integrityCheck();toast(r&&r.ok?'دیتابیس SQLite سالم است':'دیتابیس نیاز به بررسی دارد');if(r&&!r.ok)console.error('SQLite integrity:',r)}catch(e){console.error(e);toast('بررسی سلامت دیتابیس انجام نشد')}
 };
 ['storeName','storeAddress','storePhone','receiptFooter','printerName'].forEach(function(k){$('#'+k).onchange=function(e){db.settings[k]=e.target.value;save()}});['autoPrint','autoCut'].forEach(function(k){$('#'+k).onchange=function(e){db.settings[k]=e.target.checked;save()}});$('#themeSelect').onchange=function(e){db.settings.theme=e.target.value;save()};$('#scannerSuffix').onchange=function(e){db.settings.scannerSuffix=e.target.value;save()};$('#autoBackupPerDay').onchange=function(e){db.settings.autoBackupPerDay=Number(e.target.value)||0;save();maybeAutoBackup(true)};$('#themeToggle').onclick=function(){db.settings.theme=db.settings.theme==='dark'?'light':'dark';save()};$('#moneyToggle').onclick=function(){moneyVisible=!moneyVisible;db.settings.hideDashboardMoney=!moneyVisible;persistState(db);renderDashboard()};$('#reportPeriod').onchange=renderReports;if($('#invoiceReportSearch'))$('#invoiceReportSearch').oninput=renderReports;if($('#invoicePaymentFilter'))$('#invoicePaymentFilter').onchange=renderReports;
 function openPeriodRestartNotice(){
@@ -511,10 +518,10 @@ $('#startNewPeriodBtn').onclick=openPeriodRestartNotice;
 
 function auditActionLabel(action){if(action==='invoice.create')return 'ثبت فاکتور';if(action==='invoice.update')return 'ویرایش فاکتور';if(action==='invoice.delete')return 'حذف فاکتور';return action||'رویداد'}
 async function openAuditLog(){
- if(!(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.auditLog)){toast('سابقه امن در نسخه Native در دسترس است');return}
+ if(!(window.AsanNative&&window.AsanNative.isNative&&window.AsanNative.auditLog)){toast('سابقه امن در نسخه Native در دسترس است');return}
  openModal('سابقه تغییرات فاکتورها','<div class="audit-loading">در حال خواندن سابقه امن SQLite…</div>');
  try{
-  const rows=await window.YaranNative.auditLog(60);
+  const rows=await window.AsanNative.auditLog(60);
   const html=!rows.length?'<div class="audit-empty">هنوز فعالیتی ثبت نشده است.</div>':'<div class="activity-feed">'+rows.map(function(r){const p=r.payload||{},before=p.before||null,after=p.after||null;let detail=p.summary||'ثبت امن تغییر';if(r.action==='invoice.update'&&before&&after){const parts=[];if(Number(before.total)!==Number(after.total))parts.push('مبلغ '+money(before.total||0)+' → '+money(after.total||0));if(before.payment!==after.payment)parts.push('پرداخت '+before.payment+' → '+after.payment);const bq=(before.items||[]).reduce(function(a,i){return a+i.qty},0),aq=(after.items||[]).reduce(function(a,i){return a+i.qty},0);if(bq!==aq)parts.push('اقلام '+num(bq)+' → '+num(aq));detail=parts.join(' · ')||'اطلاعات فاکتور ویرایش شد'}if(r.action==='invoice.delete')detail='فاکتور حذف شد؛ نسخه قبلی محفوظ است';const icon=r.action==='invoice.create'?'＋':r.action==='invoice.delete'?'×':'✎';return '<div class="activity-item '+(r.action==='invoice.delete'?'danger':'')+'"><div class="activity-avatar">'+icon+'</div><div class="activity-bubble"><div><b>'+auditActionLabel(r.action)+'</b>'+(r.invoiceNo!=null?'<span>#'+num(r.invoiceNo)+'</span>':'')+'</div><p>'+esc(detail)+'</p><small>'+formatDateTime(r.createdAt)+'</small></div></div>'}).join('')+'</div>';
   $('#modalContent').innerHTML=html;
  }catch(e){console.error(e);$('#modalContent').innerHTML='<div class="audit-empty">خواندن سابقه تغییرات انجام نشد.</div>'}
@@ -526,140 +533,76 @@ function fitCanvasText(ctx,text,maxWidth){text=String(text||'');if(ctx.measureTe
 async function receiptPngBase64(sale){
  const set=db.settings,W=576,itemH=52,logoExtra=set.storeLogo?92:0,H=470+logoExtra+(sale.items||[]).length*itemH+(sale.discount?34:0);const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#000';x.textBaseline='middle';x.direction='rtl';let y=24;
  if(set.storeLogo){try{const logo=await loadReceiptImage(set.storeLogo);if(logo){const size=72;x.drawImage(logo,(W-size)/2,y,size,size);y+=84}}catch(e){}}
- x.textAlign='center';x.font='700 31px "Segoe UI", Tahoma, Arial';x.fillText(set.storeName||'فروشگاه من',W/2,y);y+=39;
- x.font='18px "Segoe UI", Tahoma, Arial';if(set.storeAddress){x.fillText(fitCanvasText(x,set.storeAddress,W-50),W/2,y);y+=27}if(set.storePhone){x.direction='ltr';x.fillText(String(set.storePhone),W/2,y);x.direction='rtl';y+=27}
+ x.textAlign='center';x.font='700 31px "Vazirmatn", "Nirmala UI", Tahoma, Arial';x.fillText(set.storeName||'فروشگاه من',W/2,y);y+=39;
+ x.font='18px "Vazirmatn", "Nirmala UI", Tahoma, Arial';if(set.storeAddress){x.fillText(fitCanvasText(x,set.storeAddress,W-50),W/2,y);y+=27}if(set.storePhone){x.direction='ltr';x.fillText(String(set.storePhone),W/2,y);x.direction='rtl';y+=27}
  function dash(){y+=9;x.save();x.setLineDash([8,7]);x.strokeStyle='#222';x.lineWidth=1;x.beginPath();x.moveTo(22,y);x.lineTo(W-22,y);x.stroke();x.restore();y+=14}
- dash();x.font='18px "Segoe UI", Tahoma, Arial';x.textAlign='right';x.fillText('فاکتور #'+num(sale.no),W-24,y);x.textAlign='left';x.direction='ltr';x.fillText(formatDateTime(sale.time),24,y);x.direction='rtl';y+=26;dash();
- x.font='700 17px "Segoe UI", Tahoma, Arial';x.textAlign='right';x.fillText('کالا',W-24,y);x.textAlign='center';x.fillText('تعداد',180,y);x.textAlign='left';x.fillText('مبلغ',24,y);y+=28;
- (sale.items||[]).forEach(function(i){x.font='19px "Segoe UI", Tahoma, Arial';x.textAlign='right';x.fillText(fitCanvasText(x,i.name,310),W-24,y);x.textAlign='center';x.direction='rtl';x.fillText(num(i.qty)+' '+String(i.baseUnit||'دانه'),180,y);x.textAlign='left';x.direction='ltr';x.fillText(amount((Number(i.sell)||0)*(Number(i.qty)||0))+' ؋',24,y);x.direction='rtl';y+=itemH});
- dash();function summary(label,val,bold){x.font=(bold?'700 24px':'19px')+' "Segoe UI", Tahoma, Arial';x.textAlign='right';x.fillText(label,W-24,y);x.textAlign='left';x.direction='ltr';x.fillText(val,24,y);x.direction='rtl';y+=bold?36:31}
- summary('جمع',money(sale.subtotal),false);if(sale.discount)summary('تخفیف',money(sale.discount),false);summary('قابل پرداخت',money(sale.total),true);summary('پرداخت',String(sale.payment||'نقدی'),false);dash();x.font='18px "Segoe UI", Tahoma, Arial';x.textAlign='center';x.fillText(fitCanvasText(x,set.receiptFooter||'',W-50),W/2,y);return c.toDataURL('image/png').split(',')[1]
+ dash();x.font='18px "Vazirmatn", "Nirmala UI", Tahoma, Arial';x.textAlign='right';x.fillText('فاکتور #'+num(sale.no),W-24,y);x.textAlign='left';x.direction='ltr';x.fillText(formatDateTime(sale.time),24,y);x.direction='rtl';y+=26;dash();
+ x.font='700 17px "Vazirmatn", "Nirmala UI", Tahoma, Arial';x.textAlign='right';x.fillText('کالا',W-24,y);x.textAlign='center';x.fillText('تعداد',180,y);x.textAlign='left';x.fillText('مبلغ',24,y);y+=28;
+ (sale.items||[]).forEach(function(i){x.font='19px "Vazirmatn", "Nirmala UI", Tahoma, Arial';x.textAlign='right';x.fillText(fitCanvasText(x,i.name,310),W-24,y);x.textAlign='center';x.direction='rtl';x.fillText(num(i.qty)+' '+String(i.baseUnit||'دانه'),180,y);x.textAlign='left';x.direction='ltr';x.fillText(amount((Number(i.sell)||0)*(Number(i.qty)||0))+' ؋',24,y);x.direction='rtl';y+=itemH});
+ dash();function summary(label,val,bold){x.font=(bold?'700 24px':'19px')+' "Vazirmatn", "Nirmala UI", Tahoma, Arial';x.textAlign='right';x.fillText(label,W-24,y);x.textAlign='left';x.direction='ltr';x.fillText(val,24,y);x.direction='rtl';y+=bold?36:31}
+ summary('جمع',money(sale.subtotal),false);if(sale.discount)summary('تخفیف',money(sale.discount),false);summary('قابل پرداخت',money(sale.total),true);summary('پرداخت',String(sale.payment||'نقدی'),false);dash();x.font='18px "Vazirmatn", "Nirmala UI", Tahoma, Arial';x.textAlign='center';x.fillText(fitCanvasText(x,set.receiptFooter||'',W-50),W/2,y);return c.toDataURL('image/png').split(',')[1]
 }
 async function printReceipt(s){
  s=s||lastSale||(db.sales.length?db.sales[db.sales.length-1]:null);if(!s){toast('رسیدی برای چاپ وجود ندارد');return}
- if(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.printReceiptPng&&String(db.settings.printerName||'').trim()){
-  try{const png=await receiptPngBase64(s);await window.YaranNative.printReceiptPng(db.settings.printerName,png);toast('رسید مستقیم چاپ شد');return}catch(e){console.error('Direct print failed:',e);toast('چاپ مستقیم انجام نشد؛ حالت چاپ ویندوز باز می‌شود')}
+ if(window.AsanNative&&window.AsanNative.isNative&&window.AsanNative.printReceiptPng&&String(db.settings.printerName||'').trim()){
+  try{const png=await receiptPngBase64(s);await window.AsanNative.printReceiptPng(db.settings.printerName,png);toast('رسید مستقیم چاپ شد');return}catch(e){console.error('Direct print failed:',e);toast('چاپ مستقیم انجام نشد؛ حالت چاپ ویندوز باز می‌شود')}
  }
  const f=$('#printFrame'),d=f.contentWindow.document;d.open();d.write(receiptHtml(s));d.close()
 }
 $('#testPrint').onclick=function(){printReceipt({no:'TEST',time:new Date().toISOString(),items:[{name:'چاپ آزمایشی حسابداری آسان',qty:1,sell:100,buy:80,baseUnit:'دانه'}],subtotal:100,discount:0,total:100,payment:'نقدی'})};$('#printLastReceipt').onclick=function(){printReceipt()};
 function getLatestAutoBackup(){
- if(window.YaranNative&&window.YaranNative.isNative)return db.settings.lastAutoBackupAt?{time:db.settings.lastAutoBackupAt}:null;
- try{return JSON.parse(localStorage.getItem(AUTO_BACKUP_KEY)||'null')}catch(e){return null}
+ if(window.AsanNative&&window.AsanNative.isNative)return db.settings.lastAutoBackupAt?{time:db.settings.lastAutoBackupAt}:null;
+ return null
 }
 async function createAutoBackup(showToast){
  try{
   const now=new Date().toISOString();
-  if(window.YaranNative&&window.YaranNative.isNative){const path=await window.YaranNative.backup(JSON.stringify(db));if(!path)throw new Error('backup failed');db.settings.lastAutoBackupAt=now;persistState(db)}
-  else localStorage.setItem(AUTO_BACKUP_KEY,JSON.stringify({time:now,data:db}));
+  if(window.AsanNative&&window.AsanNative.isNative){const path=await window.AsanNative.backup(JSON.stringify(db));if(!path)throw new Error('backup failed');db.settings.lastAutoBackupAt=now;persistState(db)}
+  else return false;
   renderAutoBackupStatus();if(showToast)toast('پشتیبان خودکار ثبت شد');return true
  }catch(e){console.error(e);if(showToast)toast('ثبت پشتیبان انجام نشد');return false}
 }
 function maybeAutoBackup(force){const per=Number(db.settings.autoBackupPerDay)||0;if(!per){renderAutoBackupStatus();return}const latest=getLatestAutoBackup(),interval=86400000/per;if(force||!latest||!latest.time||Date.now()-new Date(latest.time).getTime()>=interval)createAutoBackup(false)}
 $('#restoreAutoBackup').onclick=async function(){
  if(!confirm('آخرین پشتیبان خودکار بازیابی شود؟ اطلاعات فعلی با نسخه پشتیبان جایگزین می‌شود.'))return;
- if(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.restoreLatestBackup){try{const ok=await window.YaranNative.restoreLatestBackup();if(!ok){toast('پشتیبان Native وجود ندارد');return}toast('پشتیبان بازیابی شد؛ حسابداری آسان دوباره بارگذاری می‌شود');setTimeout(function(){location.reload()},700)}catch(e){console.error(e);toast('بازیابی پشتیبان انجام نشد')}return}
+ if(window.AsanNative&&window.AsanNative.isNative&&window.AsanNative.restoreLatestBackup){try{const ok=await window.AsanNative.restoreLatestBackup();if(!ok){toast('پشتیبان Native وجود ندارد');return}toast('پشتیبان بازیابی شد؛ حسابداری آسان دوباره بارگذاری می‌شود');setTimeout(function(){location.reload()},700)}catch(e){console.error(e);toast('بازیابی پشتیبان انجام نشد')}return}
  const x=getLatestAutoBackup();if(!x||!x.data){toast('پشتیبان خودکاری وجود ندارد');return}db=normalizeDB(clone(x.data));moneyVisible=!db.settings.hideDashboardMoney;save();toast('پشتیبان خودکار بازیابی شد')
 };
-$('#storeLogoInput').onchange=async function(e){const f=e.target.files[0];if(!f)return;try{db.settings.storeLogo=await resizeImage(f);save();toast('لوگو ذخیره شد')}catch(err){toast('فایل لوگو معتبر نیست')}};
+if($('#managerName'))$('#managerName').onchange=function(e){db.settings.managerName=(e.target.value||'').trim()||'مدیر سیستم';save()};
+if($('#managerPhotoInput'))$('#managerPhotoInput').onchange=async function(e){const f=e.target.files[0];if(!f)return;if(f.size>5*1024*1024){toast('حجم تصویر زیاد است');e.target.value='';return}try{db.settings.managerPhoto=await resizeImage(f,256);save();toast('تصویر مدیر ذخیره شد')}catch(err){toast('فایل تصویر معتبر نیست')}};
+if($('#removeManagerPhoto'))$('#removeManagerPhoto').onclick=function(){db.settings.managerPhoto='';$('#managerPhotoInput').value='';save()};
+$('#storeLogoInput').onchange=async function(e){const f=e.target.files[0];if(!f)return;if(f.size>5*1024*1024){toast('حجم تصویر زیاد است');e.target.value='';return}try{db.settings.storeLogo=await resizeImage(f,320);save();toast('لوگوی فروشگاه ذخیره شد')}catch(err){toast('فایل لوگو معتبر نیست')}};
 $('#removeStoreLogo').onclick=function(){db.settings.storeLogo='';$('#storeLogoInput').value='';save()};
-$('#backupBtn').onclick=async function(){try{if(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.exportBackup){const path=await window.YaranNative.exportBackup(JSON.stringify(db));toast(path?'Backup در Downloads ذخیره شد':'ذخیره Backup انجام نشد');return}const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hesabdari-asan-backup-'+dateKey()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},500)}catch(e){console.error(e);toast('ذخیره Backup انجام نشد')}};
+$('#backupBtn').onclick=async function(){try{if(window.AsanNative&&window.AsanNative.isNative&&window.AsanNative.exportBackup){const path=await window.AsanNative.exportBackup(JSON.stringify(db));toast(path?'Backup در Downloads ذخیره شد':'ذخیره Backup انجام نشد');return}const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hesabdari-asan-backup-'+dateKey()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},500)}catch(e){console.error(e);toast('ذخیره Backup انجام نشد')}};
 $('#restoreFile').onchange=async function(e){const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!x.products||!x.settings)throw new Error('bad');db=normalizeDB(x);moneyVisible=!db.settings.hideDashboardMoney;save();toast('Backup بازیابی شد')}catch(err){toast('فایل Backup معتبر نیست')}};
-function buildTrainingDemo(){
- const now=new Date(),D=clone(DEFAULT),start=new Date(now);start.setMonth(start.getMonth()-2);start.setDate(start.getDate()-10);start.setHours(8,0,0,0);
- D.settings=Object.assign({},db.settings,{storeName:'فروشگاه آموزشی حسابداری آسان',storeAddress:'نسخه آموزشی کامل · 2 ماه و 10 روز',storePhone:'0700000000',demoMode:true,workDayDate:dateKey(),workDayStartedAt:new Date(now.getFullYear(),now.getMonth(),now.getDate(),8,10).toISOString()});
- D.categories=[
-  {id:'cat-general',name:'عمومی'},{id:'cat-food',name:'خوراکی و نوشیدنی'},{id:'cat-dairy',name:'لبنیات'},{id:'cat-stationery',name:'قرطاسیه'},
-  {id:'cat-home',name:'لوازم خانه'},{id:'cat-hygiene',name:'بهداشتی'},{id:'cat-sewing',name:'خیاطی'},{id:'cat-snacks',name:'تنقلات'}
- ];
- const P=function(idv,name,cat,producer,barcode,buy,sell,stock,min,base,purchase,units){
-  return {id:idv,name:name,categoryId:cat,producer:producer,barcodes:[barcode],barcode:barcode,baseUnit:base||'دانه',purchaseUnit:purchase||base||'دانه',unitConversionEnabled:(units||1)>1,unitsPerPurchase:units||1,packageBuyPrice:buy*(units||1),buy:buy,sell:sell,stock:stock,min:min,image:''}
- };
- D.products=[
-  P('p1','شیر 1 لیتر','cat-dairy','لبنیات پامیر','6291000000001',45,62,0,12,'دانه','کارتن',12),
-  P('p2','ماست 500 گرم','cat-dairy','لبنیات پامیر','6291000000002',32,45,0,10,'دانه','کارتن',12),
-  P('p3','آب معدنی 1.5 لیتر','cat-food','آب هریوا','6291000000003',18,25,0,20,'دانه','کارتن',12),
-  P('p4','نوشابه 330ml','cat-food','نوشابه شرق','6291000000004',24,35,0,18,'دانه','کارتن',24),
-  P('p5','چای سیاه 500 گرم','cat-food','چای بهار','6291000000005',145,180,0,5),
-  P('p6','بسکویت ساده','cat-snacks','شیرین هرات','6291000000006',28,40,0,12,'دانه','کارتن',24),
-  P('p7','شکلات تخته‌ای','cat-snacks','شیرین هرات','6291000000007',20,30,0,15,'دانه','جعبه',30),
-  P('p8','قلم آبی','cat-stationery','قلم آریا','6291000000008',15,25,0,20,'دانه','جعبه',24),
-  P('p9','قلم مشکی','cat-stationery','قلم آریا','6291000000009',15,25,0,20,'دانه','جعبه',24),
-  P('p10','کتابچه 80 برگ','cat-stationery','دفتر سپید','6291000000010',58,85,0,8,'دانه','بسته',12),
-  P('p11','کاغذ A4 بسته 500','cat-stationery','Paper One','6291000000011',265,320,0,4),
-  P('p12','مایع ظرفشویی','cat-home','خانه پاک','6291000000012',92,125,0,6),
-  P('p13','دستمال کاغذی','cat-hygiene','پاکیزه','6291000000013',42,58,0,10,'دانه','بسته',12),
-  P('p14','صابون','cat-hygiene','پاکیزه','6291000000014',25,38,0,10,'دانه','کارتن',24),
-  P('p15','نخ خیاطی','cat-sewing','نخ هریوا','6291000000015',12,20,0,25,'دانه','جعبه',50),
-  P('p16','سوزن خیاطی بسته','cat-sewing','ابزار خیاطی شرق','6291000000016',18,30,0,15,'بسته','جعبه',20),
-  P('p17','باتری قلمی جفت','cat-home','Power Cell','6291000000017',32,50,0,10,'جفت','بسته',12),
-  P('p18','کیسه زباله رول','cat-home','خانه پاک','6291000000018',35,50,0,8,'رول','کارتن',24)
- ];
- D.products[7].barcodes.push('12345678901234567890123456789');
- D.customers=[
-  {id:'c0',name:'مشتری عمومی',phone:'',balance:0},
-  {id:'c1',name:'احمد رحیمی',phone:'0701000001',balance:0},{id:'c2',name:'فاطمه احمدی',phone:'0701000002',balance:0},
-  {id:'c3',name:'محمد کریمی',phone:'0701000003',balance:0},{id:'c4',name:'مریم نوری',phone:'0701000004',balance:0},
-  {id:'c5',name:'فروشگاه همکار بهار',phone:'0701000005',balance:0},{id:'c6',name:'علی رضایی',phone:'0701000006',balance:0},
-  {id:'c7',name:'سارا حسینی',phone:'0701000007',balance:0},{id:'c8',name:'کتاب‌فروشی دانش',phone:'0701000008',balance:0},
-  {id:'c9',name:'خیاطی ستاره',phone:'0701000009',balance:0},{id:'c10',name:'حمید صادقی',phone:'0701000010',balance:0}
- ];
- D.suppliers=[
-  {id:'s1',name:'شرکت پخش هریوا',phone:'0792000001',balance:0},{id:'s2',name:'لبنیات پامیر',phone:'0792000002',balance:0},
-  {id:'s3',name:'قرطاسیه مرکزی',phone:'0792000003',balance:0},{id:'s4',name:'خانه پاک',phone:'0792000004',balance:0},
-  {id:'s5',name:'شیرین هرات',phone:'0792000005',balance:0},{id:'s6',name:'بازرگانی عمومی شرق',phone:'0792000006',balance:0}
- ];
- D.sales=[];D.purchases=[];D.inventory=[];D.expenses=[];D.supplierPayments=[];D.customerReceipts=[];D.inventorySnapshots=[];D.financialPeriods=[];D.deletedSales=[];
- D.financialPeriod={no:1,start:start.toISOString()};
- function at(offset,h,m){const d=new Date(start);d.setDate(d.getDate()+offset);d.setHours(h||10,m==null?15:m,0,0);return d.toISOString()}
- const dayCount=Math.max(1,Math.floor((new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime()-start.getTime())/86400000)+1);
- const opening={};D.products.forEach(function(p,i){opening[p.id]=90+(i%6)*18});
- let purNo=1;
- for(let day=1;day<dayCount;day+=4){
-  const p=D.products[(day*3)%D.products.length],sup=D.suppliers[(day+1)%D.suppliers.length],pack=p.unitConversionEnabled,qty=pack?(1+(day%4)):(8+(day%12)),units=pack?qty*p.unitsPerPurchase:qty,total=units*p.buy,payment=(purNo%2===0?'نسیه':'نقدی');
-  D.purchases.push({id:'demo-pur-'+purNo++,time:at(day,10,20),productId:p.id,productName:p.name,supplierId:sup.id,supplierName:sup.name,purchaseMode:pack?'package':'unit',qty:qty,unitsAdded:units,unitCost:p.buy,total:total,payment:payment});
-  if(payment==='نسیه')sup.balance+=total;opening[p.id]+=units;
- }
- let no=1;
- for(let day=0;day<dayCount;day++){
-  const count=2+(day%5);
-  for(let j=0;j<count;j++){
-   const p=D.products[(day*2+j*5)%D.products.length],qty=1+((day+j)%3),credit=((day+j)%8===0),cust=credit?D.customers[1+((day+j)%10)]:D.customers[0],discount=((day+j)%13===0)?5:0,total=Math.max(0,p.sell*qty-discount);
-   const sl={id:'demo-sale-'+day+'-'+j,no:no++,time:at(day,9+j*2,(day+j*7)%55),items:[{id:p.id,name:p.name,barcode:p.barcode,buy:p.buy,sell:p.sell,qty:qty,baseUnit:p.baseUnit}],subtotal:p.sell*qty,discount:discount,total:total,payment:credit?'نسیه':'نقدی',customerId:cust.id,revisions:[]};
-   D.sales.push(sl);opening[p.id]-=qty;if(credit)cust.balance+=total
-  }
-  if(day%5===0)D.expenses.push({id:'demo-exp-'+day,time:at(day,17,10),category:['حمل‌ونقل','برق','مصارف روزانه','بسته‌بندی'][day%4],amount:120+(day%7)*45,note:'نمونه آموزشی'});
-  if(day%7===0){const c=D.customers[1+((day/7)%10|0)],amt=Math.min(220+(day%4)*80,Math.max(0,c.balance));if(amt>0){D.customerReceipts.push({id:'demo-cr-'+day,time:at(day,15,10),customerId:c.id,customerName:c.name,amount:amt,note:'دریافت بخشی از قرض'});c.balance=Math.max(0,c.balance-amt)}}
-  if(day%8===0){const s=D.suppliers[(day/8)%D.suppliers.length|0],amt=Math.min(450+(day%4)*100,Math.max(0,s.balance));if(amt>0){D.supplierPayments.push({id:'demo-sp-'+day,time:at(day,14,20),supplierId:s.id,supplierName:s.name,amount:amt,note:'پرداخت دوره‌ای'});s.balance=Math.max(0,s.balance-amt)}}
- }
- D.products.forEach(function(p,i){D.inventory.push({id:'demo-open-'+p.id,time:at(0,8,5),productId:p.id,productName:p.name,type:'موجودی اولیه',qty:90+(i%6)*18,ref:'شروع نسخه آموزشی'})});
- D.purchases.forEach(function(x){D.inventory.push({id:'inv-p-'+x.id,time:x.time,productId:x.productId,productName:x.productName,type:'خرید',qty:x.unitsAdded,ref:x.supplierName})});
- D.sales.forEach(function(sl){sl.items.forEach(function(i){D.inventory.push({id:'inv-s-'+sl.id+'-'+i.id,time:sl.time,productId:i.id,productName:i.name,type:'فروش',qty:-i.qty,ref:'#'+sl.no})})});
- [5,11,16].forEach(function(idx,n){const p=D.products[idx],q=n===1?-2:3;opening[p.id]+=q;D.inventory.push({id:'demo-adj-'+n,time:at(Math.max(3,dayCount-18+n*4),18,5),productId:p.id,productName:p.name,type:'اصلاح موجودی',qty:q,ref:'انبارگردانی آموزشی'})});
- D.products.forEach(function(p){p.stock=Math.max(0,Math.round(opening[p.id]))});
- D.products[1].stock=0;D.products[9].stock=4;D.products[14].stock=9;
- for(let d=0;d<dayCount;d+=5){const sd=new Date(start);sd.setDate(sd.getDate()+d);D.inventorySnapshots.push({date:dateKey(sd),value:D.products.reduce(function(a,p){return a+p.buy*Math.max(0,p.stock+(dayCount-d)%9)},0)})}
- return normalizeDB(D)
+if($('#resetApp'))$('#resetApp').onclick=function(){if(confirm('تمام اطلاعات حسابداری آسان به حالت اولیه بازنشانی شود؟ این کار قابل برگشت نیست.')){db=normalizeDB(clone(DEFAULT));moneyVisible=true;save();toast('حسابداری آسان به حالت اولیه بازنشانی شد')}};
+$('#exportCsv').onclick=async function(){const list=filteredSalesForReport(),lines=[['شماره فاکتور','تاریخ و زمان','مشتری','روش پرداخت','تعداد اقلام','مبلغ'],...list.map(function(s){const c=db.customers.find(function(x){return x.id===s.customerId});return [s.no,formatDateTime(s.time),c?c.name:'',s.payment,s.items.reduce(function(a,i){return a+i.qty},0),s.total]})],csv='\ufeff'+lines.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),filename='hesabdari-asan-sales-'+dateKey()+'.csv';try{if(window.AsanNative&&window.AsanNative.isNative&&window.AsanNative.exportText){const path=await window.AsanNative.exportText(filename,csv);toast(path?'فایل CSV در Downloads ذخیره شد':'خروجی CSV انجام نشد');return}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},500)}catch(e){console.error(e);toast('خروجی CSV انجام نشد')}};
+
+async function setupFirstRun(){
+ const overlay=$('#firstRun');if(!overlay)return;
+ if(db.settings.onboardingComplete){overlay.classList.add('hidden');return}
+ overlay.classList.remove('hidden');
+ $('#firstRunStoreName').value=db.settings.storeName||'';$('#firstRunAddress').value=db.settings.storeAddress||'';$('#firstRunPhone').value=db.settings.storePhone||'';$('#firstRunTheme').value=db.settings.theme||'light';$('#firstRunBackup').value=String(db.settings.autoBackupPerDay||4);
+ const detect=$('#firstRunDetectPrinters');if(detect)detect.onclick=async function(){if(!(window.AsanNative&&window.AsanNative.isNative)){toast('شناسایی پرینتر فقط در برنامه Windows فعال است');return}const list=await window.AsanNative.printers();const select=$('#firstRunPrinter');select.innerHTML='<option value="">بعداً تنظیم می‌کنم</option>'+list.map(function(n){return '<option value="'+esc(n)+'">'+esc(n)+'</option>'}).join('');if(list.length){const xp=list.find(function(n){return /xprinter/i.test(n)})||list[0];select.value=xp}toast(num(list.length)+' پرینتر شناسایی شد')};
+ $('#firstRunForm').onsubmit=async function(e){e.preventDefault();const name=$('#firstRunStoreName').value.trim(),pass=$('#firstRunPassword').value,confirmPass=$('#firstRunPasswordConfirm').value;if(!name){toast('نام فروشگاه را وارد کنید');return}if(pass.length<4){toast('رمز مدیر حداقل 4 کاراکتر باشد');return}if(pass!==confirmPass){toast('تکرار رمز مدیر یکسان نیست');return}if(!(window.AsanNative&&window.AsanNative.isNative&&window.AsanNative.changeAdminPassword)){toast('هسته Native در دسترس نیست');return}try{await window.AsanNative.changeAdminPassword(pass)}catch(err){console.error(err);toast('ذخیره رمز مدیر انجام نشد');return}db.settings.storeName=name;db.settings.storeAddress=$('#firstRunAddress').value.trim();db.settings.storePhone=$('#firstRunPhone').value.trim();db.settings.printerName=$('#firstRunPrinter').value||'';db.settings.theme=$('#firstRunTheme').value||'light';db.settings.autoBackupPerDay=Number($('#firstRunBackup').value)||4;db.settings.onboardingComplete=true;persistState(db);overlay.classList.add('hidden');applyTheme();renderAll();toast('حسابداری آسان آماده استفاده است')}
 }
-if($('#loadTrainingDemo'))$('#loadTrainingDemo').onclick=async function(){
- if(!confirm('نسخه آموزشی کامل 2 ماه و 10 روزه بارگذاری شود؟ ابتدا از اطلاعات فعلی Backup گرفته می‌شود و سپس کالاها، دسته‌ها، مشتریان، شرکت‌ها، خرید، فروش، قرض، هزینه و انبار با داده آموزشی پر می‌شوند.'))return;
- if(window.YaranNative&&window.YaranNative.isNative)await createAutoBackup(false);
- db=buildTrainingDemo();moneyVisible=true;await persistState(db);renderAll();closeModal();toast('نسخه آموزشی 2 ماه و 10 روزه فعال شد')
-};
-$('#resetDemo').onclick=function(){if(confirm('تمام اطلاعات حسابداری آسان به حالت اولیه بازنشانی شود؟ این کار قابل برگشت نیست.')){db=normalizeDB(clone(DEFAULT));moneyVisible=true;save();toast('حسابداری آسان به حالت اولیه بازنشانی شد')}};
-$('#exportCsv').onclick=async function(){const list=filteredSalesForReport(),lines=[['شماره فاکتور','تاریخ و زمان','مشتری','روش پرداخت','تعداد اقلام','مبلغ'],...list.map(function(s){const c=db.customers.find(function(x){return x.id===s.customerId});return [s.no,formatDateTime(s.time),c?c.name:'',s.payment,s.items.reduce(function(a,i){return a+i.qty},0),s.total]})],csv='\ufeff'+lines.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),filename='hesabdari-asan-sales-'+dateKey()+'.csv';try{if(window.YaranNative&&window.YaranNative.isNative&&window.YaranNative.exportText){const path=await window.YaranNative.exportText(filename,csv);toast(path?'فایل CSV در Downloads ذخیره شد':'خروجی CSV انجام نشد');return}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},500)}catch(e){console.error(e);toast('خروجی CSV انجام نشد')}};
+
+function openChangeAdminPassword(){
+ openModal('تغییر رمز مدیر','<form id="changeAdminPasswordForm" class="modal-form"><label class="field"><span>رمز فعلی</span><input name="current" type="password" required></label><label class="field"><span>رمز جدید</span><input name="next" type="password" minlength="4" required></label><label class="field"><span>تکرار رمز جدید</span><input name="confirm" type="password" minlength="4" required></label><div class="modal-actions"><button type="button" id="cancelPasswordChange" class="ghost-btn">انصراف</button><button class="primary-btn">ذخیره رمز جدید</button></div></form>');
+ $('#cancelPasswordChange').onclick=closeModal;$('#changeAdminPasswordForm').onsubmit=async function(e){e.preventDefault();const f=new FormData(e.target),current=String(f.get('current')||''),next=String(f.get('next')||''),confirmNext=String(f.get('confirm')||'');if(next.length<4){toast('رمز جدید حداقل 4 کاراکتر باشد');return}if(next!==confirmNext){toast('تکرار رمز یکسان نیست');return}if(!(await window.AsanNative.verifyAdmin(current))){toast('رمز فعلی نادرست است');return}try{await window.AsanNative.changeAdminPassword(next);closeModal();toast('رمز مدیر تغییر کرد')}catch(err){console.error(err);toast('تغییر رمز انجام نشد')}}
+}
+if($('#changeAdminPassword'))$('#changeAdminPassword').onclick=openChangeAdminPassword;
 
 function markScannerDetected(code){scannerDetectedAt=Date.now();if($('#scannerStatusPill')){$('#scannerStatusPill').textContent='متصل / فعال';$('#scannerStatusPill').className='pill success'}if($('#scannerStatusTitle'))$('#scannerStatusTitle').textContent='بارکدخوان فعال است';if($('#scannerStatusHint'))$('#scannerStatusHint').textContent='اسکن سریع USB HID شناسایی شد.';if($('#lastScan'))$('#lastScan').textContent='آخرین اسکن: '+code+' · '+formatTime(new Date())}
 function refreshScannerStatus(){if(!$('#scannerStatusPill'))return;if(!scannerDetectedAt){$('#scannerStatusPill').textContent='شناسایی نشده';$('#scannerStatusPill').className='pill warning';return}if(Date.now()-scannerDetectedAt>300000){$('#scannerStatusPill').textContent='وضعیت نامشخص';$('#scannerStatusPill').className='pill warning';if($('#scannerStatusHint'))$('#scannerStatusHint').textContent='در 5 دقیقه اخیر اسکن دریافت نشده؛ برای بررسی یک بارکد اسکن کنید.'}}
 $('#globalSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){const q=e.target.value.trim();if(q){go('pos');$('#barcodeInput').value=q;renderPosSearch(q);$('#barcodeInput').focus();e.target.value=''}}});
 document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key.toLowerCase()==='k'){e.preventDefault();$('#globalSearch').focus()}if(e.key==='F4'){e.preventDefault();if($('#page-pos').classList.contains('active'))checkout()}if(e.ctrlKey&&e.key.toLowerCase()==='p'){e.preventDefault();printReceipt()}});
 let scanBuffer='',scanLast=0;document.addEventListener('keydown',function(e){if(['INPUT','TEXTAREA','SELECT'].indexOf(document.activeElement&&document.activeElement.tagName)>-1)return;const now=performance.now();if(now-scanLast>80)scanBuffer='';scanLast=now;const suffix=db.settings.scannerSuffix||'Enter';if(e.key===suffix||e.key==='Enter'){if(scanBuffer.length>=5){const b=scanBuffer;scanBuffer='';markScannerDetected(b);if(!$('#page-pos').classList.contains('active'))go('pos');findAndAdd(b)}return}if(e.key.length===1)scanBuffer+=e.key});
-if($('#creatorContact'))$('#creatorContact').onclick=async function(e){e.preventDefault();const url=this.href;try{if(window.YaranNative&&window.YaranNative.openExternal){await window.YaranNative.openExternal(url)}else window.open(url,'_blank')}catch(err){window.open(url,'_blank')}};
+if($('#creatorContact'))$('#creatorContact').onclick=async function(e){e.preventDefault();const url=this.href;try{if(window.AsanNative&&window.AsanNative.openExternal){await window.AsanNative.openExternal(url)}else window.open(url,'_blank')}catch(err){window.open(url,'_blank')}};
 $('#menuBtn').onclick=function(){$('.sidebar').classList.toggle('open')};
 setInterval(renderWorkSession,1000);setInterval(refreshScannerStatus,30000);setInterval(function(){maybeAutoBackup(false)},60000);
-updateInventorySnapshot();applyTheme();renderAll();renderPaymentRequirement();maybeAutoBackup(false);
+updateInventorySnapshot();applyTheme();renderAll();renderPaymentRequirement();setupFirstRun();maybeAutoBackup(false);
 (async function setupCloseProtection(){try{if(window.__TAURI__&&window.__TAURI__.window&&window.__TAURI__.window.getCurrentWindow){const win=window.__TAURI__.window.getCurrentWindow();await win.onCloseRequested(async function(e){e.preventDefault();if(!confirm('آیا برنامه بسته شود؟ قبل از خروج یک پشتیبان سبک از دیتابیس گرفته می‌شود.'))return;try{await createAutoBackup(false)}catch(ignore){}await win.destroy()})}}catch(e){console.warn('close protection unavailable',e)}})();
-
 
 /* table-wrap vertical wheel forwarding: horizontal tables never trap page scrolling */
 document.addEventListener('wheel',function(e){
@@ -680,4 +623,147 @@ document.addEventListener('wheel',function(e){
   document.addEventListener('dragstart', function(e){
     if(!(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) e.preventDefault();
   });
+})();
+
+/* حسابداری آسان v3 — UI + pagination + archive + advanced reports */
+(function(){
+  const state={products:1,inventory:1,ledger:1,customers:1,suppliers:1,categories:1,expenses:1,reports:1,archive:1};
+  let customReportRange={from:'',to:''};
+  const reportSeries=new Set(['sales','expenses','debt','payments','profit']);
+
+  function value(id, fallback){const el=document.getElementById(id);return el?el.value:fallback}
+  function pageSize(id,fallback){return Math.max(1,Number(value(id,fallback))||fallback)}
+  function pageSlice(rows,page,size){const pages=Math.max(1,Math.ceil(rows.length/size));page=Math.max(1,Math.min(page,pages));return {rows:rows.slice((page-1)*size,page*size),page:page,pages:pages,total:rows.length}}
+  function pagination(id,total,page,size,key){
+    const el=document.getElementById(id);if(!el)return;const pages=Math.max(1,Math.ceil(total/size));page=Math.max(1,Math.min(page,pages));state[key]=page;
+    if(total<=size){el.innerHTML=total?'<span class="page-info">'+num(total)+' مورد</span>':'';return}
+    let out='<button data-pg="'+(page-1)+'" '+(page<=1?'disabled':'')+'>‹</button>';
+    let start=Math.max(1,page-2),end=Math.min(pages,start+4);start=Math.max(1,end-4);
+    for(let p=start;p<=end;p++)out+='<button data-pg="'+p+'" class="'+(p===page?'active':'')+'">'+num(p)+'</button>';
+    out+='<button data-pg="'+(page+1)+'" '+(page>=pages?'disabled':'')+'>›</button><span class="page-info">صفحه '+num(page)+' از '+num(pages)+' · '+num(total)+' مورد</span>';
+    el.innerHTML=out;el.querySelectorAll('[data-pg]').forEach(function(b){b.onclick=function(){const p=Number(b.dataset.pg);if(p>=1&&p<=pages){state[key]=p;renderAllV3()}}});
+  }
+  function truncateText(s,n){s=String(s||'');return s.length>n?s.slice(0,n-1)+'…':s}
+  function menuActions(items){return '<details class="row-menu"><summary title="عملیات">•••</summary><div class="row-menu-pop">'+items.join('')+'</div></details>'}
+  function customerById(idv){return db.customers.find(function(c){return c.id===idv})||db.customers[0]}
+
+  periodBounds=function(period){
+    const now=new Date(),dayStart=function(d){const x=new Date(d);x.setHours(0,0,0,0);return x},dayEnd=function(d){const x=new Date(d);x.setHours(23,59,59,999);return x};
+    if(period==='today')return {start:dayStart(now),end:dayEnd(now)};
+    if(period==='yesterday'){const d=new Date(now);d.setDate(d.getDate()-1);return {start:dayStart(d),end:dayEnd(d)}}
+    if(period==='last7'){const s=dayStart(now);s.setDate(s.getDate()-6);return {start:s,end:dayEnd(now)}}
+    if(period==='month')return {start:new Date(now.getFullYear(),now.getMonth(),1),end:dayEnd(now)};
+    if(period==='prevmonth')return {start:new Date(now.getFullYear(),now.getMonth()-1,1),end:new Date(now.getFullYear(),now.getMonth(),0,23,59,59,999)};
+    if(period==='financial')return {start:new Date(db.financialPeriod.start),end:dayEnd(now)};
+    if(period==='custom'&&customReportRange.from){const s=new Date(customReportRange.from+'T00:00:00'),e=customReportRange.to?new Date(customReportRange.to+'T23:59:59'):dayEnd(now);return {start:s,end:e}}
+    return {start:null,end:null};
+  };
+  reportLabel=function(period){if(period==='today')return 'امروز';if(period==='yesterday')return 'دیروز';if(period==='last7')return '7 روز گذشته';if(period==='month')return 'ماه جاری';if(period==='prevmonth')return 'ماه قبل';if(period==='financial')return accountingPeriodName(db.financialPeriod.no)+' · '+accountingMonthName();if(period==='custom')return 'بازه سفارشی';return 'کل اطلاعات'};
+
+  function dayData(start,end){
+    const out=[],d=new Date(start);d.setHours(12,0,0,0);const stop=new Date(end);stop.setHours(12,0,0,0);
+    while(d<=stop){out.push(new Date(d));d.setDate(d.getDate()+1)}return out;
+  }
+  function reportBuckets(period){
+    const b=periodBounds(period),now=new Date();
+    if(period==='today'||period==='yesterday'){
+      const base=b.start||now,rows=[];for(let h=0;h<24;h+=4){const s=new Date(base);s.setHours(h,0,0,0);const e=new Date(base);e.setHours(h+3,59,59,999);rows.push({start:s,end:e,label:pad(h)+':00'})}return rows;
+    }
+    let start=b.start,end=b.end||now;if(!start){start=new Date(now);start.setDate(start.getDate()-29);start.setHours(0,0,0,0)}
+    let days=dayData(start,end);let group=Math.max(1,Math.ceil(days.length/42)),rows=[];
+    for(let i=0;i<days.length;i+=group){const s=new Date(days[i]);s.setHours(0,0,0,0);const last=days[Math.min(days.length-1,i+group-1)],e=new Date(last);e.setHours(23,59,59,999);rows.push({start:s,end:e,label:group===1?pad(s.getDate())+'/'+pad(s.getMonth()+1):pad(s.getDate())+'/'+pad(s.getMonth()+1)})}
+    return rows;
+  }
+  function between(list,s,e){return list.filter(function(x){const t=new Date(x.time);return t>=s&&t<=e})}
+  function bucketMetrics(bucket){
+    const sales=between(db.sales,bucket.start,bucket.end),expenses=between(db.expenses,bucket.start,bucket.end),receipts=between(db.customerReceipts,bucket.start,bucket.end);
+    const salesTotal=sales.reduce(function(a,s){return a+(Number(s.total)||0)},0),debt=sales.filter(function(s){return s.payment==='نسیه'}).reduce(function(a,s){return a+(Number(s.total)||0)},0),exp=expenses.reduce(function(a,x){return a+(Number(x.amount)||0)},0),payments=receipts.reduce(function(a,x){return a+(Number(x.amount)||0)},0),unknown=sales.some(saleHasUnknownCost),profit=unknown?null:sales.reduce(function(a,s){return a+(saleProfit(s)||0)},0)-exp;
+    return {label:bucket.label,start:bucket.start,end:bucket.end,sales:salesTotal,expenses:exp,debt:debt,payments:payments,profit:profit};
+  }
+  function renderReportTrendChart(){
+    const root=document.getElementById('reportTrendChart');if(!root)return;const period=value('reportPeriod','month'),data=reportBuckets(period).map(bucketMetrics),keys=Array.from(reportSeries);const hasValue=data.some(function(d){return keys.some(function(k){return d[k]!=null&&Math.abs(d[k])>0})});
+    if(!data.length||!hasValue){root.innerHTML='<div class="chart-empty-state"><div class="chart-empty-icon">▥</div><b>در این بازه داده مالی ثبت نشده</b><span>با ثبت فروش، هزینه، قرض یا پرداخت، نمودار خودکار فعال می‌شود.</span></div>';return}
+    const W=980,H=300,L=58,R=18,T=20,B=40,pw=W-L-R,ph=H-T-B,vals=[];data.forEach(function(d){keys.forEach(function(k){if(d[k]!=null)vals.push(d[k])})});let min=Math.min.apply(null,[0].concat(vals)),max=Math.max.apply(null,[1].concat(vals));if(min===max)max=min+1;const s0=max-min;max+=s0*.08;if(min<0)min-=s0*.08;else min=0;const span=max-min||1,x=function(i){return data.length===1?L+pw/2:L+i/(data.length-1)*pw},y=function(v){return T+(max-v)/span*ph};
+    let grid='',yl='',xl='';for(let i=0;i<5;i++){const yy=T+ph*i/4,v=max-span*i/4;grid+='<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="currentColor" stroke-opacity=".16"/>';yl+='<text x="'+(L-9)+'" y="'+(yy+4)+'" text-anchor="end" fill="currentColor" opacity=".72" font-size="10">'+(moneyVisible?esc(amount(v)):'•••')+'</text>'}const step=data.length<=8?1:Math.ceil(data.length/7);data.forEach(function(d,i){if(i%step&&i!==data.length-1)return;xl+='<text x="'+x(i)+'" y="'+(H-13)+'" text-anchor="middle" fill="currentColor" opacity=".75" font-size="10">'+esc(d.label)+'</text>'});
+    const colors={sales:'#2f80ed',expenses:'#e05260',debt:'#8a63d2',payments:'#1aa7a1',profit:'#26a269'};function pathFor(k){const pts=data.map(function(d,i){return d[k]==null?null:{x:x(i),y:y(d[k])}}).filter(Boolean);return chartSmoothPath(pts)}let paths='';keys.forEach(function(k){const p=pathFor(k);if(p)paths+='<path d="'+p+'" fill="none" stroke="'+colors[k]+'" stroke-width="2.45" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'});let hits='';data.forEach(function(d,i){const cx=x(i),half=data.length>1?pw/(data.length-1)/2:pw/2;hits+='<rect class="report-chart-hit" data-i="'+i+'" x="'+Math.max(L,cx-half)+'" y="'+T+'" width="'+Math.min(pw,half*2)+'" height="'+ph+'" fill="transparent"/>'});
+    root.innerHTML='<div class="report-chart-stage"><svg class="clean-svg-chart" viewBox="0 0 '+W+' '+H+'" role="img" style="background:transparent;color:var(--muted)">'+grid+'<line x1="'+L+'" y1="'+y(0)+'" x2="'+(W-R)+'" y2="'+y(0)+'" stroke="currentColor" stroke-opacity=".27" stroke-dasharray="4 4"/>'+yl+xl+paths+hits+'</svg><div class="report-chart-cross"></div><div class="report-chart-tooltip"></div></div>';
+    const tt=root.querySelector('.report-chart-tooltip'),cross=root.querySelector('.report-chart-cross'),stage=root.querySelector('.report-chart-stage'),labels={sales:'فروش',expenses:'هزینه',debt:'قرض',payments:'پرداخت',profit:'سود خالص'};root.querySelectorAll('.report-chart-hit').forEach(function(hit){hit.onpointerenter=hit.onpointermove=function(){const i=Number(hit.dataset.i),d=data[i],r=stage.getBoundingClientRect(),xx=x(i)/W*r.width;cross.style.left=xx+'px';cross.classList.add('show');let lines='';keys.forEach(function(k){if(d[k]==null)return;lines+='<span>'+labels[k]+'<strong>'+maskedMoney(d[k])+'</strong></span>'});tt.innerHTML='<b>'+formatDate(d.start)+'</b>'+lines;tt.classList.add('show');tt.style.left=Math.max(8,Math.min(r.width-205,xx+10))+'px';tt.style.top='18px'};hit.onpointerleave=function(){tt.classList.remove('show');cross.classList.remove('show')}});
+  }
+
+
+  renderDashboard=function(){
+    const s=salesToday(),total=s.reduce(function(a,x){return a+x.total},0),low=db.products.filter(function(p){return p.stock<=p.min}),expenseToday=totalAmounts(periodExpenses('today'));
+    $('#mSales').textContent=maskedMoney(total);$('#mSalesCount').textContent=num(s.length)+' فاکتور';$('#mNetProfit').textContent=maskedMoney(netProfitPeriod('today'));$('#mExpenseToday').textContent=maskedMoney(expenseToday);$('#mCustomerDebt').textContent=maskedMoney(customerDebt());$('#mInventoryValue').textContent=maskedMoney(currentInventoryValue());$('#mInventorySnapshot').textContent='ارزش خرید · '+formatDate(new Date());$('#mLowStock').textContent=num(low.length);$('#dashboardCustomerCount').textContent=num(Math.max(0,db.customers.length-1));
+    if($('#mSupplierPaid'))$('#mSupplierPaid').textContent=maskedMoney(totalAmounts(periodSupplierPayments('today')));if($('#mSupplierDebt'))$('#mSupplierDebt').textContent=maskedMoney(supplierDebt());if($('#mFinancialPeriod'))$('#mFinancialPeriod').textContent=accountingPeriodName(db.financialPeriod.no)+' · '+accountingMonthName();
+    $('#moneyToggleIcon').textContent=moneyVisible?'◉':'⊘';$('#moneyToggleText').textContent=moneyVisible?'پنهان کردن مبلغ‌ها':'نمایش مبلغ‌ها';renderFinanceChart();
+    const recent=db.sales.slice().reverse().slice(0,6);$('#dashboardRecentSales').innerHTML=recent.length?recent.map(function(x){const c=customerById(x.customerId);return '<div class="recent-sale-row"><span class="recent-sale-icon">🛒</span><div class="recent-sale-main"><b>'+esc(c?c.name:'مشتری عمومی')+'</b><small>#'+num(x.no)+' · '+formatDateTime(x.time)+'</small></div><div class="recent-sale-amount"><b>'+maskedMoney(x.total)+'</b><small>'+esc(x.payment)+'</small></div></div>'}).join(''):'<div class="empty-mini">هنوز فروشی ثبت نشده است.</div>';
+  };
+
+  function productRows(){renderCategoryOptions();let q=(value('productSearch','')||'').trim(),filter=value('productFilter','all'),cat=value('categoryFilter','all');let rows=db.products.filter(function(p){const special=filter==='low'?p.stock<=p.min:filter==='packaged'?!!p.unitConversionEnabled:true;return (!q||productMatches(p,q))&&special&&(cat==='all'||p.categoryId===cat)});if(q)rows=searchProducts(q).filter(function(p){const special=filter==='low'?p.stock<=p.min:filter==='packaged'?!!p.unitConversionEnabled:true;return special&&(cat==='all'||p.categoryId===cat)});return rows}
+  renderProducts=function(){
+    const all=productRows(),size=pageSize('productPageSize',20),pg=pageSlice(all,state.products,size);state.products=pg.page;
+    $('#productsBody').innerHTML=pg.rows.map(function(p){const enabled=!!p.unitConversionEnabled,units=Math.max(1,Number(p.unitsPerPurchase)||1),pack=enabled?num(units)+' '+esc(p.baseUnit)+' / '+esc(p.purchaseUnit):'تک‌واحد';const actions=menuActions(['<button class="purchase-product" data-id="'+p.id+'">ثبت خرید</button>','<button class="edit-product" data-id="'+p.id+'">ویرایش</button>']);return '<tr><td><div class="product-name-cell">'+productImageHtml(p,'product-thumb')+'<div><b>'+esc(p.name)+'</b><small>'+esc(categoryName(p.categoryId))+(p.producer?' · '+esc(p.producer):'')+'</small></div></div></td><td><code class="barcode-code" title="'+esc(p.barcode||'—')+'">'+esc(p.barcode||'—')+'</code></td><td>'+num((p.barcodes||[]).length)+'/15</td><td>'+money(p.buy)+'</td><td><b>'+money(p.sell)+'</b></td><td>'+pack+'</td><td><span class="pill '+(p.stock<=p.min?'danger':'success')+'">'+num(p.stock)+' '+esc(p.baseUnit)+'</span></td><td>'+actions+'</td></tr>'}).join('')||'<tr><td colspan="8" class="muted">کالایی پیدا نشد.</td></tr>';
+    pagination('productsPagination',all.length,pg.page,size,'products');$$('.edit-product').forEach(function(b){b.onclick=function(){openProduct(b.dataset.id)}});$$('.purchase-product').forEach(function(b){b.onclick=function(){openPurchase(b.dataset.id)}});
+    const quick=$('#quickProducts');if(quick){quick.innerHTML='';quick.classList.add('hidden')}
+  };
+
+  renderInventory=function(){
+    const out=db.products.filter(function(p){return inventoryStatus(p)==='out'}).length,low=db.products.filter(function(p){return inventoryStatus(p)==='low'}).length;$('#invProductCount').textContent=num(db.products.length);$('#invUnits').textContent=num(db.products.reduce(function(a,p){return a+(Number(p.stock)||0)},0));$('#invCost').textContent=money(currentInventoryValue());$('#invLow').textContent=num(out+low);$('#invOutOfStockMeta').textContent=num(out)+' ناموجود · '+num(low)+' رو به اتمام';
+    const q=normalizeText(value('inventorySearch','')),f=value('inventoryStatusFilter','all'),rows=db.products.filter(function(p){return (!q||productMatches(p,q))&&(f==='all'||inventoryStatus(p)===f)}),size=pageSize('inventoryPageSize',20),pg=pageSlice(rows,state.inventory,size);state.inventory=pg.page;
+    $('#inventoryStockBody').innerHTML=pg.rows.map(function(p){const st=inventoryStatus(p),label=st==='out'?'ناموجود':st==='low'?'رو به اتمام':'موجود';return '<tr><td><div class="product-name-cell">'+productImageHtml(p,'product-thumb')+'<div><b>'+esc(p.name)+'</b><small title="'+esc(p.barcode||'')+'">'+esc(truncateText(p.barcode||'بدون بارکد',18))+'</small></div></div></td><td>'+esc(categoryName(p.categoryId))+'</td><td><b>'+num(p.stock)+' '+esc(p.baseUnit)+'</b></td><td>'+num(p.min||0)+'</td><td>'+money(p.stock*p.buy)+'</td><td>'+money(p.stock*p.sell)+'</td><td><span class="pill '+(st==='ok'?'success':'danger')+'">'+label+'</span></td></tr>'}).join('')||'<tr><td colspan="7" class="muted">کالایی وجود ندارد.</td></tr>';pagination('inventoryPagination',rows.length,pg.page,size,'inventory');
+    const ledger=db.inventory.slice().reverse(),ls=pageSize('ledgerPageSize',20),lp=pageSlice(ledger,state.ledger,ls);state.ledger=lp.page;$('#inventoryBody').innerHTML=lp.rows.map(function(x){return '<tr><td>'+formatDateTime(x.time)+'</td><td>'+esc(x.productName)+'</td><td>'+esc(x.type)+'</td><td dir="ltr"><b>'+(x.qty>0?'+':'')+num(x.qty)+'</b></td><td>'+esc(x.ref||'')+'</td></tr>'}).join('')||'<tr><td colspan="5" class="muted">گردشی ثبت نشده است.</td></tr>';pagination('ledgerPagination',ledger.length,lp.page,ls,'ledger');
+    $('#inventoryPurchases').innerHTML=db.purchases.slice().reverse().slice(0,8).map(function(x){return '<div class="list-row"><div><strong>'+esc(x.productName||'خرید کالا')+'</strong><small>'+formatDateTime(x.time)+' · '+num(x.units||x.unitsAdded||0)+' واحد</small></div><b>'+money(x.total||0)+'</b></div>'}).join('')||'<div class="muted padded">هنوز خریدی ثبت نشده است.</div>';
+  };
+
+  renderCustomers=function(){
+    const selected=$('#customerSelect')?($('#customerSelect').value||'c0'):'c0';if($('#customerDatalist'))$('#customerDatalist').innerHTML=db.customers.map(function(c){return '<option value="'+esc(c.name)+'">'+esc(c.phone||'')+'</option>'}).join('');setCustomerSelection(selected);
+    const cq=normalizeText(value('partyCustomerSearch','')),customers=db.customers.filter(function(c){return !cq||normalizeText(c.name).includes(cq)||normalizeText(c.phone).includes(cq)}),cs=pageSize('customerPageSize',20),cp=pageSlice(customers,state.customers,cs);state.customers=cp.page;$('#customerList').innerHTML=cp.rows.map(function(c){return '<div class="list-row"><div><strong>'+esc(c.name)+'</strong><small>'+esc(c.phone||'بدون شماره')+' · قرض '+money(c.balance||0)+'</small></div><div class="list-actions">'+((c.balance||0)>0?'<button class="ghost-btn receive-customer" data-id="'+c.id+'">دریافت قرض</button>':'')+'<span class="pill">مشتری</span></div></div>'}).join('')||'<div class="muted padded">مشتری پیدا نشد.</div>';pagination('customerPagination',customers.length,cp.page,cs,'customers');$$('.receive-customer').forEach(function(b){b.onclick=function(){openCustomerReceipt(b.dataset.id)}});
+    const sq=normalizeText(value('supplierSearch','')),suppliers=db.suppliers.filter(function(s){return !sq||normalizeText(s.name).includes(sq)||normalizeText(s.phone).includes(sq)}),ss=pageSize('supplierPageSize',20),sp=pageSlice(suppliers,state.suppliers,ss);state.suppliers=sp.page;$('#supplierList').innerHTML=sp.rows.map(function(s){return '<div class="list-row"><div><strong>'+esc(s.name)+'</strong><small>'+esc(s.phone||'بدون شماره')+' · قرض '+money(s.balance||0)+'</small></div><div class="list-actions">'+((s.balance||0)>0?'<button class="ghost-btn pay-supplier" data-id="'+s.id+'">پرداخت قرض</button>':'')+'<span class="pill">شرکت</span></div></div>'}).join('')||'<div class="muted padded">شرکتی ثبت نشده است.</div>';pagination('supplierPagination',suppliers.length,sp.page,ss,'suppliers');$$('.pay-supplier').forEach(function(b){b.onclick=function(){openSupplierPayment(b.dataset.id)}});
+  };
+
+  function renderCategoriesPage(){const q=normalizeText(value('categoryPageSearch','')),rows=db.categories.filter(function(c){return !q||normalizeText(c.name).includes(q)}),size=pageSize('categoryPageSize',20),pg=pageSlice(rows,state.categories,size);state.categories=pg.page;$('#categoriesBody').innerHTML=pg.rows.map(function(c){const count=db.products.filter(function(p){return p.categoryId===c.id}).length,fixed=c.id==='cat-general',actions=fixed?'<span class="pill">پیش‌فرض</span>':menuActions(['<button class="cat-edit" data-id="'+c.id+'">ویرایش</button>','<button class="cat-up" data-id="'+c.id+'">انتقال بالا</button>','<button class="cat-down" data-id="'+c.id+'">انتقال پایین</button>','<button class="cat-delete danger-text" data-id="'+c.id+'">حذف</button>']);return '<tr><td><b>'+esc(c.name)+'</b></td><td>'+num(count)+' کالا</td><td>'+num(db.categories.indexOf(c)+1)+'</td><td>'+actions+'</td></tr>'}).join('');pagination('categoriesPagination',rows.length,pg.page,size,'categories');
+    $$('.cat-edit').forEach(function(b){b.onclick=function(){const c=db.categories.find(function(x){return x.id===b.dataset.id});if(!c)return;const n=prompt('نام جدید دسته',c.name);if(n&&n.trim()){c.name=n.trim();save()}}});
+    $$('.cat-up,.cat-down').forEach(function(b){b.onclick=function(){const i=db.categories.findIndex(function(x){return x.id===b.dataset.id}),j=b.classList.contains('cat-up')?i-1:i+1;if(i<=0||j<=0||j>=db.categories.length)return;const tmp=db.categories[i];db.categories[i]=db.categories[j];db.categories[j]=tmp;save()}});
+    $$('.cat-delete').forEach(function(b){b.onclick=function(){const cid=b.dataset.id,c=db.categories.find(function(x){return x.id===cid});if(!c)return;const count=db.products.filter(function(p){return p.categoryId===cid}).length;if(!confirm('دسته «'+c.name+'» حذف شود؟'+(count?' '+count+' کالا به دسته عمومی منتقل می‌شود.':'')))return;db.products.forEach(function(p){if(p.categoryId===cid)p.categoryId='cat-general'});db.categories=db.categories.filter(function(x){return x.id!==cid});save()}});
+  }
+  function editExpense(eid){const x=db.expenses.find(function(e){return e.id===eid});if(!x)return;openModal('ویرایش هزینه','<form id="expenseEditForm" class="modal-form"><label class="field"><span>نوع هزینه</span><input name="category" value="'+esc(x.category)+'" required></label><label class="field"><span>مبلغ</span><input name="amount" type="number" min="1" value="'+Number(x.amount||0)+'" required></label><label class="field"><span>یادداشت</span><input name="note" value="'+esc(x.note||'')+'"></label><div class="modal-actions"><button class="primary-btn">ذخیره تغییرات</button></div></form>');$('#expenseEditForm').onsubmit=function(e){e.preventDefault();const f=new FormData(e.target);x.category=String(f.get('category')||'هزینه');x.amount=Number(f.get('amount'))||0;x.note=String(f.get('note')||'');save();closeModal();toast('هزینه ویرایش شد')}}
+  function renderExpensesPage(){const q=normalizeText(value('expenseSearch','')),period=value('expensePeriod','month'),all=filterPeriod(db.expenses,period).filter(function(x){return !q||normalizeText(x.category).includes(q)||normalizeText(x.note).includes(q)}).slice().reverse(),size=pageSize('expensePageSize',20),pg=pageSlice(all,state.expenses,size);state.expenses=pg.page;$('#expenseTodayTotal').textContent=money(totalAmounts(periodExpenses('today')));$('#expenseMonthTotal').textContent=money(totalAmounts(periodExpenses('month')));$('#expenseCount').textContent=num(db.expenses.length);$('#expensesBody').innerHTML=pg.rows.map(function(x){return '<tr><td>'+formatDateTime(x.time)+'</td><td><b>'+esc(x.category)+'</b></td><td title="'+esc(x.note||'')+'">'+esc(truncateText(x.note||'—',55))+'</td><td><b>'+money(x.amount)+'</b></td><td>'+menuActions(['<button class="expense-edit" data-id="'+x.id+'">ویرایش</button>','<button class="expense-delete danger-text" data-id="'+x.id+'">حذف</button>'])+'</td></tr>'}).join('')||'<tr><td colspan="5" class="muted">هزینه‌ای در این بازه ثبت نشده است.</td></tr>';pagination('expensesPagination',all.length,pg.page,size,'expenses');$$('.expense-edit').forEach(function(b){b.onclick=function(){editExpense(b.dataset.id)}});$$('.expense-delete').forEach(function(b){b.onclick=function(){if(confirm('این هزینه حذف شود؟')){db.expenses=db.expenses.filter(function(x){return x.id!==b.dataset.id});save()}}})}
+
+  filteredSalesForReport=function(){let list=periodSales(value('reportPeriod','month')),q=normalizeText(value('invoiceReportSearch','')),pf=value('invoicePaymentFilter','all');return list.filter(function(s){if(pf!=='all'&&s.payment!==pf)return false;if(!q)return true;const c=customerById(s.customerId);return normalizeText(String(s.no)).includes(q)||normalizeText(c?c.name:'').includes(q)||normalizeText(String(s.total)).includes(q)})};
+  renderReports=function(){
+    const period=value('reportPeriod','month'),list=periodSales(period),salesTotal=list.reduce(function(a,s){return a+(Number(s.total)||0)},0),credit=list.filter(function(s){return s.payment==='نسیه'}).reduce(function(a,s){return a+(Number(s.total)||0)},0),expenses=totalAmounts(periodExpenses(period)),payments=totalAmounts(periodCustomerReceipts(period)),discount=list.reduce(function(a,s){return a+(Number(s.discount)||0)},0),net=netProfitPeriod(period);
+    $('#rSalesPeriod').textContent=money(salesTotal);$('#rSalesPeriodMeta').textContent=num(list.length)+' فاکتور';$('#rExpensesPeriod').textContent=money(expenses);$('#rReportDebt').textContent=money(credit);$('#rReportPayments').textContent=money(payments);$('#rNetProfitPeriod').textContent=net==null?'نامشخص':money(net);$('#rCustomerDebt').textContent=money(customerDebt());$('#rSupplierDebt').textContent=money(supplierDebt());$('#rInventoryValue').textContent=money(currentInventoryValue());$('#rCashMonth').textContent=money(netCash('month'));if($('#rCashToday'))$('#rCashToday').textContent=money(netCash('today'));
+    $('#financialSummaryTitle').textContent='خلاصه مالی '+reportLabel(period);$('#financialSummary').innerHTML=[['فروش کل',money(salesTotal)],['هزینه‌ها',money(expenses)],['فروش نسیه',money(credit)],['دریافت قرض مشتری',money(payments)],['تخفیف‌ها',money(discount)],['ورودی نقدی',money(cashIn(period))],['خروجی نقدی',money(cashOut(period))],['گردش خالص',money(netCash(period))]].map(function(x){return '<div class="summary-item"><span>'+x[0]+'</span><b>'+x[1]+'</b></div>'}).join('');renderPeriodStatus();renderReportTrendChart();
+    const rows=filteredSalesForReport().slice().reverse(),size=pageSize('reportInvoicePageSize',20),pg=pageSlice(rows,state.reports,size);state.reports=pg.page;const cash=rows.filter(function(x){return x.payment==='نقدی'}).reduce(function(a,x){return a+x.total},0),debt=rows.filter(function(x){return x.payment==='نسیه'}).reduce(function(a,x){return a+x.total},0);$('#invoiceReportStats').innerHTML='<span>'+num(rows.length)+' فاکتور</span><span>نقدی '+money(cash)+'</span><span>نسیه '+money(debt)+'</span>';
+    $('#salesBody').innerHTML=pg.rows.map(invoiceRowHtml).join('')||'<tr><td colspan="7" class="muted">فاکتوری در این بازه نیست.</td></tr>';pagination('reportSalesPagination',rows.length,pg.page,size,'reports');bindInvoiceActions();
+    $('#customReportRange').classList.toggle('hidden',period!=='custom');
+  };
+  function invoiceRowHtml(s){const c=customerById(s.customerId),qty=(s.items||[]).reduce(function(a,i){return a+(Number(i.qty)||0)},0),actions=menuActions(['<button class="edit-invoice" data-sale="'+s.id+'">ویرایش</button>','<button class="delete-invoice danger-text" data-sale="'+s.id+'">حذف</button>']);return '<tr><td><b>#'+num(s.no)+'</b></td><td>'+formatDateTime(s.time)+'</td><td>'+esc(c?c.name:'—')+'</td><td><span class="pill">'+esc(s.payment)+'</span></td><td>'+num(qty)+'</td><td><b>'+money(s.total)+'</b></td><td>'+actions+'</td></tr>'}
+  function archiveRows(){const q=normalizeText(value('archiveSearch','')),pf=value('archivePaymentFilter','all'),from=value('archiveFrom',''),to=value('archiveTo','');return db.sales.filter(function(s){if(pf!=='all'&&s.payment!==pf)return false;const t=new Date(s.time);if(from&&t<new Date(from+'T00:00:00'))return false;if(to&&t>new Date(to+'T23:59:59'))return false;if(!q)return true;const c=customerById(s.customerId);return normalizeText(String(s.no)).includes(q)||normalizeText(c?c.name:'').includes(q)||normalizeText(String(s.total)).includes(q)}).slice().reverse()}
+  function renderArchive(){const rows=archiveRows(),size=pageSize('archivePageSize',20),pg=pageSlice(rows,state.archive,size);state.archive=pg.page;$('#archiveBody').innerHTML=pg.rows.map(invoiceRowHtml).join('')||'<tr><td colspan="7" class="muted">فاکتوری پیدا نشد.</td></tr>';pagination('archivePagination',rows.length,pg.page,size,'archive');bindInvoiceActions()}
+  function renderPosRecentSales(){const lim=Math.max(1,Number(value('posInvoiceLimit',20))||20),rows=db.sales.slice().reverse().slice(0,lim);$('#posRecentSales').innerHTML=rows.map(invoiceRowHtml).join('')||'<tr><td colspan="7" class="muted">هنوز فروشی ثبت نشده است.</td></tr>';bindInvoiceActions()}
+
+  renderAllV3=function(){updateInventorySnapshot();renderDashboard();renderProducts();renderInventory();renderCustomers();renderCategoriesPage();renderExpensesPage();renderReports();renderArchive();renderPosRecentSales();renderSettings();renderCart();renderWorkSession()};
+  window.HesabdariV3Render=renderAllV3;renderAll=renderAllV3;
+
+  const meta={dashboard:['داشبورد','نمای کلی کسب‌وکار'],pos:['فروش','صندوق سریع و ثبت فاکتور'],products:['کالاها','کالا، قیمت، بارکد و موجودی'],parties:['مشتریان و شرکت‌ها','دفتر قرض و تأمین‌کنندگان'],categories:['دسته‌ها','ساختار دسته‌بندی کالاها'],expenses:['هزینه‌ها','ثبت و پیگیری هزینه‌ها'],reports:['گزارش‌ها','تحلیل فروش، هزینه، قرض و سود'],archive:['آرشیو فاکتورها','تمام فاکتورها با صفحه‌بندی'],inventory:['انبارداری','موجودی، کاردکس و خرید'],data:['داده‌ها و پشتیبانی','Backup و سلامت دیتابیس'],settings:['تنظیمات','ظاهر، چاپ، بارکد و آنلاین']};
+  go=function(page){$$('.page').forEach(function(e){e.classList.remove('active')});const target=$('#page-'+page);if(!target)return;target.classList.add('active');target.scrollTop=0;$$('.nav-item').forEach(function(e){e.classList.toggle('active',e.dataset.page===page)});const m=meta[page]||[page,''];$('#pageTitle').textContent=m[0];$('#pageSubtitle').textContent=m[1];$('.sidebar').classList.remove('open');if(page==='pos'){if(!editingSaleId&&!cart.length){paymentMethod=null;setCustomerSelection('c0');$$('.payment').forEach(function(x){x.classList.remove('active')});renderPaymentRequirement()}setTimeout(function(){$('#barcodeInput').focus()},30)}if(page==='archive')renderArchive()};
+
+  function resetPage(key){state[key]=1}
+  function bindV3(){
+    $$('.nav-item').forEach(function(b){b.onclick=function(){go(b.dataset.page)}});$$('[data-go]').forEach(function(b){b.onclick=function(){go(b.dataset.go)}});
+    $('#newSaleTop').onclick=function(){go('pos')};
+    ['productSearch','categoryFilter','productFilter','productPageSize'].forEach(function(idv){const el=$('#'+idv);if(el)el.oninput=el.onchange=function(){resetPage('products');renderProducts()}});
+    ['inventorySearch','inventoryStatusFilter','inventoryPageSize'].forEach(function(idv){const el=$('#'+idv);if(el)el.oninput=el.onchange=function(){resetPage('inventory');renderInventory()}});if($('#ledgerPageSize'))$('#ledgerPageSize').onchange=function(){resetPage('ledger');renderInventory()};
+    ['partyCustomerSearch','customerPageSize'].forEach(function(idv){const el=$('#'+idv);if(el)el.oninput=el.onchange=function(){resetPage('customers');renderCustomers()}});['supplierSearch','supplierPageSize'].forEach(function(idv){const el=$('#'+idv);if(el)el.oninput=el.onchange=function(){resetPage('suppliers');renderCustomers()}});
+    ['categoryPageSearch','categoryPageSize'].forEach(function(idv){const el=$('#'+idv);if(el)el.oninput=el.onchange=function(){resetPage('categories');renderCategoriesPage()}});$('#categoryPageManageBtn').onclick=openCategoryManager;
+    ['expenseSearch','expensePeriod','expensePageSize'].forEach(function(idv){const el=$('#'+idv);if(el)el.oninput=el.onchange=function(){resetPage('expenses');renderExpensesPage()}});
+    $('#reportPeriod').onchange=function(){if(this.value==='custom'&&!customReportRange.from){const n=new Date(),s=new Date(n.getFullYear(),n.getMonth(),1);customReportRange.from=dateKey(s);customReportRange.to=dateKey(n);if($('#reportFrom'))$('#reportFrom').value=customReportRange.from;if($('#reportTo'))$('#reportTo').value=customReportRange.to}resetPage('reports');renderReports()};['invoiceReportSearch','invoicePaymentFilter','reportInvoicePageSize'].forEach(function(idv){const el=$('#'+idv);if(el)el.oninput=el.onchange=function(){resetPage('reports');renderReports()}});
+    $('#applyCustomReport').onclick=function(){customReportRange.from=value('reportFrom','');customReportRange.to=value('reportTo','');resetPage('reports');renderReports()};
+    $$('.series-toggle').forEach(function(b){b.onclick=function(){const k=b.dataset.reportSeries;if(reportSeries.has(k)){if(reportSeries.size>1)reportSeries.delete(k)}else reportSeries.add(k);b.classList.toggle('active',reportSeries.has(k));renderReportTrendChart()}});
+    ['archiveSearch','archivePaymentFilter','archiveFrom','archiveTo','archivePageSize'].forEach(function(idv){const el=$('#'+idv);if(el)el.oninput=el.onchange=function(){resetPage('archive');renderArchive()}});
+    $('#posInvoiceLimit').onchange=renderPosRecentSales;
+    $('#dashboardAddProduct').onclick=function(){go('products');setTimeout(function(){$('#addProductBtn').click()},80)};$('#dashboardAddCustomer').onclick=function(){go('parties');setTimeout(function(){$('#addCustomerBtn').click()},80)};
+  }
+  bindV3();renderAllV3();
 })();
