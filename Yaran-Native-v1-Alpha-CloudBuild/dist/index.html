@@ -6,112 +6,122 @@
   <meta name="color-scheme" content="light dark" />
   <title>حسابداری آسان</title>
   <link rel="stylesheet" href="vendor/vazirmatn/wght.css" />
-  <link rel="stylesheet" href="app-v3.css" />
+  <link rel="stylesheet" href="app-v4.css" />
 </head>
-<body data-page="pos">
+<body data-page="dashboard">
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand">
-        <div class="brand-mark"><span>ح</span></div>
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 36 36"><rect x="4" y="20" width="6" height="12" rx="3"/><rect x="15" y="12" width="6" height="20" rx="3"/><rect x="26" y="5" width="6" height="27" rx="3"/></svg>
+        </div>
         <div class="brand-copy">
           <div class="brand-title">حسابداری آسان</div>
-          <div class="brand-sub">نسخه رایگان</div>
+          <div class="brand-sub">مدیریت ساده، کار سریع</div>
         </div>
       </div>
 
       <nav id="nav" class="nav">
-        <button class="nav-item" data-page="dashboard"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"/></svg></span><b>داشبورد</b></button>
-        <button class="nav-item active" data-page="pos"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M7 8h10M7 12h6M7 16h4"/></svg></span><b>فروش</b></button>
-        <button class="nav-item" data-page="products"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="m4 7 8 4 8-4M4 12l8 4 8-4M4 17l8 4 8-4"/></svg></span><b>کالاها</b></button>
-        <button class="nav-item" data-page="inventory"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><b>انبار</b></button>
-        <button class="nav-item" data-page="parties"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-4 2.5-6 5.5-6s5 2 5.5 6"/><circle cx="17" cy="9" r="2"/><path d="M15.5 14c2.8 0 4.5 1.7 5 5"/></svg></span><b>اشخاص</b></button>
-        <button class="nav-item" data-page="reports"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/></svg></span><b>گزارش‌ها</b></button>
-        <button class="nav-item" data-page="settings"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21h-4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3.1 14H3v-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3.1V3h4v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1v4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></span><b>تنظیمات</b></button>
+        <button class="nav-item active" data-page="dashboard"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-6h5v6"/></svg></span><b>داشبورد</b></button>
+        <button class="nav-item" data-page="pos"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 5h2l2 10h10l2-7H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg></span><b>فروش</b></button>
+        <button class="nav-item" data-page="products"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="M4 7v10l8 4 8-4V7"/><path d="M12 11v10"/></svg></span><b>کالاها</b></button>
+        <button class="nav-item" data-page="parties"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-4 2.5-6 5.5-6s5 2 5.5 6"/><circle cx="17" cy="9" r="2"/><path d="M15.5 14c2.8 0 4.5 1.7 5 5"/></svg></span><b>اشخاص</b></button>
+        <button class="nav-item" data-page="inventory"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 10 12 4l8 6v10H4V10Z"/><path d="M8 20v-6h8v6"/><path d="M8 10h8"/></svg></span><b>انبارداری</b></button>
+        <button class="nav-item" data-page="reports"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/></svg></span><b>گزارش‌ها</b></button>
+        <button class="nav-item" data-page="settings"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21h-4v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3.1 14H3v-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3.1V3h4v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1v4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></span><b>تنظیمات</b></button>
       </nav>
 
       <a id="creatorContact" class="sidebar-footer creator-footer" href="https://t.me/Naman_Rahimi" title="ارتباط با سازنده">
-        <div class="creator-copy"><small>ساخته شده توسط</small><strong>© MNRAHIMI . Ltd</strong><em>ارتباط مستقیم</em></div>
+        <div class="creator-copy"><small>ساخته شده توسط</small><strong>© MNRAHIMI . Ltd</strong></div>
       </a>
     </aside>
 
     <main class="main">
       <header class="topbar">
-        <div class="page-title-wrap">
+        <div class="profile-zone">
+          <div class="profile-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.6-5 3-7.5 7.5-7.5s6.9 2.5 7.5 7.5"/></svg></div>
+          <div class="profile-copy"><strong>مدیر سیستم</strong><small>حسابداری آسان</small></div>
           <button id="menuBtn" class="icon-btn mobile-only" aria-label="منو">☰</button>
-          <div>
-            <h1 id="pageTitle">فروش</h1>
-            <p id="pageSubtitle">فروش سریع و بدون حواس‌پرتی</p>
+          <div class="profile-tools">
+            <button class="icon-btn soft-icon" type="button" title="پیام‌ها"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 3V5Z"/><path d="M8 9h8M8 13h5"/></svg></button>
+            <button class="icon-btn soft-icon" type="button" title="تقویم"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></button>
           </div>
         </div>
 
-        <div class="top-actions">
-          <div class="global-search">
-            <span class="search-icon">⌕</span>
-            <input id="globalSearch" placeholder="جستجو: کالا، بارکد، فاکتور..." />
-            <kbd>Ctrl K</kbd>
-          </div>
-          <div id="workSession" class="work-session work-session-solid" title="از اولین اجرای امروز محاسبه می‌شود">
-            <span class="work-door" aria-hidden="true">
-              <svg viewBox="0 0 32 32" width="24" height="24" fill="none"><path d="M8 5.5h10.5v21H8z" stroke="currentColor" stroke-width="1.8"/><path d="M18.5 7.2 25 10v14l-6.5 2.8V7.2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="21.5" cy="17" r="1" fill="currentColor"/></svg>
-            </span>
-            <span class="work-copy"><small>ساعات کاری امروز</small><b id="workSessionValue">00:00:00</b></span>
+        <div class="global-search">
+          <input id="globalSearch" placeholder="جستجو در فاکتورها، مشتریان، کالاها و ..." />
+          <span class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span>
+          <kbd>Ctrl K</kbd>
+        </div>
+
+        <div class="topbar-meta">
+          <div class="today-card"><span>امروز</span><b id="topDateText">—</b></div>
+          <div id="workSession" class="work-session" title="از اولین اجرای امروز محاسبه می‌شود">
+            <span class="work-door"><svg viewBox="0 0 32 32"><path d="M8 5.5h10.5v21H8z"/><path d="M18.5 7.2 25 10v14l-6.5 2.8V7.2Z"/><circle cx="21.5" cy="17" r="1"/></svg></span>
+            <span class="work-copy"><small>ساعات کاری</small><b id="workSessionValue">00:00:00</b></span>
           </div>
           <div id="clock" class="clock"></div>
           <button id="themeToggle" class="icon-btn theme-toggle" title="تغییر تم" aria-label="تغییر تم">☾</button>
-          <button id="newSaleTop" class="primary-btn">فروش جدید</button>
+          <button id="newSaleTop" class="primary-btn new-sale-top"><span>+</span> فروش جدید</button>
         </div>
+
+        <div class="page-title-wrap page-title-hidden" aria-hidden="true"><div><h1 id="pageTitle">داشبورد</h1><p id="pageSubtitle">نمای کلی فروشگاه</p></div></div>
       </header>
 
-      <section id="page-dashboard" class="page">
-        <div class="dashboard-control-row">
-          <div class="status-chip"><span></span> سیستم آماده ثبت فروش است</div>
+      <section id="page-dashboard" class="page active">
+        <div class="dashboard-topline">
+          <div><span class="section-kicker">نمای کلی</span><h2>داشبورد حسابداری آسان</h2><p>فروش، وضعیت مالی و عملیات روزانه در یک نگاه.</p></div>
           <button id="moneyToggle" class="money-toggle" title="پنهان/نمایش مبلغ‌ها"><span id="moneyToggleIcon">◉</span><b id="moneyToggleText">پنهان کردن مبلغ‌ها</b></button>
         </div>
 
-        <div class="metric-grid dashboard-metrics">
-          <article class="metric-card primary-metric"><span>فروش امروز</span><strong id="mSales" class="sensitive-money">0 ؋</strong><small id="mSalesCount">0 فاکتور</small></article>
-          <article class="metric-card"><span>سود خالص امروز</span><strong id="mNetProfit" class="sensitive-money">0 ؋</strong><small>سود فروش منهای هزینه‌های امروز</small></article>
-          <article class="metric-card"><span>قرضه مشتریان</span><strong id="mCustomerDebt" class="sensitive-money">0 ؋</strong><small>مانده نسیه مشتریان</small></article>
-          <article class="metric-card"><span>ارزش موجودی امروز</span><strong id="mInventoryValue" class="sensitive-money">0 ؋</strong><small id="mInventorySnapshot">بر اساس قیمت خرید</small></article>
+        <div class="metric-grid dashboard-metrics reference-metrics">
+          <article class="metric-card metric-sales"><div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M4 17 9 12l4 3 7-8"/><path d="M15 7h5v5"/></svg></div><div><span>فروش امروز</span><strong id="mSales" class="sensitive-money">0 ؋</strong><small id="mSalesCount">0 فاکتور</small></div></article>
+          <article class="metric-card metric-income"><div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M5 19V11M12 19V5M19 19v-8"/></svg></div><div><span>درآمد نقدی امروز</span><strong id="mIncome" class="sensitive-money">0 ؋</strong><small>ورودی واقعی پول</small></div></article>
+          <article class="metric-card metric-expense"><div class="metric-icon"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><div><span>هزینه امروز</span><strong id="mExpensesToday" class="sensitive-money">0 ؋</strong><small>مصارف ثبت‌شده امروز</small></div></article>
+          <article class="metric-card metric-debt"><div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M7 7a5 5 0 0 1 9.5 2M17 17a5 5 0 0 1-9.5-2"/><path d="M17 4v5h-5M7 20v-5h5"/></svg></div><div><span>قرض مشتریان</span><strong id="mCustomerDebt" class="sensitive-money">0 ؋</strong><small>مانده نسیه مشتریان</small></div></article>
+          <article class="metric-card metric-profit"><div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/><path d="m4 8 5-4 4 3 7-5"/></svg></div><div><span>سود خالص امروز</span><strong id="mNetProfit" class="sensitive-money">0 ؋</strong><small>پس از کسر هزینه‌ها</small></div></article>
         </div>
 
-        <div class="dashboard-mini-grid">
-          <div class="mini-stat"><span>پرداخت قرض شرکت‌ها امروز</span><b id="mSupplierPaid" class="sensitive-money">0 ؋</b></div>
-          <div class="mini-stat"><span>قرض شرکت‌ها</span><b id="mSupplierDebt" class="sensitive-money">0 ؋</b></div>
-          <div class="mini-stat"><span>موجودی کم</span><b id="mLowStock">0</b></div>
-          <div class="mini-stat"><span>دوره حسابی جاری</span><b id="mFinancialPeriod">دوره حسابی اول · ماه اول</b></div>
-        </div>
-
-        <div class="dashboard-grid">
+        <div class="dashboard-grid reference-dashboard-grid">
           <article class="panel finance-chart-panel">
             <div class="panel-head chart-panel-head">
-              <div><h3>روند مالی روزانه</h3><p>فروش، قرض‌ها و مفاد خالص در یک نگاه</p></div>
+              <div><h3>نمودار عملکرد مالی</h3><p>فروش، قرض‌ها و سود خالص در بازه انتخابی</p></div>
               <div class="chart-range" aria-label="بازه نمودار">
                 <button class="chart-range-btn active" data-chart-range="7">7 روز</button>
                 <button class="chart-range-btn" data-chart-range="30">30 روز</button>
                 <button class="chart-range-btn" data-chart-range="month">ماه جاری</button>
               </div>
             </div>
-            <div class="chart-legend" aria-label="راهنمای نمودار">
-              <span><i class="legend-dot sales"></i>فروش</span>
-              <span><i class="legend-dot debt"></i>قرض‌ها</span>
-              <span><i class="legend-dot profit"></i>مفاد خالص</span>
-            </div>
-            <div id="financeChart" class="finance-chart" aria-label="نمودار مالی روزانه"></div>
+            <div class="chart-legend"><span><i class="legend-dot sales"></i>فروش</span><span><i class="legend-dot debt"></i>قرض</span><span><i class="legend-dot profit"></i>سود خالص</span></div>
+            <div id="financeChart" class="finance-chart"></div>
           </article>
-          <article class="panel">
-            <div class="panel-head"><div><h3>هشدار موجودی</h3><p>کالاهای زیر حداقل موجودی</p></div></div>
-            <div id="lowStockList" class="list"></div>
+
+          <article class="panel recent-sales-panel">
+            <div class="panel-head"><div><h3>فروش‌های اخیر</h3><p>آخرین فاکتورهای ثبت‌شده</p></div><button class="text-link" data-go="reports">مشاهده همه</button></div>
+            <div id="recentSales" class="recent-sales-list"></div>
           </article>
         </div>
 
-        <article class="panel recent-panel">
-          <div class="panel-head"><div><h3>آخرین فروش‌ها</h3><p>آخرین فاکتورهای ثبت‌شده</p></div><button class="ghost-btn" data-go="reports">مشاهده گزارش</button></div>
-          <div class="table-wrap"><table><thead><tr><th>فاکتور</th><th>زمان</th><th>اقلام</th><th>پرداخت</th><th>مبلغ</th><th>عملیات</th></tr></thead><tbody id="recentSales"></tbody></table></div>
-        </article>
+        <div class="dashboard-bottom-grid">
+          <article class="panel quick-access-panel">
+            <div class="panel-head"><div><h3>دسترسی سریع</h3><p>عملیات‌های پرکاربرد سیستم</p></div></div>
+            <div class="quick-access-grid">
+              <button class="quick-action qa-blue" data-go="pos"><span class="qa-icon"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><span><b>ثبت فاکتور</b><small>صدور فاکتور فروش</small></span></button>
+              <button id="quickAddProduct" class="quick-action qa-green"><span class="qa-icon"><svg viewBox="0 0 24 24"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="M4 7v10l8 4 8-4V7M12 11v10"/></svg></span><span><b>کالای جدید</b><small>ثبت کالای جدید</small></span></button>
+              <button id="quickAddCustomer" class="quick-action qa-yellow"><span class="qa-icon"><svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="3"/><path d="M4 20c.5-4.5 2.5-7 6-7 2.2 0 3.8.9 4.8 2.5"/><path d="M18 13v6M15 16h6"/></svg></span><span><b>مشتری جدید</b><small>ثبت مشتری جدید</small></span></button>
+            </div>
+          </article>
+
+          <article class="panel mini-overview-card"><div class="overview-icon"><svg viewBox="0 0 24 24"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="M4 7v10l8 4 8-4V7M12 11v10"/></svg></div><div><span>وضعیت موجودی کالاها</span><strong id="dashInventoryCount">0</strong><small>قلم کالا</small><button class="text-link" data-go="inventory">مشاهده انبار ←</button></div></article>
+          <article class="panel mini-overview-card"><div class="overview-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-4 2.5-6 5.5-6s5 2 5.5 6"/><circle cx="17" cy="9" r="2"/><path d="M15.5 14c2.8 0 4.5 1.7 5 5"/></svg></div><div><span>مشتریان ثبت‌شده</span><strong id="dashCustomerCount">0</strong><small>مشتری</small><button class="text-link" data-go="parties">مشاهده همه ←</button></div></article>
+        </div>
+
+        <div class="dashboard-compat visually-hidden" aria-hidden="true">
+          <span id="mInventoryValue">0 ؋</span><span id="mInventorySnapshot"></span><span id="mSupplierPaid">0 ؋</span><span id="mSupplierDebt">0 ؋</span><span id="mLowStock">0</span><span id="mFinancialPeriod"></span><div id="lowStockList"></div>
+        </div>
       </section>
 
-      <section id="page-pos" class="page active">
+      <section id="page-pos" class="page">
         <div class="pos-layout">
           <div class="panel pos-main">
             <div class="sales-focus-head">
